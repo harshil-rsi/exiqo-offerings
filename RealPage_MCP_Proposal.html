@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RealPage · Secure MCP Connectors · Proposal Deck</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  :root{
+    --navy:#0B2447; --navy-2:#143B6B; --teal:#19A7CE; --teal-deep:#146C94; --bg:#F4F6FB;
+    --ink:#0F172A; --muted:#64748B; --line:#E2E8F0; --accent:#F4A261;
+    --ok:#0F766E; --warn:#9B1D2A;
+    --soft-blue:#EEF6FF; --soft-amber:#FFF7E6; --soft-red:#FFEDEA; --soft-green:#E6F7F2; --soft-purple:#F3E8FF;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;padding:0;background:#0a0f1c;color:var(--ink);
+    font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  /* Stage holds the slide centered, with a subtle gradient backdrop */
+  .stage{
+    min-height:100vh;
+    background:radial-gradient(circle at 20% 0%, #1d2a4a 0%, #0a0f1c 50%, #050811 100%);
+    display:flex;flex-direction:column;align-items:center;
+    padding:24px 24px 90px;
+  }
+  .deck{
+    width:100%;max-width:1180px;background:#fff;border-radius:18px;
+    box-shadow:0 30px 60px rgba(0,0,0,.4);
+    overflow:hidden;position:relative;
+  }
+  .slide{
+    display:none;padding:54px 56px;min-height:calc(100vh - 160px);
+    animation:fadeIn .35s ease-out;
+  }
+  .slide.active{display:block}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+  /* Top bar inside deck */
+  .top-bar{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:14px 24px;border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,#fafbfd,#fff);
+  }
+  .progress-track{flex:1;height:3px;background:#e7ecf3;margin:0 18px;border-radius:2px;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,#19A7CE,#0B2447);transition:width .25s}
+
+  /* Bottom navigation - fixed */
+  .nav-bar{
+    position:fixed;bottom:0;left:0;right:0;z-index:50;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:12px 22px;background:rgba(11,36,71,.96);color:#fff;backdrop-filter:blur(8px);
+    border-top:1px solid rgba(255,255,255,.08);
+  }
+  .btn{padding:8px 14px;border-radius:8px;font-size:.85rem;font-weight:600;border:1px solid transparent;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;transition:all .12s}
+  .btn-primary{background:var(--teal);color:#fff}
+  .btn-primary:hover{background:#3BB8DB}
+  .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,.18);color:#fff}
+  .btn-ghost:hover{background:rgba(255,255,255,.08)}
+  .btn[disabled]{opacity:.4;cursor:not-allowed}
+
+  /* Slide content helpers */
+  .h-tag{font-size:.7rem;font-weight:700;letter-spacing:.16em;color:var(--teal-deep);text-transform:uppercase}
+  .h-title{font-size:2.0rem;font-weight:700;color:var(--navy);letter-spacing:-.015em;line-height:1.15}
+  .h-sub{font-size:1.05rem;color:var(--muted);line-height:1.55}
+  .pill{display:inline-flex;align-items:center;gap:.4rem;padding:.25rem .7rem;border-radius:9999px;font-weight:600;font-size:.74rem}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px}
+  .kpi{font-weight:700;letter-spacing:-.02em}
+  .step-num{width:28px;height:28px;border-radius:9999px;background:var(--teal);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex:none}
+  .timeline-cell{height:30px;display:flex;align-items:center;justify-content:center;font-size:.62rem;border:1px solid var(--line);min-width:34px}
+  .timeline-on{background:linear-gradient(180deg,#19A7CE,#146C94);color:#fff;font-weight:700}
+  .system-tab{cursor:pointer;border-radius:10px;padding:.5rem .9rem;font-weight:600;font-size:.85rem;border:1px solid transparent}
+  .system-tab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .system-tab:not(.active){color:var(--navy);background:#fff;border-color:var(--line)}
+  .arrow{stroke:var(--teal-deep);stroke-width:2;fill:none;marker-end:url(#arrow)}
+  .pulse{animation:pulse 2.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.55}50%{opacity:1}}
+  .grad-cover{background:radial-gradient(circle at 25% 20%, #1f4f8c 0%, #0B2447 55%, #051026 100%);color:#fff}
+  .toc-link{display:flex;align-items:center;gap:.6rem;padding:.45rem .65rem;border-radius:8px;color:#fff;font-size:.8rem;cursor:pointer;border:1px solid transparent}
+  .toc-link:hover{background:rgba(255,255,255,.08)}
+  .toc-link.active{background:rgba(25,167,206,.22);border-color:rgba(25,167,206,.6);font-weight:600}
+  .toc-num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:rgba(255,255,255,.08);font-size:.7rem;font-weight:700}
+  table.tight td, table.tight th{padding:.45rem .55rem;font-size:.85rem}
+  .mode-card{border:1px solid var(--line);border-radius:14px;padding:18px;background:#fff}
+  .mode-tag{font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+  .check{color:#0F766E;font-weight:700;margin-right:.4rem}
+  .x-mark{color:#9B1D2A;font-weight:700;margin-right:.4rem}
+
+  /* TOC drawer */
+  .drawer{
+    position:fixed;top:0;right:0;bottom:0;width:280px;background:#0B2447;color:#fff;
+    transform:translateX(100%);transition:transform .25s ease;z-index:60;padding:18px;
+    overflow-y:auto;border-left:1px solid rgba(255,255,255,.08);
+  }
+  .drawer.open{transform:translateX(0)}
+  .drawer h4{font-size:.7rem;text-transform:uppercase;letter-spacing:.14em;color:#7CD7E8;margin:8px 0}
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <!-- Deck -->
+  <div class="deck" id="deck">
+
+    <!-- Top bar -->
+    <div class="top-bar">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold" style="background:linear-gradient(135deg,#0B2447,#19A7CE)">R</div>
+        <div>
+          <div class="text-xs font-semibold" style="color:var(--navy)">RealPage × R Systems</div>
+          <div class="text-[11px] text-slate-500">Secure MCP Connectors · 8-week Proposal</div>
+        </div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progress" style="width:6%"></div></div>
+      <div class="text-[12px] text-slate-500"><span id="cur">1</span> / <span id="tot">16</span></div>
+    </div>
+
+    <!-- ============= SLIDE 1 · COVER ============= -->
+    <section class="slide active grad-cover" data-title="Cover">
+      <div class="flex flex-col justify-center" style="min-height:calc(100vh - 160px - 50px)">
+        <div class="pill" style="background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.18)">
+          <span class="w-2 h-2 rounded-full" style="background:#7CD7E8"></span>
+          Proposal v1.1 · prepared for Harish, SVP Engineering
+        </div>
+        <h1 class="mt-6 text-4xl md:text-5xl font-bold tracking-tight leading-tight">
+          Secure MCP Connectors for<br>
+          <span style="color:#7CD7E8">Oracle Fusion</span>,
+          <span style="color:#F4A261">Coupa</span> &amp;
+          <span style="color:#A6E3A1">BigQuery</span>
+        </h1>
+        <p class="mt-5 text-lg max-w-2xl" style="color:rgba(255,255,255,.78)">
+          A pragmatic, AWS-native engagement that gives RealPage's AI platform
+          production-grade tool access to its core enterprise systems —
+          inheriting your existing identity, RBAC, and audit posture.
+        </p>
+        <div class="mt-10 grid grid-cols-2 md:grid-cols-4 gap-5 max-w-3xl">
+          <div><div class="text-[11px] uppercase tracking-wider" style="color:rgba(255,255,255,.5)">Duration</div><div class="kpi text-3xl mt-1">8 weeks</div></div>
+          <div><div class="text-[11px] uppercase tracking-wider" style="color:rgba(255,255,255,.5)">Investment</div><div class="kpi text-3xl mt-1">~$70K</div><div class="text-xs" style="color:rgba(255,255,255,.45)">Premium tier · dedicated architect</div></div>
+          <div><div class="text-[11px] uppercase tracking-wider" style="color:rgba(255,255,255,.5)">MCP servers</div><div class="kpi text-3xl mt-1">3</div><div class="text-xs" style="color:rgba(255,255,255,.45)">19 tools total</div></div>
+          <div><div class="text-[11px] uppercase tracking-wider" style="color:rgba(255,255,255,.5)">Team</div><div class="kpi text-3xl mt-1">5–6</div><div class="text-xs" style="color:rgba(255,255,255,.45)">Onshore + Offshore</div></div>
+        </div>
+        <div class="mt-12 text-xs" style="color:rgba(255,255,255,.5)">
+          R Systems · May 2026 · Use ← / → keys to navigate
+        </div>
+      </div>
+    </section>
+
+    <!-- ============= SLIDE 2 · ENGAGEMENT AT A GLANCE ============= -->
+    <section class="slide" data-title="Engagement at a glance">
+      <div class="h-tag">Slide 2 · Executive Summary</div>
+      <h2 class="h-title mt-2">Engagement at a glance</h2>
+      <p class="h-sub mt-3 max-w-3xl">Three production-grade MCP servers, deployed to your AWS account, governed by your identity stack.</p>
+      <div class="grid md:grid-cols-3 gap-5 mt-9">
+        <div class="card p-6">
+          <div class="w-10 h-10 rounded-lg flex items-center justify-center mb-3" style="background:#E6F7F2;color:#0F766E">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4M12 2l9 4v6c0 5-3.5 9.5-9 10-5.5-.5-9-5-9-10V6l9-4z"/></svg>
+          </div>
+          <div class="font-semibold" style="color:var(--navy)">Production-grade, not POC</div>
+          <p class="text-sm text-slate-600 mt-2 leading-relaxed">Three MCP servers on AWS Fargate behind API Gateway, deployed via Terraform — ready for your AI platform team day one.</p>
+        </div>
+        <div class="card p-6">
+          <div class="w-10 h-10 rounded-lg flex items-center justify-center mb-3" style="background:#EEF6FF;color:#1D4F8C">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l9 4v6c0 5-3.5 9.5-9 10-5.5-.5-9-5-9-10V6l9-4z"/></svg>
+          </div>
+          <div class="font-semibold" style="color:var(--navy)">Identity inherited, not redesigned</div>
+          <p class="text-sm text-slate-600 mt-2 leading-relaxed">Two patterns supported: a central IdP (Okta / Entra ID) <i>or</i> per-system native auth where each MCP inherits the source system's identity.</p>
+        </div>
+        <div class="card p-6">
+          <div class="w-10 h-10 rounded-lg flex items-center justify-center mb-3" style="background:#F3E8FF;color:#6A1B9A">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+          </div>
+          <div class="font-semibold" style="color:var(--navy)">Semantic catalog for BigQuery</div>
+          <p class="text-sm text-slate-600 mt-2 leading-relaxed">A lightweight business-intent → schema mapping layer so LLMs generate correct SQL on first attempt — not after three retries. ~$70K · 8 weeks · dedicated architect.</p>
+        </div>
+      </div>
+
+      <div class="mt-10 grid md:grid-cols-2 gap-5">
+        <div class="card p-6">
+          <div class="h-tag">In scope</div>
+          <ul class="mt-3 text-sm text-slate-700 space-y-2">
+            <li><span class="check">✓</span>3 MCP servers · 19 tools (incl. semantic catalog)</li>
+            <li><span class="check">✓</span>AWS reference architecture (Terraform IaC)</li>
+            <li><span class="check">✓</span>Two auth modes: centralized IdP or per-system native</li>
+            <li><span class="check">✓</span>RBAC inherited; threat model + audit logging</li>
+            <li><span class="check">✓</span>KT, runbook, ops handover</li>
+          </ul>
+        </div>
+        <div class="card p-6">
+          <div class="h-tag">Key assumptions</div>
+          <ul class="mt-3 text-sm text-slate-700 space-y-2">
+            <li>· Customer prefers AWS for MCP hosting (default).</li>
+            <li>· REST APIs are accessible: Fusion REST V1 (Business Objects), Coupa Core API, BigQuery REST.</li>
+            <li>· If a central IdP exists, we federate; if not, we fall back to per-system auth (see slide on Auth modes).</li>
+            <li>· SME availability: 4–6 hrs/week per system, weeks 1–4.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============= SLIDE 3 · FINDINGS ============= -->
+    <section class="slide" data-title="Findings · MCP availability">
+      <div class="h-tag">Slide 3 · Findings</div>
+      <h2 class="h-title mt-2">Are these MCP servers available out of the box?</h2>
+      <p class="h-sub mt-3 max-w-3xl">Surveyed: official MCP catalogs, vendor docs, community marketplaces. Only one of the three has a GA-track managed offering.</p>
+      <div class="mt-8 grid md:grid-cols-3 gap-5">
+        <div class="card p-6 border-l-4" style="border-left-color:#E63946">
+          <div class="flex items-center justify-between">
+            <div class="font-semibold text-lg" style="color:var(--navy)">Oracle Fusion</div>
+            <span class="pill" style="background:var(--soft-red);color:#9B1D2A">No official MCP</span>
+          </div>
+          <p class="mt-3 text-sm text-slate-600">Oracle has shipped MCPs for Database, MySQL/HeatWave, OCI APIs — <b>not</b> Fusion ERP/SCM/HCM. Roadmap exists; no GA.</p>
+          <div class="mt-4 text-xs text-slate-500"><b class="text-slate-700">Action:</b> Custom build over Fusion REST V1, OAuth 2.0/JWT via OCI IAM domain.</div>
+        </div>
+        <div class="card p-6 border-l-4" style="border-left-color:#F4A261">
+          <div class="flex items-center justify-between">
+            <div class="font-semibold text-lg" style="color:var(--navy)">Coupa</div>
+            <span class="pill" style="background:var(--soft-amber);color:#8B5A0B">No official MCP</span>
+          </div>
+          <p class="mt-3 text-sm text-slate-600">Third-party wrappers exist (Composio, PulseMCP, Workato) — <b>none enterprise-grade</b>.</p>
+          <div class="mt-4 text-xs text-slate-500"><b class="text-slate-700">Action:</b> Custom MCP over Coupa Core API. OAuth 2.0/OIDC mandatory; SAML 2.0 SSO at IdP.</div>
+        </div>
+        <div class="card p-6 border-l-4" style="border-left-color:#2A9D8F">
+          <div class="flex items-center justify-between">
+            <div class="font-semibold text-lg" style="color:var(--navy)">BigQuery</div>
+            <span class="pill" style="background:var(--soft-green);color:#0F766E">Managed MCP available</span>
+          </div>
+          <p class="mt-3 text-sm text-slate-600">Google's <b>fully-managed remote BigQuery MCP</b> (Preview, Jan 2026). Schema awareness, query exec, AI.FORECAST.</p>
+          <div class="mt-4 text-xs text-slate-500"><b class="text-slate-700">Action:</b> Consume managed MCP, fronted by a thin proxy adding semantic catalog + audit overlay.</div>
+        </div>
+      </div>
+      <div class="mt-8 card p-5" style="background:var(--soft-blue)">
+        <div class="text-sm text-slate-700"><b style="color:var(--navy)">Bottom line:</b> Of the three, only BigQuery is "ready". Oracle Fusion and Coupa MCPs require a careful custom build, with auth and RBAC modeled on each system's existing security plane.</div>
+      </div>
+    </section>
+
+    <!-- ============= SLIDE 4 · ORACLE FUSION ============= -->
+    <section class="slide" data-title="Oracle Fusion · MCP">
+      <div class="h-tag">Slide 4 · System deep-dive · 1 of 3</div>
+      <h2 class="h-title mt-2">Oracle Fusion · MCP</h2>
+      <div class="grid md:grid-cols-3 gap-6 mt-7">
+        <div class="md:col-span-2 card p-6">
+          <h3 class="font-semibold" style="color:var(--navy)">Tools (5)</h3>
+          <table class="w-full mt-3 tight">
+            <thead>
+              <tr class="text-left text-slate-500 border-b border-slate-200">
+                <th>Tool</th><th>Description</th><th>Endpoint</th><th>RBAC inherits</th>
+              </tr>
+            </thead>
+            <tbody class="text-slate-700">
+              <tr class="border-b border-slate-100"><td class="font-mono text-xs">list_purchase_orders</td><td>POs by supplier / status / date</td><td class="text-xs text-slate-500">/fscmRestApi/.../purchaseOrders</td><td>Fusion: PO Inquiry</td></tr>
+              <tr class="border-b border-slate-100"><td class="font-mono text-xs">get_invoice_details</td><td>Header + lines for an invoice</td><td class="text-xs text-slate-500">/fscmRestApi/.../invoices/{id}</td><td>Fusion: AP Inquiry</td></tr>
+              <tr class="border-b border-slate-100"><td class="font-mono text-xs">list_suppliers</td><td>Search suppliers</td><td class="text-xs text-slate-500">/fscmRestApi/.../suppliers</td><td>Fusion: Supplier Mgr</td></tr>
+              <tr class="border-b border-slate-100"><td class="font-mono text-xs">get_gl_balances</td><td>Trial balance pull</td><td class="text-xs text-slate-500">/fscmRestApi/.../ledgerBalances</td><td>Fusion: GL Inquiry</td></tr>
+              <tr><td class="font-mono text-xs">create_service_request</td><td>Open ticket in Fusion Service</td><td class="text-xs text-slate-500">/crmRestApi/.../serviceRequests</td><td>Fusion: SR Creator</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card p-6">
+          <div class="h-tag">Auth (native)</div>
+          <div class="font-semibold mt-1" style="color:var(--navy)">OAuth 2.0 JWT · OCI IAM domain</div>
+          <ul class="mt-3 text-sm text-slate-700 space-y-2 list-disc list-inside">
+            <li>Confidential client app in OCI IAM</li>
+            <li>3-legged auth-code for user-context; client-credentials for service tools</li>
+            <li><code>Authorization: Bearer &lt;jwt&gt;</code> on every Fusion REST call</li>
+            <li><b>If central IdP exists:</b> federate OCI IAM to Okta/Entra (SAML or OIDC)</li>
+            <li><b>If not:</b> users authenticate to OCI IAM directly via Fusion's native login</li>
+          </ul>
+          <div class="mt-5 h-tag">Risk flag</div>
+          <div class="text-sm mt-1 text-slate-700">REST V1 may not cover all HCM payloads — keep SOAP/BIP fallback in scope.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============= SLIDE 5 · COUPA ============= -->
+    <section class="slide" data-title="Coupa · MCP">
+      <div class="h-tag">Slide 5 · System deep-dive · 2 of 3</div>
+      <h2 class="h-title mt-2">Coupa · MCP</h2>
+      <div class="grid md:grid-cols-3 gap-6 mt-7">
+        <div class="md:col-span-2 card p-6">
+          <h3 class="font-semibold" style="color:var(--navy)">Tools (5)</h3>
+          <table class="w-full mt-3 tight">
+            <thead>
+              <tr class="text-left text-slate-500 border-b border-slate-200">
+                <th>Tool</th><th>Description</th><th>Scope</th><th>Mode</th>
+              </tr>
+            </thead>
+            <tbody class="text-slate-700">
+              <tr class="border-b border-slate-100"><td class="font-mono text-xs">list_requisitions</td><td>Requisitions by user / status</td><td class="text-xs"><code>core.requisitions.read</code></td><td><span class="pill" style="background:var(--soft-blue);color:#1D4F8C">Read</span></td></tr>
+              <tr class="border-b border-slate-100"><td class="font-mono text-xs">create_requisition</td><td>Submit new requisition</td><td class="text-xs"><code>core.requisitions.write</code></td><td><span class="pill" style="background:var(--soft-amber);color:#8B5A0B">Write · HITL</span></td></tr>
+              <tr class="border-b border-slate-100"><td class="font-mono text-xs">get_supplier_spend</td><td>Aggregate spend by supplier</td><td class="text-xs"><code>core.accounting.read</code></td><td><span class="pill" style="background:var(--soft-blue);color:#1D4F8C">Read</span></td></tr>
+              <tr class="border-b border-slate-100"><td class="font-mono text-xs">list_contracts</td><td>Active contracts &amp; metadata</td><td class="text-xs"><code>core.contracts.read</code></td><td><span class="pill" style="background:var(--soft-blue);color:#1D4F8C">Read</span></td></tr>
+              <tr><td class="font-mono text-xs">approve_invoice</td><td>Approve a pending invoice</td><td class="text-xs"><code>core.invoices.write</code></td><td><span class="pill" style="background:var(--soft-amber);color:#8B5A0B">Write · HITL</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card p-6">
+          <div class="h-tag">Auth (native)</div>
+          <div class="font-semibold mt-1" style="color:var(--navy)">OAuth 2.0 / OIDC (mandatory)</div>
+          <ul class="mt-3 text-sm text-slate-700 space-y-2 list-disc list-inside">
+            <li>Coupa OAuth client per environment</li>
+            <li>Client-credentials for headless; user-context via SAML JIT</li>
+            <li>Token rotation every ~20 hrs</li>
+            <li><b>If central IdP exists:</b> SAML 2.0 SP-init from Okta/Entra</li>
+            <li><b>If not:</b> Coupa-local users login directly; MCP holds per-user OAuth tokens</li>
+          </ul>
+          <div class="mt-5 h-tag">Risk flag</div>
+          <div class="text-sm mt-1 text-slate-700">Customer security review on OAuth scope provisioning is the long pole — request on Day 1.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============= SLIDE 6 · BIGQUERY ============= -->
+    <section class="slide" data-title="BigQuery · MCP">
+      <div class="h-tag">Slide 6 · System deep-dive · 3 of 3</div>
+      <h2 class="h-title mt-2">BigQuery · MCP</h2>
+      <div class="grid md:grid-cols-3 gap-6 mt-7">
+        <div class="md:col-span-2 card p-6">
+          <h3 class="font-semibold" style="color:var(--navy)">Tools (5 + 4 semantic)</h3>
+          <table class="w-full mt-3 tight">
+            <thead>
+              <tr class="text-left text-slate-500 border-b border-slate-200">
+                <th>Tool</th><th>Description</th><th>BQ surface</th><th>RBAC</th>
+              </tr>
+            </thead>
+            <tbody class="text-slate-700">
+              <tr class="border-b border-slate-100"><td class="font-mono text-xs">list_datasets</td><td>Datasets the caller can see</td><td class="text-xs">datasets.list</td><td>BQ IAM (project)</td></tr>
+              <tr class="border-b border-slate-100"><td class="font-mono text-xs">describe_table</td><td>Schema, partitioning, labels</td><td class="text-xs">tables.get</td><td>BQ IAM (table)</td></tr>
+              <tr class="border-b border-slate-100"><td class="font-mono text-xs">run_sql_query</td><td>Parameterized SQL (read-only by default)</td><td class="text-xs">jobs.query</td><td>BQ IAM + row policy</td></tr>
+              <tr class="border-b border-slate-100"><td class="font-mono text-xs">get_query_history</td><td>Query lineage for the user</td><td class="text-xs">INFORMATION_SCHEMA</td><td>BQ IAM</td></tr>
+              <tr class="border-b border-slate-100"><td class="font-mono text-xs">forecast_metric</td><td>Time-series forecast</td><td class="text-xs">ML.FORECAST</td><td>BQ IAM</td></tr>
+              <tr class="border-b border-slate-100" style="background:#F8FAFE"><td class="font-mono text-xs" style="color:#6A1B9A">resolve_business_term</td><td>Map "active customer" → exact filter</td><td class="text-xs">Semantic catalog</td><td>Catalog ACL</td></tr>
+              <tr class="border-b border-slate-100" style="background:#F8FAFE"><td class="font-mono text-xs" style="color:#6A1B9A">get_metric_definition</td><td>SQL template for a named metric</td><td class="text-xs">Semantic catalog</td><td>Catalog ACL</td></tr>
+              <tr class="border-b border-slate-100" style="background:#F8FAFE"><td class="font-mono text-xs" style="color:#6A1B9A">suggest_join_path</td><td>Best join graph between entities</td><td class="text-xs">Semantic catalog</td><td>Catalog ACL</td></tr>
+              <tr style="background:#F8FAFE"><td class="font-mono text-xs" style="color:#6A1B9A">validate_query_intent</td><td>Pre-flight check vs. catalog</td><td class="text-xs">Semantic catalog</td><td>Catalog ACL</td></tr>
+            </tbody>
+          </table>
+          <div class="mt-3 text-xs text-slate-500">Rows shaded purple = new semantic catalog tools (covered next slide).</div>
+        </div>
+        <div class="card p-6">
+          <div class="h-tag">Auth (native)</div>
+          <div class="font-semibold mt-1" style="color:var(--navy)">OAuth + Service Account Impersonation</div>
+          <ul class="mt-3 text-sm text-slate-700 space-y-2 list-disc list-inside">
+            <li>User authenticates via Google IdP (or federated Workforce Identity)</li>
+            <li>MCP impersonates least-privilege SA per dataset</li>
+            <li>BigQuery IAM enforced on every job</li>
+            <li><b>If central IdP exists:</b> Workforce Identity federation to Okta/Entra</li>
+            <li><b>If not:</b> users login with Google identity directly</li>
+          </ul>
+          <div class="mt-5 h-tag">Build vs. buy</div>
+          <div class="text-sm mt-1 text-slate-700">Default: consume Google's managed BQ MCP, fronted by our thin proxy that hosts the semantic catalog and unified audit.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============= SLIDE 7 · SEMANTIC CATALOG ============= -->
+    <section class="slide" data-title="BigQuery semantic catalog">
+      <div class="h-tag">Slide 7 · BigQuery · Semantic Catalog</div>
+      <h2 class="h-title mt-2">From business intent to correct SQL — on the first try</h2>
+      <p class="h-sub mt-3 max-w-3xl">A lightweight semantic layer that sits in front of BigQuery, translating natural-language business terms into precise schema, joins, and metric definitions before the LLM ever writes SQL.</p>
+
+      <div class="grid md:grid-cols-5 gap-6 mt-8">
+        <div class="md:col-span-3 card p-5">
+          <h3 class="font-semibold text-base" style="color:var(--navy)">Architecture · semantic layer in the request path</h3>
+          <svg viewBox="0 0 720 380" xmlns="http://www.w3.org/2000/svg" class="mt-3 w-full">
+            <defs>
+              <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#146C94"/></marker>
+            </defs>
+            <!-- Top: NL question -->
+            <rect x="240" y="14" width="240" height="50" rx="10" fill="#0B2447"/>
+            <text x="360" y="36" text-anchor="middle" font-size="13" fill="#fff" font-weight="700">"Top 5 customers by ARR last quarter"</text>
+            <text x="360" y="54" text-anchor="middle" font-size="10.5" fill="#A6E3A1">Natural-language question from LLM</text>
+
+            <!-- LLM Host -->
+            <rect x="40" y="100" width="180" height="50" rx="10" fill="#fff" stroke="#0B2447" stroke-width="1.5"/>
+            <text x="130" y="124" text-anchor="middle" font-size="12" font-weight="700" fill="#0B2447">LLM / Agent</text>
+            <text x="130" y="140" text-anchor="middle" font-size="10" fill="#64748B">MCP client</text>
+
+            <!-- MCP BQ wrapper -->
+            <rect x="270" y="100" width="180" height="50" rx="10" fill="#fff" stroke="#19A7CE" stroke-width="1.5"/>
+            <text x="360" y="124" text-anchor="middle" font-size="12" font-weight="700" fill="#0B2447">MCP · BigQuery (proxy)</text>
+            <text x="360" y="140" text-anchor="middle" font-size="10" fill="#64748B">Routes tool calls</text>
+
+            <!-- Semantic Catalog box -->
+            <rect x="500" y="80" width="200" height="220" rx="14" fill="#F3E8FF" stroke="#6A1B9A" stroke-width="1.5"/>
+            <text x="600" y="104" text-anchor="middle" font-size="12.5" font-weight="700" fill="#6A1B9A">Semantic Catalog</text>
+            <rect x="514" y="118" width="172" height="40" rx="7" fill="#fff" stroke="#D8B4FE"/>
+            <text x="600" y="135" text-anchor="middle" font-size="10.5" font-weight="700" fill="#6A1B9A">Business Glossary</text>
+            <text x="600" y="150" text-anchor="middle" font-size="9.5" fill="#64748B">"ARR" → SUM(...) over...</text>
+            <rect x="514" y="164" width="172" height="40" rx="7" fill="#fff" stroke="#D8B4FE"/>
+            <text x="600" y="181" text-anchor="middle" font-size="10.5" font-weight="700" fill="#6A1B9A">Entity Dictionary</text>
+            <text x="600" y="196" text-anchor="middle" font-size="9.5" fill="#64748B">customer, order, product</text>
+            <rect x="514" y="210" width="172" height="40" rx="7" fill="#fff" stroke="#D8B4FE"/>
+            <text x="600" y="227" text-anchor="middle" font-size="10.5" font-weight="700" fill="#6A1B9A">Metric Definitions</text>
+            <text x="600" y="242" text-anchor="middle" font-size="9.5" fill="#64748B">curated by data team</text>
+            <rect x="514" y="256" width="172" height="36" rx="7" fill="#fff" stroke="#D8B4FE"/>
+            <text x="600" y="271" text-anchor="middle" font-size="10.5" font-weight="700" fill="#6A1B9A">Join Graph</text>
+            <text x="600" y="284" text-anchor="middle" font-size="9.5" fill="#64748B">FK / shortest path</text>
+
+            <!-- BigQuery -->
+            <rect x="270" y="320" width="180" height="50" rx="10" fill="#E6F7F2" stroke="#0F766E" stroke-width="1.5"/>
+            <text x="360" y="343" text-anchor="middle" font-size="12" font-weight="700" fill="#0F766E">BigQuery</text>
+            <text x="360" y="359" text-anchor="middle" font-size="10" fill="#64748B">jobs.query</text>
+
+            <!-- Arrows -->
+            <path class="arrow" d="M360,64 L360,100"/>
+            <path class="arrow" d="M220,125 L270,125"/>
+            <path class="arrow" d="M450,125 L500,125"/>
+            <path class="arrow" d="M500,165 L450,150"/>
+            <path class="arrow" d="M360,150 L360,320"/>
+            <text x="466" y="100" font-size="9" fill="#6A1B9A">resolve / metric / join</text>
+            <text x="370" y="240" font-size="9" fill="#64748B">parameterized SQL</text>
+          </svg>
+        </div>
+
+        <div class="md:col-span-2 card p-5">
+          <h3 class="font-semibold text-base" style="color:var(--navy)">Why bother?</h3>
+          <ul class="mt-3 text-sm text-slate-700 space-y-2 list-disc list-inside">
+            <li><b>Accuracy.</b> LLMs hallucinate column names; the catalog maps "MRR" to the exact column + filter your finance team uses.</li>
+            <li><b>Governance.</b> Metric definitions are versioned and curated, not crowdsourced from prompts.</li>
+            <li><b>Cost.</b> Validated joins prevent runaway BQ scans (the catalog can warn before <i>SELECT *</i> on a 12 TB table).</li>
+            <li><b>Onboarding.</b> New agents and analysts get the same definitions — single source of truth.</li>
+          </ul>
+          <div class="mt-5 h-tag">Build approach</div>
+          <ul class="mt-2 text-sm text-slate-700 space-y-1.5 list-disc list-inside">
+            <li>Backed by Postgres (RDS) + pgvector for embedding search</li>
+            <li>YAML-based metric definitions, version-controlled</li>
+            <li>Bootstrap from <code>INFORMATION_SCHEMA</code> + LLM-suggested term mapping</li>
+            <li>Curation UI for data team (post-engagement, optional Phase-2)</li>
+          </ul>
+          <div class="mt-5 h-tag">Effort</div>
+          <div class="text-sm text-slate-700 mt-1">~1 person-week within the existing 8-week scope; covered in BigQuery workstream.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============= SLIDE 8 · ARCHITECTURE ============= -->
+    <section class="slide" data-title="Reference architecture">
+      <div class="h-tag">Slide 8 · Reference architecture</div>
+      <h2 class="h-title mt-2">AWS-native, identity-first, observable by default</h2>
+      <div class="card p-5 mt-6 overflow-x-auto">
+        <svg viewBox="0 0 1100 600" xmlns="http://www.w3.org/2000/svg" class="w-full" style="max-width:1100px">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#146C94"/></marker>
+            <linearGradient id="vpc" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#F0F8FF"/><stop offset="100%" stop-color="#E1EFFA"/></linearGradient>
+          </defs>
+          <rect x="20" y="60" width="170" height="80" rx="10" fill="#fff" stroke="#0B2447" stroke-width="1.5"/>
+          <text x="105" y="92" text-anchor="middle" font-size="14" font-weight="700" fill="#0B2447">RealPage AI Platform</text>
+          <text x="105" y="112" text-anchor="middle" font-size="11" fill="#64748B">Claude / Internal LLM hosts</text>
+          <text x="105" y="128" text-anchor="middle" font-size="11" fill="#64748B">acting as MCP clients</text>
+
+          <rect x="20" y="180" width="170" height="70" rx="10" fill="#fff" stroke="#1D4F8C" stroke-width="1.5"/>
+          <text x="105" y="204" text-anchor="middle" font-size="13" font-weight="700" fill="#1D4F8C">Identity</text>
+          <text x="105" y="222" text-anchor="middle" font-size="11" fill="#64748B">Okta / Entra ID</text>
+          <text x="105" y="238" text-anchor="middle" font-size="10" fill="#64748B">(or per-system fallback)</text>
+
+          <rect x="230" y="40" width="640" height="540" rx="14" fill="url(#vpc)" stroke="#94A3B8" stroke-dasharray="4 4"/>
+          <text x="250" y="65" font-size="13" font-weight="700" fill="#1D4F8C">AWS · RealPage account · us-east-1</text>
+
+          <rect x="260" y="90" width="170" height="68" rx="10" fill="#fff" stroke="#0B2447" stroke-width="1.5"/>
+          <text x="345" y="118" text-anchor="middle" font-size="13" font-weight="700" fill="#0B2447">API Gateway</text>
+          <text x="345" y="136" text-anchor="middle" font-size="10.5" fill="#64748B">HTTPS · WAF · throttling</text>
+
+          <rect x="450" y="90" width="170" height="68" rx="10" fill="#fff" stroke="#0B2447" stroke-width="1.5"/>
+          <text x="535" y="118" text-anchor="middle" font-size="13" font-weight="700" fill="#0B2447">Cognito</text>
+          <text x="535" y="136" text-anchor="middle" font-size="10.5" fill="#64748B">OAuth 2.1 · OIDC broker</text>
+
+          <rect x="640" y="90" width="200" height="68" rx="10" fill="#fff" stroke="#0B2447" stroke-width="1.5"/>
+          <text x="740" y="118" text-anchor="middle" font-size="13" font-weight="700" fill="#0B2447">Token Exchange Svc</text>
+          <text x="740" y="136" text-anchor="middle" font-size="10.5" fill="#64748B">RFC 8693 · OBO flow</text>
+
+          <rect x="260" y="200" width="580" height="200" rx="12" fill="#fff" stroke="#19A7CE" stroke-width="1.5"/>
+          <text x="280" y="223" font-size="12" font-weight="700" fill="#146C94">ECS Fargate cluster · MCP servers (private subnets)</text>
+
+          <rect x="280" y="240" width="170" height="140" rx="10" fill="#FBE9E7" stroke="#E63946" stroke-width="1.3"/>
+          <text x="365" y="266" text-anchor="middle" font-size="13" font-weight="700" fill="#9B1D2A">MCP · Oracle Fusion</text>
+          <text x="365" y="286" text-anchor="middle" font-size="10.5" fill="#64748B">5 tools · custom build</text>
+          <text x="365" y="306" text-anchor="middle" font-size="10.5" fill="#64748B">JWT to Fusion REST</text>
+          <text x="365" y="326" text-anchor="middle" font-size="10.5" fill="#64748B">2 task replicas</text>
+          <text x="365" y="354" text-anchor="middle" font-size="10" font-style="italic" fill="#9B1D2A">via OCI IAM domain</text>
+
+          <rect x="465" y="240" width="170" height="140" rx="10" fill="#FFF7E6" stroke="#F4A261" stroke-width="1.3"/>
+          <text x="550" y="266" text-anchor="middle" font-size="13" font-weight="700" fill="#8B5A0B">MCP · Coupa</text>
+          <text x="550" y="286" text-anchor="middle" font-size="10.5" fill="#64748B">5 tools · custom build</text>
+          <text x="550" y="306" text-anchor="middle" font-size="10.5" fill="#64748B">OAuth 2.0 / OIDC</text>
+          <text x="550" y="326" text-anchor="middle" font-size="10.5" fill="#64748B">2 task replicas</text>
+          <text x="550" y="354" text-anchor="middle" font-size="10" font-style="italic" fill="#8B5A0B">SAML SSO at IdP</text>
+
+          <rect x="650" y="240" width="180" height="140" rx="10" fill="#E6F7F2" stroke="#2A9D8F" stroke-width="1.3"/>
+          <text x="740" y="266" text-anchor="middle" font-size="13" font-weight="700" fill="#0F766E">MCP · BigQuery + Catalog</text>
+          <text x="740" y="286" text-anchor="middle" font-size="10.5" fill="#64748B">9 tools (5 + 4 semantic)</text>
+          <text x="740" y="306" text-anchor="middle" font-size="10.5" fill="#64748B">Proxies managed BQ MCP</text>
+          <text x="740" y="326" text-anchor="middle" font-size="10.5" fill="#64748B">Postgres + pgvector catalog</text>
+          <text x="740" y="354" text-anchor="middle" font-size="10" font-style="italic" fill="#0F766E">Workforce Identity / direct</text>
+
+          <rect x="260" y="420" width="190" height="60" rx="10" fill="#fff" stroke="#64748B" stroke-width="1.2"/>
+          <text x="355" y="443" text-anchor="middle" font-size="12" font-weight="700" fill="#1F2937">Secrets Manager</text>
+          <text x="355" y="463" text-anchor="middle" font-size="10.5" fill="#64748B">OAuth secrets · KMS</text>
+
+          <rect x="465" y="420" width="190" height="60" rx="10" fill="#fff" stroke="#64748B" stroke-width="1.2"/>
+          <text x="560" y="443" text-anchor="middle" font-size="12" font-weight="700" fill="#1F2937">CloudWatch + OTel</text>
+          <text x="560" y="463" text-anchor="middle" font-size="10.5" fill="#64748B">Metrics · traces · alarms</text>
+
+          <rect x="670" y="420" width="170" height="60" rx="10" fill="#fff" stroke="#64748B" stroke-width="1.2"/>
+          <text x="755" y="443" text-anchor="middle" font-size="12" font-weight="700" fill="#1F2937">S3 · Audit logs</text>
+          <text x="755" y="463" text-anchor="middle" font-size="10.5" fill="#64748B">Object Lock · 7-yr</text>
+
+          <rect x="425" y="510" width="220" height="56" rx="10" fill="#fff" stroke="#64748B" stroke-width="1.2"/>
+          <text x="535" y="533" text-anchor="middle" font-size="12" font-weight="700" fill="#1F2937">NAT Gateway · egress</text>
+          <text x="535" y="552" text-anchor="middle" font-size="10.5" fill="#64748B">to Coupa, Fusion, Google</text>
+
+          <rect x="900" y="220" width="180" height="60" rx="10" fill="#FBE9E7" stroke="#E63946" stroke-width="1.3"/>
+          <text x="990" y="245" text-anchor="middle" font-size="12" font-weight="700" fill="#9B1D2A">Oracle Fusion Cloud</text>
+          <text x="990" y="265" text-anchor="middle" font-size="10.5" fill="#64748B">REST V1 · OCI IAM</text>
+
+          <rect x="900" y="295" width="180" height="60" rx="10" fill="#FFF7E6" stroke="#F4A261" stroke-width="1.3"/>
+          <text x="990" y="320" text-anchor="middle" font-size="12" font-weight="700" fill="#8B5A0B">Coupa BSM</text>
+          <text x="990" y="340" text-anchor="middle" font-size="10.5" fill="#64748B">Core API · OAuth/OIDC</text>
+
+          <rect x="900" y="370" width="180" height="60" rx="10" fill="#E6F7F2" stroke="#2A9D8F" stroke-width="1.3"/>
+          <text x="990" y="395" text-anchor="middle" font-size="12" font-weight="700" fill="#0F766E">Google BigQuery</text>
+          <text x="990" y="415" text-anchor="middle" font-size="10.5" fill="#64748B">Workforce IAM</text>
+
+          <path class="arrow" d="M105,140 L105,180"/>
+          <path class="arrow" d="M190,124 L260,124"/>
+          <path class="arrow" d="M430,124 L450,124"/>
+          <path class="arrow" d="M620,124 L640,124"/>
+          <path class="arrow" d="M345,158 L345,240"/>
+          <path class="arrow" d="M535,158 L550,240"/>
+          <path class="arrow" d="M740,158 L740,240"/>
+          <path class="arrow" d="M820,310 L900,250"/>
+          <path class="arrow" d="M635,310 L900,325"/>
+          <path class="arrow" d="M830,360 L900,400"/>
+        </svg>
+      </div>
+    </section>
+
+    <!-- ============= SLIDE 9 · AUTH MODES (DUAL) ============= -->
+    <section class="slide" data-title="Auth modes">
+      <div class="h-tag">Slide 9 · Authentication &amp; SSO · two modes</div>
+      <h2 class="h-title mt-2">If a central IdP exists — we federate. If not — we inherit each system's native auth.</h2>
+      <p class="h-sub mt-3 max-w-3xl">The "central IdP" is an <i>assumption</i>. We design for both worlds; the deployment chooses one based on RealPage's reality.</p>
+
+      <div class="grid md:grid-cols-2 gap-6 mt-8">
+        <!-- Mode A -->
+        <div class="mode-card">
+          <div class="flex items-center justify-between">
+            <div class="mode-tag" style="color:#0F766E">Mode A · Recommended (if available)</div>
+            <span class="pill" style="background:#E6F7F2;color:#0F766E">Centralized IdP</span>
+          </div>
+          <div class="font-semibold text-lg mt-2" style="color:var(--navy)">Federation through Okta or Entra ID</div>
+          <p class="text-sm text-slate-600 mt-2">Single login at RealPage's IdP; tokens exchanged into per-system credentials. SSO across all three MCP servers.</p>
+          <ul class="text-sm text-slate-700 mt-3 space-y-1.5">
+            <li><span class="check">✓</span>Cognito brokers OIDC; access tokens carry user claims</li>
+            <li><span class="check">✓</span>RFC 8693 token exchange to Fusion (OCI IAM-bound JWT)</li>
+            <li><span class="check">✓</span>SAML 2.0 SP-init to Coupa (JIT user)</li>
+            <li><span class="check">✓</span>Workforce Identity Federation to BigQuery</li>
+            <li><span class="check">✓</span>Single login, single audit identity, single offboarding</li>
+          </ul>
+          <div class="mt-4 text-xs text-slate-500">Trade-off: requires existing IdP + admin willingness to add 3 SAML/OIDC apps.</div>
+        </div>
+        <!-- Mode B -->
+        <div class="mode-card">
+          <div class="flex items-center justify-between">
+            <div class="mode-tag" style="color:#8B5A0B">Mode B · Fallback</div>
+            <span class="pill" style="background:#FFF7E6;color:#8B5A0B">Per-system native auth</span>
+          </div>
+          <div class="font-semibold text-lg mt-2" style="color:var(--navy)">MCP inherits each system's identity</div>
+          <p class="text-sm text-slate-600 mt-2">No central IdP? Each MCP relies on the upstream's own auth. Users link an account per system on first use.</p>
+          <ul class="text-sm text-slate-700 mt-3 space-y-1.5">
+            <li><span class="check">→</span><b>Oracle Fusion:</b> users login to OCI IAM domain via Fusion's native page; MCP holds OCI access &amp; refresh tokens (encrypted in Secrets Manager).</li>
+            <li><span class="check">→</span><b>Coupa:</b> users authenticate via Coupa's local user store or Coupa's tenant-level SAML; MCP exchanges OIDC code per user.</li>
+            <li><span class="check">→</span><b>BigQuery:</b> users login with their Google identity; MCP triggers <code>gcloud auth login</code> equivalent flow, stores Google refresh token.</li>
+            <li><span class="check">✓</span>Each tool call still inherits the upstream RBAC of <i>that</i> user.</li>
+          </ul>
+          <div class="mt-4 text-xs text-slate-500">Trade-off: 3 distinct logins, 3 separate audit identities, more token plumbing — but works without central IdP investment.</div>
+        </div>
+      </div>
+
+      <div class="mt-7 card p-4" style="background:var(--soft-blue)">
+        <div class="text-sm text-slate-700"><b style="color:var(--navy)">Switching modes is a config flag, not a rewrite.</b> The MCP edge supports both — Mode A is the default in our IaC; Mode B is a per-system override block. We confirm the decision in Week 1 discovery.</div>
+      </div>
+    </section>
+
+    <!-- ============= SLIDE 10 · AUTH SEQUENCE ============= -->
+    <section class="slide" data-title="End-to-end auth sequence">
+      <div class="h-tag">Slide 10 · End-to-end auth (Mode A example)</div>
+      <h2 class="h-title mt-2">A user asks; the LLM acts; identity flows end-to-end.</h2>
+      <div class="card p-5 mt-6">
+        <div class="mermaid">
+sequenceDiagram
+    autonumber
+    participant U as User (RealPage)
+    participant LLM as AI Platform (LLM)
+    participant MCP as MCP Server (Fargate)
+    participant CG as Cognito + IdP
+    participant TX as Token Exchange
+    participant API as Upstream (Fusion/Coupa/BQ)
+    U->>LLM: "Top suppliers by spend"
+    LLM->>CG: OIDC auth (code + PKCE)
+    CG->>U: SSO challenge (skipped if active)
+    U-->>CG: Approve
+    CG-->>LLM: id_token + access_token (claims: roles)
+    LLM->>MCP: tool: get_supplier_spend (Bearer at)
+    MCP->>CG: Verify token (sig, exp, aud)
+    MCP->>TX: token_exchange(subject=at, audience=Fusion)
+    TX-->>MCP: Fusion JWT bound to user
+    MCP->>API: GET /suppliers (Bearer fusion_jwt)
+    API-->>MCP: 200 OK, filtered by Fusion role
+    MCP-->>LLM: Result + audit_id
+    LLM-->>U: Answer
+        </div>
+      </div>
+      <div class="mt-5 text-sm text-slate-600">In Mode B, steps 2–4 are replaced by per-system OAuth flows; the rest remains identical.</div>
+    </section>
+
+    <!-- ============= SLIDE 11 · RBAC & AUDIT ============= -->
+    <section class="slide" data-title="RBAC & audit">
+      <div class="h-tag">Slide 11 · RBAC &amp; Audit</div>
+      <h2 class="h-title mt-2">Inherited, never re-implemented</h2>
+      <div class="grid md:grid-cols-3 gap-5 mt-7">
+        <div class="card p-5">
+          <div class="h-tag">Principle 1</div>
+          <div class="font-semibold text-base mt-1" style="color:var(--navy)">No new permission model</div>
+          <p class="text-sm text-slate-600 mt-2">Every tool call is bound to the human user via OBO tokens (Mode A) or per-system identity (Mode B). The upstream system's RBAC engine is the source of truth — Fusion roles, Coupa user permissions, BigQuery IAM &amp; row-access policies.</p>
+        </div>
+        <div class="card p-5">
+          <div class="h-tag">Principle 2</div>
+          <div class="font-semibold text-base mt-1" style="color:var(--navy)">Defense-in-depth at the MCP edge</div>
+          <p class="text-sm text-slate-600 mt-2">Tool registration carries an explicit scope contract (e.g. <code>core.requisitions.write</code>). Default-deny on unknown scopes. Human-in-the-loop required on all write tools (create / approve / cancel).</p>
+        </div>
+        <div class="card p-5">
+          <div class="h-tag">Principle 3</div>
+          <div class="font-semibold text-base mt-1" style="color:var(--navy)">Every tool call, immutably audited</div>
+          <p class="text-sm text-slate-600 mt-2">Caller identity, tool, args hash, scopes, latency, upstream status — written to S3 with Object Lock (7-year retention). CloudWatch alarms on anomaly patterns; optional SIEM forwarding.</p>
+        </div>
+      </div>
+
+      <div class="card p-5 mt-7">
+        <h3 class="font-semibold" style="color:var(--navy)">RBAC matrix · who enforces what</h3>
+        <table class="w-full mt-3 tight">
+          <thead>
+            <tr class="text-left text-slate-500 border-b border-slate-200">
+              <th>System</th><th>Identity</th><th>Authorization</th><th>Audit</th>
+            </tr>
+          </thead>
+          <tbody class="text-slate-700">
+            <tr class="border-b border-slate-100"><td>Oracle Fusion</td><td>OCI IAM domain (federated or native)</td><td>Fusion roles &amp; data security policies</td><td>Fusion audit + MCP audit log</td></tr>
+            <tr class="border-b border-slate-100"><td>Coupa</td><td>SAML or local Coupa user</td><td>Coupa user permissions &amp; OAuth scopes</td><td>Coupa audit + MCP audit log</td></tr>
+            <tr><td>BigQuery</td><td>Google identity (Workforce or direct)</td><td>BQ IAM, dataset/column/row policies + Catalog ACL</td><td>BQ audit + MCP audit log</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============= SLIDE 12 · TEAM ============= -->
+    <section class="slide" data-title="Team">
+      <div class="h-tag">Slide 12 · Team composition</div>
+      <h2 class="h-title mt-2">5–6 people, blended onshore + offshore</h2>
+      <div class="grid md:grid-cols-3 gap-5 mt-7" id="team-cards"></div>
+    </section>
+
+    <!-- ============= SLIDE 13 · RISKS ============= -->
+    <section class="slide" data-title="Risks">
+      <div class="h-tag">Slide 13 · Risks &amp; mitigations</div>
+      <h2 class="h-title mt-2">What can go wrong, and how we contain it</h2>
+      <div class="grid md:grid-cols-2 gap-5 mt-7" id="risk-cards"></div>
+    </section>
+
+    <!-- ============= SLIDE 14 · COMMERCIALS ============= -->
+    <section class="slide" data-title="Commercials">
+      <div class="h-tag">Slide 14 · Commercials</div>
+      <h2 class="h-title mt-2">Investment &amp; pricing position</h2>
+      <div class="grid mt-7 items-start">
+        <div class="card p-6">
+          <h3 class="font-semibold text-lg" style="color:var(--navy)">Cost build-up</h3>
+          <p class="text-sm text-slate-500 mt-1">Premium tier · dedicated architect · 8 weeks</p>
+          <table class="w-full mt-4 tight">
+            <thead>
+              <tr class="text-left text-slate-500 border-b border-slate-200">
+                <th>Component</th><th class="text-center">Hours</th><th class="text-right">Rate</th><th class="text-right">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody class="text-slate-800">
+              <tr class="border-b border-slate-100"><td class="py-2">Offshore AI Engineering<br><span class="text-xs text-slate-500">Lead + Engineer + DevOps + Security</span></td><td class="text-center">768</td><td class="text-right">$50</td><td class="text-right">$38,400</td></tr>
+              <tr class="border-b border-slate-100"><td class="py-2">Onshore Architect (40%, dedicated, 8w)</td><td class="text-center">128</td><td class="text-right">$165</td><td class="text-right">$21,120</td></tr>
+              <tr class="border-b border-slate-100"><td class="py-2">Onshore Engagement Manager (10%, 8w)</td><td class="text-center">32</td><td class="text-right">$130</td><td class="text-right">$4,160</td></tr>
+              <tr class="border-b border-slate-200" style="background:var(--bg)"><td class="py-2 font-semibold">Subtotal — Labor</td><td></td><td></td><td class="text-right font-semibold">$63,680</td></tr>
+              <tr class="border-b border-slate-100"><td class="py-2">Reserve / Contingency (10%)</td><td></td><td></td><td class="text-right">$6,368</td></tr>
+              <tr style="background:var(--navy);color:#fff"><td class="py-3 px-2 font-bold">TOTAL</td><td></td><td></td><td class="py-3 text-right font-bold pr-2">$70,048</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6 mt-6">
+        <div class="card p-5">
+          <h3 class="font-semibold mb-2" style="color:var(--navy)">In scope</h3>
+          <ul class="text-sm text-slate-700 space-y-1.5">
+            <li><span class="check">✓</span>3 MCP servers · 19 tools (incl. semantic catalog)</li>
+            <li><span class="check">✓</span>AWS reference architecture + Terraform IaC</li>
+            <li><span class="check">✓</span>Both auth modes implemented</li>
+            <li><span class="check">✓</span>RBAC mapping + threat model</li>
+            <li><span class="check">✓</span>Observability + audit logging</li>
+            <li><span class="check">✓</span>KT, runbook, ops handover</li>
+          </ul>
+        </div>
+        <div class="card p-5">
+          <h3 class="font-semibold mb-2" style="color:var(--navy)">Out of scope (Phase-2)</h3>
+          <ul class="text-sm text-slate-700 space-y-1.5">
+            <li><span class="x-mark">×</span>Long-tail Fusion modules beyond REST V1</li>
+            <li><span class="x-mark">×</span>MCP gateway / registry (multi-tenant)</li>
+            <li><span class="x-mark">×</span>Curation UI for semantic catalog</li>
+            <li><span class="x-mark">×</span>24×7 SRE rota beyond initial 30 days</li>
+            <li><span class="x-mark">×</span>SIEM custom integrations</li>
+            <li><span class="x-mark">×</span>LLM eval harness</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============= SLIDE 15 · NEXT STEPS ============= -->
+    <section class="slide grad-cover" data-title="Next steps">
+      <div class="flex flex-col justify-center" style="min-height:calc(100vh - 160px - 50px)">
+        <div class="h-tag" style="color:#7CD7E8">Slide 15 · Next steps</div>
+        <h2 class="text-4xl font-bold mt-3">Ready to start within 2 weeks of sign-off.</h2>
+        <p class="mt-5 text-lg max-w-2xl" style="color:rgba(255,255,255,.78)">
+          Suggested first step: a 60-minute architecture alignment call with Harish's team to confirm IdP availability,
+          AWS landing zone, and SME availability — so we lock the right auth mode on Day 1.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="mailto:Satish.Gundawar@rsystems.com?subject=RealPage MCP - Proposal feedback" class="btn btn-primary">Email Satish</a>
+          <a href="mailto:Harshil.Shah@rsystems.com?subject=RealPage MCP - Architecture alignment" class="btn btn-ghost">Architecture call</a>
+        </div>
+        <div class="mt-12 text-xs" style="color:rgba(255,255,255,.5)">
+          Prepared by R Systems · v1.1 · May 2026 · For RealPage internal use only
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- Bottom nav -->
+<div class="nav-bar">
+  <div class="flex items-center gap-2">
+    <button id="prev" class="btn btn-ghost">← Prev</button>
+    <button id="next" class="btn btn-primary">Next →</button>
+  </div>
+  <div class="text-xs" style="color:rgba(255,255,255,.6)">
+    <span id="slide-title">Cover</span>
+  </div>
+  <div class="flex items-center gap-2">
+    <button id="toc-btn" class="btn btn-ghost">☰ Slides</button>
+  </div>
+</div>
+
+<!-- Slide drawer -->
+<div class="drawer" id="drawer">
+  <div class="flex justify-between items-center mb-3">
+    <h4>Slides</h4>
+    <button id="close-drawer" class="text-white/80 hover:text-white">✕</button>
+  </div>
+  <div id="toc-list"></div>
+</div>
+
+<script>
+  // Slide management
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const total = slides.length;
+  document.getElementById("tot").textContent = total;
+  let cur = 0;
+
+  // Build TOC
+  const tocList = document.getElementById("toc-list");
+  slides.forEach((s, i) => {
+    const a = document.createElement("div");
+    a.className = "toc-link";
+    a.dataset.idx = i;
+    a.innerHTML = `<span class="toc-num">${i+1}</span><span>${s.dataset.title}</span>`;
+    a.addEventListener("click", () => { go(i); closeDrawer(); });
+    tocList.appendChild(a);
+  });
+  const tocLinks = Array.from(tocList.children);
+
+  function go(i){
+    cur = Math.max(0, Math.min(total-1, i));
+    slides.forEach((s, idx)=>s.classList.toggle("active", idx===cur));
+    document.getElementById("cur").textContent = cur+1;
+    document.getElementById("progress").style.width = ((cur+1)/total*100)+"%";
+    document.getElementById("slide-title").textContent = slides[cur].dataset.title;
+    tocLinks.forEach((l, idx)=>l.classList.toggle("active", idx===cur));
+    document.getElementById("prev").disabled = cur===0;
+    document.getElementById("next").disabled = cur===total-1;
+    window.scrollTo({top:0,behavior:"instant"});
+  }
+
+  document.getElementById("prev").addEventListener("click", ()=>go(cur-1));
+  document.getElementById("next").addEventListener("click", ()=>go(cur+1));
+
+  // Keyboard nav
+  document.addEventListener("keydown", (e)=>{
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+    if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") { go(cur+1); e.preventDefault(); }
+    else if (e.key === "ArrowLeft" || e.key === "PageUp") { go(cur-1); e.preventDefault(); }
+    else if (e.key === "Home") go(0);
+    else if (e.key === "End") go(total-1);
+  });
+
+  // Drawer
+  const drawer = document.getElementById("drawer");
+  document.getElementById("toc-btn").addEventListener("click", ()=>drawer.classList.add("open"));
+  document.getElementById("close-drawer").addEventListener("click", ()=>drawer.classList.remove("open"));
+  function closeDrawer(){ drawer.classList.remove("open"); }
+
+  // Mermaid init
+  mermaid.initialize({startOnLoad:true, theme:"base", themeVariables:{
+    primaryColor:"#19A7CE", primaryTextColor:"#0F172A",
+    lineColor:"#146C94", secondaryColor:"#EEF6FF", tertiaryColor:"#FFF"
+  }});
+
+  // Team
+  const TEAM=[
+    {role:"Solution Architect",loc:"Onshore",alloc:"40% (dedicated)",rate:"$165/hr",note:"Architecture, security review, governance, weekly steerco — premium tier dedicated allocation"},
+    {role:"Lead AI Engineer (MCP)",loc:"Offshore",alloc:"100%",rate:"$55/hr",note:"MCP framework, Oracle Fusion connector, code reviews"},
+    {role:"AI Engineer (MCP)",loc:"Offshore",alloc:"100%",rate:"$45/hr",note:"Coupa connector, BigQuery wrapper + semantic catalog"},
+    {role:"DevOps / Cloud Engineer",loc:"Offshore",alloc:"30%",rate:"$50/hr",note:"ECS/Fargate, CI/CD, IaC (Terraform), observability"},
+    {role:"Security / IAM Specialist",loc:"Offshore",alloc:"20% · 4w",rate:"$60/hr",note:"Auth modes, OBO, RBAC mapping, threat model"},
+    {role:"Engagement Manager",loc:"Onshore",alloc:"10%",rate:"$130/hr",note:"Scope, status, risk, customer governance"},
+  ];
+  const tc=document.getElementById("team-cards");
+  TEAM.forEach(p=>{
+    const d=document.createElement("div");
+    d.className="card p-5";
+    d.innerHTML=`<div class="flex items-center justify-between">
+        <div class="font-semibold" style="color:var(--navy)">${p.role}</div>
+        <span class="pill" style="background:${p.loc==='Onshore'?'#EEF6FF':'#FFF7E6'};color:${p.loc==='Onshore'?'#1D4F8C':'#8B5A0B'}">${p.loc}</span>
+      </div>
+      <div class="mt-2 text-xs text-slate-500">Allocation · <b class="text-slate-700">${p.alloc}</b> · ${p.rate}</div>
+      <p class="text-sm text-slate-600 mt-3">${p.note}</p>`;
+    tc.appendChild(d);
+  });
+
+  // Risks
+  const RISKS=[
+    {sev:"High",risk:"No central IdP — Mode B activates with per-system token plumbing",mit:"Mode B is designed in. ~3 days additional work for token persistence + per-system login UX. Decision finalized in Week 1."},
+    {sev:"High",risk:"Coupa OAuth scope provisioning lead time (customer security review)",mit:"Request OAuth client Day 1 with scope list pre-aligned. Use sandbox tenant to unblock dev while prod scopes get approved."},
+    {sev:"High",risk:"BigQuery RBAC drift — IAM may not reflect data sensitivity",mit:"Recommend column-level / row-access policy review in Week 1. Layer policy tags + audit-log alerts in MCP tool."},
+    {sev:"High",risk:"LLM prompt injection causing destructive Coupa writes",mit:"Default-deny on writes; HITL required for create/approve. Field allow-lists. Audit every write."},
+    {sev:"Medium",risk:"Semantic catalog initial coverage gaps",mit:"Bootstrap catalog from INFORMATION_SCHEMA + LLM term extraction. Curation backlog handed to data team. Phase-2 candidate: curation UI."},
+    {sev:"Medium",risk:"Oracle Fusion REST V1 coverage gaps for some HCM/SCM payloads",mit:"Confirm endpoint coverage in Week 1. SOAP/BIP fallback isolated behind same MCP tool surface."},
+    {sev:"Medium",risk:"Customer SME unavailability slows API discovery",mit:"Lock 4-6 hr/wk SME slots upfront. Use BQ INFORMATION_SCHEMA + Fusion docs as fallback."},
+    {sev:"Low",risk:"Cost overrun if scope expands beyond 19 tools",mit:"Change-control gate after Week-4 demo. Phase-2 SOW for additional tools."},
+  ];
+  const sevC={High:{bg:"#FFEDEA",col:"#9B1D2A"},Medium:{bg:"#FFF7E6",col:"#8B5A0B"},Low:{bg:"#E6F7F2",col:"#0F766E"}};
+  const rc=document.getElementById("risk-cards");
+  RISKS.forEach(r=>{
+    const d=document.createElement("div");
+    d.className="card p-5";
+    d.innerHTML=`<div class="flex items-start gap-3">
+        <span class="pill" style="background:${sevC[r.sev].bg};color:${sevC[r.sev].col}">${r.sev}</span>
+        <div class="font-semibold text-sm" style="color:var(--navy)">${r.risk}</div>
+      </div>
+      <div class="mt-3 text-sm text-slate-600"><b class="text-slate-800">Mitigation: </b>${r.mit}</div>`;
+    rc.appendChild(d);
+  });
+
+  // Init
+  go(0);
+</script>
+</body>
+</html>
