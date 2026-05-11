@@ -3266,7 +3266,7 @@ h3.subhead em { color: var(--accent); font-style: normal; }
   </div>
 
   <h3 class="subhead">B. The 14-month delivery journey — <em>value at every two-month gate</em>.</h3>
-  <p>Three product streams run in parallel from M0; common-platform investment front-loads in months 0–4 so Insights can light up at M2 (pilot) and reach 100% recording coverage by M6, while Agent Assist work seeds in parallel and goes live at M10, with Conv AI's BRD-phased channels following from M8 through M14. The strip at the bottom of the diagram is the coverage commitment — what we promise the customer they can demo to their stakeholders by each gate.</p>
+  <p>Three product streams run in parallel from M0; the first six months are a deliberate <strong>build phase</strong> — platform spine plus the per-product components — with <em>no</em> tenant-facing value promised. The customer-visible flywheel starts at <strong>M6</strong>: Insights pilots with one tenant at 25% recording coverage while Agent Assist enters shadow mode on the same tenant's calls. From M6 onward every two-month gate compounds value — Insights reaches 100% by M10, Agent Assist GA at M10, Conv AI's BRD-phased channels rolling out from M8 through M14. The strip at the bottom of the diagram is the coverage commitment — what we promise the customer they can demo to their stakeholders by each gate.</p>
 
   <div class="diagram-frame no-pad">
     <svg viewBox="0 0 1240 830" width="100%" xmlns="http://www.w3.org/2000/svg" style="display:block;background:var(--bg-2);">
@@ -3295,15 +3295,15 @@ h3.subhead em { color: var(--accent); font-style: normal; }
         <text x="160"  y="78" class="svc-text" text-anchor="middle" font-weight="600">M0</text>
         <text x="160"  y="91" class="svc-sub"  text-anchor="middle">Kickoff</text>
         <text x="310"  y="78" class="svc-text" text-anchor="middle" font-weight="600">M2</text>
-        <text x="310"  y="91" class="svc-sub"  text-anchor="middle">Insights pilot</text>
+        <text x="310"  y="91" class="svc-sub"  text-anchor="middle">Spine build</text>
         <text x="460"  y="78" class="svc-text" text-anchor="middle" font-weight="600">M4</text>
-        <text x="460"  y="91" class="svc-sub"  text-anchor="middle">Insights @ 50%</text>
+        <text x="460"  y="91" class="svc-sub"  text-anchor="middle">Pre-pilot</text>
         <text x="610"  y="78" class="svc-text" text-anchor="middle" font-weight="600">M6</text>
-        <text x="610"  y="91" class="svc-sub"  text-anchor="middle">Insights GA · AA shadow</text>
+        <text x="610"  y="91" class="svc-sub"  text-anchor="middle">Ins pilot · AA shadow</text>
         <text x="760"  y="78" class="svc-text" text-anchor="middle" font-weight="600">M8</text>
-        <text x="760"  y="91" class="svc-sub"  text-anchor="middle">AA beta · CAI alpha</text>
+        <text x="760"  y="91" class="svc-sub"  text-anchor="middle">Ins 50% · AA β · CAI α</text>
         <text x="910"  y="78" class="svc-text" text-anchor="middle" font-weight="600">M10</text>
-        <text x="910"  y="91" class="svc-sub"  text-anchor="middle">AA GA · CAI Phase 1</text>
+        <text x="910"  y="91" class="svc-sub"  text-anchor="middle">Ins GA · AA GA · CAI P1</text>
         <text x="1060" y="78" class="svc-text" text-anchor="middle" font-weight="600">M12</text>
         <text x="1060" y="91" class="svc-sub"  text-anchor="middle">CAI Phase 2 channels</text>
         <text x="1210" y="78" class="svc-text" text-anchor="middle" font-weight="600">M14</text>
@@ -3330,18 +3330,24 @@ h3.subhead em { color: var(--accent); font-style: normal; }
       <rect x="40" y="250" width="1170" height="150" class="layer-rect" fill="#1f1d28"/>
       <text x="58" y="272" class="layer-label" fill="#818cf8">PRODUCT 1 · INSIGHTS</text>
       <g>
-        <rect x="160" y="282" width="150" height="16" fill="#818cf8" opacity="0.92"/>
-        <text x="166" y="294" fill="#ffffff" font-family="Geist, sans-serif" font-size="10.5" font-weight="600">Recording Ingest + Genesys adapter</text>
-        <rect x="160" y="304" width="300" height="16" fill="#818cf8" opacity="0.92"/>
-        <text x="166" y="316" fill="#ffffff" font-family="Geist, sans-serif" font-size="10.5" font-weight="600">QA Scoring Engine v1 (objective rubrics → +subjective by M4)</text>
-        <rect x="310" y="326" width="150" height="16" fill="#818cf8" opacity="0.92"/>
-        <text x="316" y="338" fill="#ffffff" font-family="Geist, sans-serif" font-size="10.5" font-weight="600">+Twilio + Amazon Connect adapters</text>
-        <rect x="310" y="348" width="225" height="16" fill="#818cf8" opacity="0.92"/>
-        <text x="316" y="360" fill="#ffffff" font-family="Geist, sans-serif" font-size="10.5" font-weight="600">Coaching Workflow · Sentiment Aggregator · Compliance Detector</text>
-        <rect x="460" y="370" width="150" height="16" fill="#818cf8" opacity="0.92"/>
-        <text x="466" y="382" fill="#ffffff" font-family="Geist, sans-serif" font-size="10.5" font-weight="600">+NICE adapter · Calibration UI · Fine-tune pipeline</text>
-        <rect x="610" y="370" width="600" height="16" fill="#818cf8" opacity="0.55" stroke="#818cf8" stroke-width="0.5" stroke-dasharray="4,3"/>
-        <text x="616" y="382" fill="#ffffff" font-family="Geist, sans-serif" font-size="10.5" font-weight="600">Insights GA · Export · Retention · drift loop tightening · 100% coverage sustained</text>
+        <!-- Build phase 1 (M0–M4): adapters + ingest + platform spine wiring -->
+        <rect x="160" y="282" width="300" height="16" fill="#818cf8" opacity="0.92"/>
+        <text x="166" y="294" fill="#ffffff" font-family="Geist, sans-serif" font-size="10.5" font-weight="600">Build · Recording Ingest · Genesys + Twilio + Connect adapters · platform spine wiring</text>
+        <!-- Build phase 2 (M2–M6): product components -->
+        <rect x="310" y="304" width="300" height="16" fill="#818cf8" opacity="0.92"/>
+        <text x="316" y="316" fill="#ffffff" font-family="Geist, sans-serif" font-size="10.5" font-weight="600">Build · QA Scoring Engine + rubric DSL · Coaching · Compliance · Sentiment · Calibration UI · Fine-tune</text>
+        <!-- Pilot (M6–M8): first tenant value -->
+        <rect x="610" y="326" width="150" height="16" fill="#818cf8" opacity="0.92"/>
+        <text x="616" y="338" fill="#ffffff" font-family="Geist, sans-serif" font-size="10.5" font-weight="600">Pilot · 25% recordings · 1 tenant · 1 CCaaS · objective rubrics live</text>
+        <!-- Expand (M8–M10) -->
+        <rect x="760" y="348" width="150" height="16" fill="#818cf8" opacity="0.92"/>
+        <text x="766" y="360" fill="#ffffff" font-family="Geist, sans-serif" font-size="10.5" font-weight="600">50% · 2 tenants · 3 CCaaS · +subjective rubrics +sentiment +compliance</text>
+        <!-- GA (M10–M12) -->
+        <rect x="910" y="370" width="150" height="16" fill="#818cf8" opacity="0.92"/>
+        <text x="916" y="382" fill="#ffffff" font-family="Geist, sans-serif" font-size="10.5" font-weight="600">100% GA · 3 tenants · 4 CCaaS · +NICE · calibration · fine-tune · export</text>
+        <!-- Sustained (M12–M14) -->
+        <rect x="1060" y="370" width="150" height="16" fill="#818cf8" opacity="0.55" stroke="#818cf8" stroke-width="0.5" stroke-dasharray="4,3"/>
+        <text x="1066" y="382" fill="#ffffff" font-family="Geist, sans-serif" font-size="10.5" font-weight="600">Sustained · drift loop · 5 tenants · federation v0</text>
       </g>
 
       <!-- LANE: Agent Assist -->
@@ -3394,34 +3400,34 @@ h3.subhead em { color: var(--accent); font-style: normal; }
         <line x1="1060" y1="752" x2="1060" y2="810" stroke="#3a3a44" stroke-width="0.5"/>
 
         <!-- M2 -->
-        <text x="235" y="772" text-anchor="middle" fill="#818cf8" font-family="Geist, sans-serif" font-size="11" font-weight="600">Insights · 25%</text>
-        <text x="235" y="788" text-anchor="middle" fill="#82828c" font-family="Geist Mono, monospace" font-size="9">1 tenant · 1 CCaaS · pilot</text>
-        <text x="235" y="802" text-anchor="middle" fill="#82828c" font-family="Geist Mono, monospace" font-size="9">objective rubrics live</text>
+        <text x="235" y="772" text-anchor="middle" fill="#cfcfcf" font-family="Geist, sans-serif" font-size="11" font-weight="600">Foundation build</text>
+        <text x="235" y="788" text-anchor="middle" fill="#82828c" font-family="Geist Mono, monospace" font-size="9">platform spine in flight</text>
+        <text x="235" y="802" text-anchor="middle" fill="#82828c" font-family="Geist Mono, monospace" font-size="9">no tenant value yet</text>
 
         <!-- M4 -->
-        <text x="385" y="772" text-anchor="middle" fill="#818cf8" font-family="Geist, sans-serif" font-size="11" font-weight="600">Insights · 50%</text>
-        <text x="385" y="788" text-anchor="middle" fill="#82828c" font-family="Geist Mono, monospace" font-size="9">2 tenants · 3 CCaaS</text>
-        <text x="385" y="802" text-anchor="middle" fill="#82828c" font-family="Geist Mono, monospace" font-size="9">+sentiment + compliance</text>
+        <text x="385" y="772" text-anchor="middle" fill="#cfcfcf" font-family="Geist, sans-serif" font-size="11" font-weight="600">Pre-pilot ready</text>
+        <text x="385" y="788" text-anchor="middle" fill="#82828c" font-family="Geist Mono, monospace" font-size="9">Insights components built</text>
+        <text x="385" y="802" text-anchor="middle" fill="#82828c" font-family="Geist Mono, monospace" font-size="9">ZDR audit · SOC 2 scoping</text>
 
         <!-- M6 -->
-        <text x="535" y="772" text-anchor="middle" fill="#818cf8" font-family="Geist, sans-serif" font-size="11" font-weight="600">Insights · 100% GA</text>
+        <text x="535" y="772" text-anchor="middle" fill="#818cf8" font-family="Geist, sans-serif" font-size="11" font-weight="600">Insights pilot · 25%</text>
         <text x="535" y="788" text-anchor="middle" fill="#fbbf24" font-family="Geist, sans-serif" font-size="10.5" font-weight="600">AA · shadow mode</text>
-        <text x="535" y="802" text-anchor="middle" fill="#82828c" font-family="Geist Mono, monospace" font-size="9">3 tenants · 4 CCaaS</text>
+        <text x="535" y="802" text-anchor="middle" fill="#82828c" font-family="Geist Mono, monospace" font-size="9">1 tenant · 1 CCaaS</text>
 
         <!-- M8 -->
-        <text x="685" y="772" text-anchor="middle" fill="#fbbf24" font-family="Geist, sans-serif" font-size="11" font-weight="600">AA beta · 30% calls</text>
-        <text x="685" y="788" text-anchor="middle" fill="#34d399" font-family="Geist, sans-serif" font-size="10.5" font-weight="600">CAI · 1 channel pilot</text>
-        <text x="685" y="802" text-anchor="middle" fill="#82828c" font-family="Geist Mono, monospace" font-size="9">5 CCaaS · web chat live</text>
+        <text x="685" y="772" text-anchor="middle" fill="#818cf8" font-family="Geist, sans-serif" font-size="11" font-weight="600">Insights · 50%</text>
+        <text x="685" y="788" text-anchor="middle" fill="#fbbf24" font-family="Geist, sans-serif" font-size="10.5" font-weight="600">AA beta · 30% calls</text>
+        <text x="685" y="802" text-anchor="middle" fill="#34d399" font-family="Geist, sans-serif" font-size="10" font-weight="600">CAI · 1 ch pilot · web chat</text>
 
         <!-- M10 -->
-        <text x="835" y="772" text-anchor="middle" fill="#fbbf24" font-family="Geist, sans-serif" font-size="11" font-weight="600">AA GA · 100% calls</text>
-        <text x="835" y="788" text-anchor="middle" fill="#34d399" font-family="Geist, sans-serif" font-size="10.5" font-weight="600">CAI · 4 channels (P1)</text>
-        <text x="835" y="802" text-anchor="middle" fill="#82828c" font-family="Geist Mono, monospace" font-size="9">web · WA · Twilio + Connect voice</text>
+        <text x="835" y="772" text-anchor="middle" fill="#818cf8" font-family="Geist, sans-serif" font-size="11" font-weight="600">Insights · 100% GA</text>
+        <text x="835" y="788" text-anchor="middle" fill="#fbbf24" font-family="Geist, sans-serif" font-size="10.5" font-weight="600">AA GA · 100% calls</text>
+        <text x="835" y="802" text-anchor="middle" fill="#34d399" font-family="Geist, sans-serif" font-size="10" font-weight="600">CAI · 4 channels (P1)</text>
 
         <!-- M12 -->
-        <text x="985" y="772" text-anchor="middle" fill="#34d399" font-family="Geist, sans-serif" font-size="11" font-weight="600">CAI · 6 channels (P2)</text>
-        <text x="985" y="788" text-anchor="middle" fill="#82828c" font-family="Geist Mono, monospace" font-size="9">+SMS + Genesys voice</text>
-        <text x="985" y="802" text-anchor="middle" fill="#82828c" font-family="Geist Mono, monospace" font-size="9">HIPAA BAA-ready</text>
+        <text x="985" y="772" text-anchor="middle" fill="#818cf8" font-family="Geist, sans-serif" font-size="10.5" font-weight="600">Insights sustained · 5T</text>
+        <text x="985" y="788" text-anchor="middle" fill="#34d399" font-family="Geist, sans-serif" font-size="11" font-weight="600">CAI · 6 channels (P2)</text>
+        <text x="985" y="802" text-anchor="middle" fill="#82828c" font-family="Geist Mono, monospace" font-size="9">+SMS + Genesys · HIPAA</text>
 
         <!-- M14 -->
         <text x="1135" y="772" text-anchor="middle" fill="#34d399" font-family="Geist, sans-serif" font-size="11" font-weight="600">Platform GA · 7 channels</text>
@@ -3444,13 +3450,13 @@ h3.subhead em { color: var(--accent); font-style: normal; }
     <tbody>
       <tr>
         <td>Insights · recordings under AI QA</td>
-        <td><span class="cov-cell"><span class="pct">25%</span><span class="sub">1 tenant · 1 CCaaS</span></span></td>
+        <td><span class="cov-cell"><span class="pct dim">—</span><span class="sub">build phase</span></span></td>
+        <td><span class="cov-cell"><span class="pct dim">—</span><span class="sub">components built</span></span></td>
+        <td><span class="cov-cell"><span class="pct">25%</span><span class="sub">1 tenant · 1 CCaaS · pilot</span></span></td>
         <td><span class="cov-cell"><span class="pct">50%</span><span class="sub">2 tenants · 3 CCaaS</span></span></td>
         <td><span class="cov-cell"><span class="pct">100%</span><span class="sub">3 tenants · 4 CCaaS · GA</span></span></td>
-        <td><span class="cov-cell"><span class="pct dim">100%</span><span class="sub">+NICE · 5 CCaaS</span></span></td>
         <td><span class="cov-cell"><span class="pct dim">100%</span><span class="sub">5 tenants · all CCaaS</span></span></td>
-        <td><span class="cov-cell"><span class="pct dim">100%</span><span class="sub">drift loop tightening</span></span></td>
-        <td><span class="cov-cell"><span class="pct dim">100%</span><span class="sub">+federation v0</span></span></td>
+        <td><span class="cov-cell"><span class="pct dim">100%</span><span class="sub">drift loop · federation v0</span></span></td>
       </tr>
       <tr>
         <td>Agent Assist · live calls covered</td>
@@ -3484,12 +3490,12 @@ h3.subhead em { color: var(--accent); font-style: normal; }
       </tr>
       <tr>
         <td>Tenant footprint</td>
+        <td><span class="cov-cell"><span class="pct dim">0</span><span class="sub">pre-onboarding</span></span></td>
+        <td><span class="cov-cell"><span class="pct dim">0</span><span class="sub">contracting · pilot tenant signed</span></span></td>
         <td><span class="cov-cell"><span class="pct">1</span><span class="sub">anchor · Insights pilot</span></span></td>
-        <td><span class="cov-cell"><span class="pct">2</span><span class="sub">Insights only</span></span></td>
-        <td><span class="cov-cell"><span class="pct">3</span><span class="sub">Insights GA</span></span></td>
-        <td><span class="cov-cell"><span class="pct">4</span><span class="sub">+AA beta</span></span></td>
-        <td><span class="cov-cell"><span class="pct">5</span><span class="sub">multi-product</span></span></td>
-        <td><span class="cov-cell"><span class="pct">5+</span><span class="sub">cross-product expansion</span></span></td>
+        <td><span class="cov-cell"><span class="pct">2</span><span class="sub">+AA beta on anchor</span></span></td>
+        <td><span class="cov-cell"><span class="pct">3</span><span class="sub">Insights + AA GA</span></span></td>
+        <td><span class="cov-cell"><span class="pct">5</span><span class="sub">cross-product expansion</span></span></td>
         <td><span class="cov-cell"><span class="pct">5–7</span><span class="sub">platform GA · all three</span></span></td>
       </tr>
     </tbody>
