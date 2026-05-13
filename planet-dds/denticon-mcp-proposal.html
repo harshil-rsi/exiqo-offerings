@@ -1,0 +1,2572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Denticon MCP POC — Architecture & Implementation Proposal · RSI × Planet DDS</title>
+<style>
+  /* ============ DESIGN TOKENS ============ */
+  :root {
+    --ink: #0B2545;
+    --ink-2: #1F2E4D;
+    --muted: #5B6B85;
+    --muted-2: #94A3B8;
+    --line: #DCE3EE;
+    --line-2: #EEF2F7;
+    --bg: #FFFFFF;
+    --bg-soft: #F7F9FC;
+    --bg-tint: #EEF5F7;
+    --teal: #0E8C8C;
+    --teal-2: #14A8A8;
+    --teal-tint: #DDF1F1;
+    --amber: #C2820B;
+    --amber-tint: #FBEED1;
+    --blue: #2456C8;
+    --blue-tint: #DCE6FB;
+    --purple: #6F3DD3;
+    --purple-tint: #E6DCF8;
+    --rose: #B5325A;
+    --rose-tint: #F6D9E2;
+    --green: #1F8049;
+    --green-tint: #D4ECDD;
+    --slate: #334155;
+    --code-bg: #F1F5F9;
+    --shadow: 0 1px 0 rgba(11,37,69,0.04), 0 12px 32px rgba(11,37,69,0.06);
+    --shadow-deep: 0 4px 16px rgba(11,37,69,0.08), 0 24px 64px rgba(11,37,69,0.12);
+    --r-sm: 6px;
+    --r-md: 10px;
+    --r-lg: 16px;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "SF Pro Text", "Inter", system-ui, sans-serif;
+    --mono: "SF Mono", "JetBrains Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    font-family: var(--font);
+    color: var(--ink);
+    background: #E9EDF3;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow: hidden;
+  }
+
+  /* ============ DECK ============ */
+  #deck { position: relative; width: 100vw; height: 100vh; overflow: hidden; }
+  .slide {
+    position: absolute; inset: 0;
+    width: 100vw; height: 100vh;
+    display: none;
+    background: var(--bg);
+    overflow: hidden;
+  }
+  .slide.active { display: block; }
+
+  .stage {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding: 56px 80px 56px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+
+  /* slide header */
+  .head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--line);
+  }
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--teal);
+    font-weight: 600;
+  }
+  .head .right {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  /* slide footer */
+  .foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--muted-2);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-2);
+  }
+
+  /* slide body */
+  .body { padding: 28px 0; overflow: hidden; }
+
+  h1.title {
+    font-size: 64px;
+    line-height: 1.05;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 16px;
+    color: var(--ink);
+  }
+  h2.slide-title {
+    font-size: 38px;
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -0.018em;
+    margin: 0 0 6px;
+    color: var(--ink);
+  }
+  .deck-h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink-2);
+    margin: 0 0 8px;
+    letter-spacing: -0.005em;
+  }
+  .lede {
+    font-size: 20px;
+    line-height: 1.45;
+    color: var(--slate);
+    max-width: 1100px;
+    font-weight: 400;
+    margin: 0 0 24px;
+  }
+  p { margin: 0 0 12px; font-size: 15px; line-height: 1.55; color: var(--slate); }
+
+  /* TITLE SLIDE */
+  .title-stage {
+    display: flex; flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    padding: 0 96px;
+    position: relative;
+  }
+  .title-eyebrow {
+    font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--teal); font-weight: 600; margin-bottom: 28px;
+  }
+  .title-stage .sub {
+    font-size: 22px; color: var(--slate); max-width: 880px;
+    line-height: 1.45; margin: 4px 0 48px; font-weight: 400;
+  }
+  .title-meta {
+    display: grid; grid-template-columns: repeat(4, auto);
+    gap: 48px; padding: 28px 0 0;
+    border-top: 1px solid var(--line);
+    max-width: 1100px;
+  }
+  .title-meta .k {
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 6px;
+  }
+  .title-meta .v {
+    font-size: 15px; color: var(--ink); font-weight: 500;
+  }
+  .corner-mark {
+    position: absolute; top: 48px; right: 96px;
+    display: flex; align-items: center; gap: 12px;
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .corner-mark .dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--teal);
+    box-shadow: 0 0 0 4px var(--teal-tint);
+  }
+  .title-watermark {
+    position: absolute; bottom: 48px; right: 96px;
+    font-size: 10px; letter-spacing: 0.18em;
+    color: var(--muted-2); text-transform: uppercase;
+  }
+
+  /* GRIDS */
+  .cols-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; }
+  .cols-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 28px; }
+  .cols-2-asym { display: grid; grid-template-columns: 1fr 1.2fr; gap: 36px; }
+
+  /* CARDS */
+  .card {
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 22px;
+    background: var(--bg);
+    box-shadow: 0 1px 0 rgba(11,37,69,0.02);
+  }
+  .card.tint { background: var(--bg-soft); }
+  .card.teal { background: var(--teal-tint); border-color: rgba(14,140,140,0.2); }
+  .card.amber { background: var(--amber-tint); border-color: rgba(194,130,11,0.2); }
+  .card.blue { background: var(--blue-tint); border-color: rgba(36,86,200,0.2); }
+  .card.purple { background: var(--purple-tint); border-color: rgba(111,61,211,0.2); }
+  .card.rose { background: var(--rose-tint); border-color: rgba(181,50,90,0.2); }
+  .card.green { background: var(--green-tint); border-color: rgba(31,128,73,0.2); }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--teal); font-weight: 700; margin-bottom: 10px;
+  }
+  .badge.amber { color: var(--amber); }
+  .badge.blue { color: var(--blue); }
+  .badge.purple { color: var(--purple); }
+  .badge.rose { color: var(--rose); }
+  .badge.green { color: var(--green); }
+
+  /* LISTS */
+  ul.crisp { padding: 0; margin: 8px 0 0; list-style: none; }
+  ul.crisp li {
+    position: relative;
+    padding: 7px 0 7px 22px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--slate);
+    border-bottom: 1px dashed var(--line-2);
+  }
+  ul.crisp li:last-child { border-bottom: 0; }
+  ul.crisp li::before {
+    content: ""; position: absolute; left: 0; top: 16px;
+    width: 8px; height: 1px; background: var(--teal);
+  }
+  ul.crisp.green li::before { background: var(--green); }
+  ul.crisp.amber li::before { background: var(--amber); }
+  ul.crisp.rose li::before { background: var(--rose); }
+  ul.crisp.blue li::before { background: var(--blue); }
+  ul.crisp.purple li::before { background: var(--purple); }
+  ul.crisp li strong { color: var(--ink); font-weight: 600; }
+
+  .kv {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 10px 20px;
+    font-size: 14px;
+  }
+  .kv .k {
+    color: var(--muted); font-weight: 500;
+    border-right: 1px solid var(--line-2); padding-right: 16px;
+  }
+  .kv .v { color: var(--ink-2); }
+
+  /* TABLES */
+  table.matrix {
+    width: 100%; border-collapse: collapse;
+    font-size: 13.5px;
+  }
+  table.matrix th, table.matrix td {
+    padding: 11px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  table.matrix th {
+    background: var(--bg-soft);
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  table.matrix td.dim {
+    color: var(--ink-2);
+    font-weight: 600;
+    width: 26%;
+  }
+  table.matrix .pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .pill.high { background: var(--green-tint); color: var(--green); }
+  .pill.med { background: var(--amber-tint); color: var(--amber); }
+  .pill.low { background: var(--rose-tint); color: var(--rose); }
+  .pill.blue { background: var(--blue-tint); color: var(--blue); }
+  .pill.purple { background: var(--purple-tint); color: var(--purple); }
+  .pill.teal { background: var(--teal-tint); color: var(--teal); }
+
+  /* CODE */
+  code, pre {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    background: var(--code-bg);
+    color: var(--ink);
+    border-radius: 4px;
+  }
+  code { padding: 2px 6px; }
+  pre { padding: 14px 16px; overflow: auto; line-height: 1.55; }
+
+  /* SVG diagram frames */
+  .diagram {
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 16px;
+  }
+  .diagram svg { width: 100%; height: auto; display: block; }
+  .diagram-cap {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 10px;
+    letter-spacing: 0.02em;
+  }
+
+  /* SVG diagram styling */
+  .node {
+    fill: #fff;
+    stroke: var(--ink-2);
+    stroke-width: 1.5;
+  }
+  .node-teal { fill: var(--teal-tint); stroke: var(--teal); }
+  .node-amber { fill: var(--amber-tint); stroke: var(--amber); }
+  .node-blue { fill: var(--blue-tint); stroke: var(--blue); }
+  .node-purple { fill: var(--purple-tint); stroke: var(--purple); }
+  .node-rose { fill: var(--rose-tint); stroke: var(--rose); }
+  .node-green { fill: var(--green-tint); stroke: var(--green); }
+  .node-soft { fill: var(--bg-soft); stroke: var(--line); }
+  .lbl {
+    font-family: var(--font);
+    font-size: 12px;
+    fill: var(--ink);
+    font-weight: 600;
+  }
+  .lbl-sm { font-size: 10.5px; font-weight: 500; fill: var(--slate); }
+  .lbl-xs { font-size: 9.5px; font-weight: 500; fill: var(--muted); letter-spacing: 0.04em; }
+  .lbl-eyebrow { font-size: 9.5px; font-weight: 700; fill: var(--teal); letter-spacing: 0.14em; text-transform: uppercase; }
+  .lbl-zone {
+    font-size: 10px; fill: var(--muted); font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+  }
+  .edge { fill: none; stroke: var(--muted); stroke-width: 1.4; }
+  .edge-strong { stroke: var(--ink); stroke-width: 1.7; }
+  .edge-teal { stroke: var(--teal); stroke-width: 1.6; }
+  .edge-amber { stroke: var(--amber); stroke-width: 1.6; }
+  .edge-blue { stroke: var(--blue); stroke-width: 1.6; }
+  .edge-purple { stroke: var(--purple); stroke-width: 1.6; }
+  .edge-dashed { stroke-dasharray: 4 4; }
+  .zone {
+    fill: none;
+    stroke: var(--line);
+    stroke-dasharray: 3 3;
+    stroke-width: 1;
+    rx: 10;
+  }
+  .zone-fill { fill: rgba(247,249,252,0.7); stroke: var(--line); stroke-width: 1; rx: 10; }
+
+  /* HUD */
+  #hud {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--line-2);
+    z-index: 1000;
+  }
+  #hud .bar {
+    height: 100%;
+    background: var(--teal);
+    transition: width 0.3s ease;
+  }
+  #controls {
+    position: fixed;
+    bottom: 12px; right: 16px;
+    display: flex;
+    gap: 6px;
+    z-index: 1001;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 5px 10px;
+    box-shadow: var(--shadow);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    align-items: center;
+  }
+  #controls .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px;
+    border: 0; background: transparent;
+    cursor: pointer; color: var(--ink-2); border-radius: 50%;
+    font-size: 14px;
+  }
+  #controls .btn:hover { background: var(--line-2); }
+  #controls .ctr { padding: 0 6px; font-variant-numeric: tabular-nums; }
+  #controls .sep { width: 1px; height: 16px; background: var(--line); }
+
+  /* NOTES OVERLAY */
+  #notes {
+    position: fixed;
+    bottom: 16px; left: 16px;
+    width: 360px;
+    max-height: 50vh;
+    overflow: auto;
+    background: var(--ink);
+    color: #E2E8F0;
+    border-radius: var(--r-md);
+    padding: 14px 16px;
+    font-size: 12px;
+    line-height: 1.55;
+    box-shadow: var(--shadow-deep);
+    z-index: 1002;
+    display: none;
+  }
+  #notes.open { display: block; }
+  #notes .nh { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--teal-2); margin-bottom: 8px; }
+
+  /* OVERVIEW MODE */
+  #deck.overview .slide {
+    display: block !important;
+    position: absolute;
+    transform-origin: top left;
+  }
+  #deck.overview {
+    overflow: auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    padding: 24px;
+    background: #DBE2EC;
+  }
+  #deck.overview .slide {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%;
+    box-shadow: var(--shadow);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transform: scale(0.25);
+    transform-origin: top left;
+    /* fallback for browsers — use zoom instead */
+  }
+
+  /* PRINT */
+  @media print {
+    @page { size: 1600px 900px; margin: 0; }
+    body { background: #fff; }
+    #hud, #controls, #notes { display: none !important; }
+    #deck, .slide { width: 1600px !important; height: 900px !important; position: relative !important; overflow: hidden !important; }
+    .slide { display: block !important; page-break-after: always; page-break-inside: avoid; box-shadow: none !important; }
+    .slide:last-child { page-break-after: auto; }
+  }
+
+  /* Decorative title shapes */
+  .deco {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0.55;
+  }
+
+  /* Inline tag */
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: var(--bg-tint);
+    color: var(--teal);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    border: 1px solid rgba(14,140,140,0.25);
+  }
+  .tag.amber { background: var(--amber-tint); color: var(--amber); border-color: rgba(194,130,11,0.25); }
+  .tag.blue { background: var(--blue-tint); color: var(--blue); border-color: rgba(36,86,200,0.25); }
+  .tag.purple { background: var(--purple-tint); color: var(--purple); border-color: rgba(111,61,211,0.25); }
+  .tag.green { background: var(--green-tint); color: var(--green); border-color: rgba(31,128,73,0.25); }
+  .tag.rose { background: var(--rose-tint); color: var(--rose); border-color: rgba(181,50,90,0.25); }
+
+  /* Two-up callout boxes */
+  .lift {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--teal);
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-size: 13.5px;
+    color: var(--ink-2);
+  }
+  .lift.amber { border-left-color: var(--amber); }
+  .lift.blue { border-left-color: var(--blue); }
+  .lift.purple { border-left-color: var(--purple); }
+  .lift.rose { border-left-color: var(--rose); }
+  .lift.green { border-left-color: var(--green); }
+
+  /* Inline definitions */
+  dl.defs { margin: 0; }
+  dl.defs > div { padding: 8px 0; border-bottom: 1px solid var(--line-2); display: grid; grid-template-columns: 180px 1fr; gap: 18px; }
+  dl.defs > div:last-child { border-bottom: 0; }
+  dl.defs dt { font-weight: 600; color: var(--ink-2); font-size: 13px; }
+  dl.defs dd { margin: 0; color: var(--slate); font-size: 13.5px; line-height: 1.5; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+
+  .small { font-size: 12px; color: var(--muted); }
+  .x-small { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+
+  .nowrap { white-space: nowrap; }
+
+  /* Help overlay */
+  #help {
+    position: fixed; inset: 0;
+    background: rgba(11,37,69,0.55);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 1003;
+  }
+  #help.open { display: flex; }
+  #help .panel {
+    background: #fff;
+    border-radius: 12px;
+    padding: 28px 32px;
+    max-width: 480px;
+    box-shadow: var(--shadow-deep);
+  }
+  #help h3 { margin: 0 0 12px; }
+  #help kbd {
+    display: inline-block;
+    min-width: 24px; text-align: center;
+    padding: 2px 8px;
+    border: 1px solid var(--line);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    background: var(--bg-soft);
+    color: var(--ink-2);
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+  #help table { width: 100%; border-collapse: collapse; }
+  #help td { padding: 8px 0; font-size: 13px; color: var(--slate); }
+  #help td:first-child { width: 100px; }
+</style>
+</head>
+<body>
+
+<div id="deck">
+
+<!-- ====================== SLIDE 1: TITLE ====================== -->
+<section class="slide active" data-notes="Welcome. This deck is a draft POC proposal for a Denticon MCP server, organized for a CTO+architecture audience. We hold both implementation paths (API-wrap, Direct-DB) as live options and present the trade-offs without a RSI-weighted recommendation — that decision is the team's to make after reading.">
+  <div class="title-stage">
+    <div class="corner-mark"><span class="dot"></span><span>RSI × Planet DDS</span></div>
+    <div class="title-eyebrow">Architecture & implementation proposal · Draft 0.1</div>
+    <h1 class="title">Denticon MCP POC</h1>
+    <p class="sub">Two paths to an agent-native data surface for the Denticon platform — wrap the existing REST APIs, or read directly from the SQL replicas. This deck is the working document for that decision.</p>
+    <div class="title-meta">
+      <div><div class="k">Prepared for</div><div class="v">Planet DDS — Architecture</div></div>
+      <div><div class="k">Prepared by</div><div class="v">Harshil Shah · RSI</div></div>
+      <div><div class="k">Basis</div><div class="v">Arch walkthrough · 04 May 2026</div></div>
+      <div><div class="k">Decision target</div><div class="v">Phase 1 path selection</div></div>
+    </div>
+    <div class="title-watermark">Confidential · For Planet DDS review</div>
+
+    <!-- subtle decoration -->
+    <svg class="deco" style="top:60%; right:5%; width: 480px; opacity: 0.18;" viewBox="0 0 480 360">
+      <defs>
+        <linearGradient id="dg1" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#0E8C8C"/>
+          <stop offset="100%" stop-color="#0B2545" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <circle cx="240" cy="180" r="160" fill="none" stroke="url(#dg1)" stroke-width="1"/>
+      <circle cx="240" cy="180" r="120" fill="none" stroke="url(#dg1)" stroke-width="1"/>
+      <circle cx="240" cy="180" r="80" fill="none" stroke="url(#dg1)" stroke-width="1"/>
+      <circle cx="240" cy="180" r="40" fill="none" stroke="url(#dg1)" stroke-width="1"/>
+      <line x1="40" y1="180" x2="440" y2="180" stroke="url(#dg1)" stroke-width="1"/>
+      <line x1="240" y1="20" x2="240" y2="340" stroke="url(#dg1)" stroke-width="1"/>
+    </svg>
+  </div>
+</section>
+
+<!-- placeholders filled in subsequent edits -->
+<!-- ====================== SLIDE 2: EXECUTIVE SUMMARY ====================== -->
+<section class="slide" data-notes="The three-bullet executive read. The point is: the foundations are right, the choice is non-trivial, and the POC isn't really 'A vs B' so much as 'which path makes semantic correctness easier given your data dictionary state.'">
+  <div class="stage">
+    <div class="head">
+      <div>
+        <div class="eyebrow">02 · Executive summary</div>
+        <h2 class="slide-title">The three takeaways before we go deep</h2>
+      </div>
+      <div class="right">Denticon MCP POC · v0.1</div>
+    </div>
+    <div class="body">
+      <p class="lede">Denticon already runs on the right substrate to host a production-grade MCP server. The hard call is not <em>whether</em> to build it — it's <em>how</em> to wire the data plane and where the semantic catalog lives.</p>
+      <div class="cols-3" style="margin-top: 28px;">
+        <div class="card teal">
+          <span class="badge">01 · Substrate</span>
+          <h3 class="deck-h3">The foundations are already in place</h3>
+          <p>Azure APIM fronting your developer portal, an Identity Server issuing JWT claims, an Entra-friendly auth model, and a four-tier multi-tenant data model (PGID → OID → RPID → Patient) mean a remote MCP server slots in alongside what you have — not on top of a rebuild.</p>
+        </div>
+        <div class="card blue">
+          <span class="badge blue">02 · The choice</span>
+          <h3 class="deck-h3">Two legitimate paths, different trade spaces</h3>
+          <p><strong>Option A:</strong> wrap the existing public APIs. Inherit auth, billing, semantics. Accept that the analytical surface is bounded by what the APIs expose. <strong>Option B:</strong> read directly from the SQL replicas. Get the whole column space and analytical joins, at the cost of rebuilding tenant scoping and the semantic layer from scratch.</p>
+        </div>
+        <div class="card amber">
+          <span class="badge amber">03 · Scope</span>
+          <h3 class="deck-h3">Read-only, partner-facing, analytical</h3>
+          <p>The POC stays on read replicas and on read-only API surfaces — no writes, no transactional path. The shipping decision is less &ldquo;API vs DB&rdquo; than &ldquo;which path makes the data dictionary work easier, fastest, with the lowest tenant-isolation risk.&rdquo;</p>
+        </div>
+      </div>
+      <div class="lift" style="margin-top: 28px;">
+        <strong>Our recommendation for this deck:</strong>&nbsp; run both paths as parallel spikes for the first two weeks, then converge on the path with the better prompt-eval score on a shared test set. The investment to run both in parallel is small relative to the cost of choosing wrong.
+      </div>
+    </div>
+    <div class="foot"><div>RSI · Confidential</div><div>02 / 23</div></div>
+  </div>
+</section>
+<!-- ====================== SLIDE 3: WHY MCP NOW ====================== -->
+<section class="slide" data-notes="Frame the moment. MCP is no longer a curiosity — it's the de facto enterprise standard. Planet DDS has already validated the agent-native thesis with DentalOS AI Agents. Partner-facing MCP is the next layer.">
+  <div class="stage">
+    <div class="head">
+      <div>
+        <div class="eyebrow">03 · Why now</div>
+        <h2 class="slide-title">MCP has crossed the threshold — and Denticon is already on the curve</h2>
+      </div>
+      <div class="right">Market context</div>
+    </div>
+    <div class="body cols-2-asym">
+      <div>
+        <h3 class="deck-h3">The protocol moment</h3>
+        <ul class="crisp">
+          <li><strong>Linux Foundation governance &amp; 18,000+ community servers.</strong> MCP has moved from interesting experiment to enterprise infrastructure in twelve months.</li>
+          <li><strong>Streamable HTTP transport</strong> (2025-06-18 spec) replaced HTTP+SSE — single-endpoint, stateless-capable, load-balancer friendly.</li>
+          <li><strong>OAuth 2.1 + PKCE, DCR (RFC 7591), Resource Indicators (RFC 8707), Protected Resource Metadata.</strong> The authorization story finally matches enterprise expectations.</li>
+          <li><strong>Tool-level scopes</strong> (SEP-835, June 2025) and <strong>token exchange</strong> (RFC 8693) at trust boundaries give multi-tenant MCP a clean isolation model.</li>
+          <li><strong>Microsoft, Anthropic, Google, OpenAI</strong> all ship MCP clients now. Building a server is building to a market, not a vendor.</li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="deck-h3">The Denticon moment</h3>
+        <div class="card teal" style="margin-bottom: 14px;">
+          <span class="badge">Already shipped</span>
+          <h3 class="deck-h3">DentalOS AI Agents</h3>
+          <p style="margin: 0;">Confirmation Agent (15–30% no-show reduction) and Scheduling Agent already live inside Denticon and Cloud 9. Internal validation that AI agents working against your data model creates measurable practice value.</p>
+        </div>
+        <div class="card blue" style="margin-bottom: 14px;">
+          <span class="badge blue">Already on Azure APIM</span>
+          <h3 class="deck-h3">Developer portal at developer.planetdds.com</h3>
+          <p style="margin: 0;">The portal is &ldquo;Powered by Azure API Management&rdquo;. APIM natively supports exposing REST APIs as MCP servers and validating Entra-issued JWTs — significant zero-day leverage.</p>
+        </div>
+        <div class="card amber">
+          <span class="badge amber">Already in the market</span>
+          <h3 class="deck-h3">Third-party AI integrations</h3>
+          <p style="margin: 0;">Resonate, TensorLinks, Kickcall, and others are already shipping AI receptionists on top of Denticon APIs. A partner-facing MCP standardizes their integration model and reduces support load.</p>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><div>RSI · Confidential</div><div>03 / 23</div></div>
+  </div>
+</section>
+<!-- ====================== SLIDE 4: POC OBJECTIVES ====================== -->
+<section class="slide" data-notes="What success looks like. The POC is intentionally read-only and analytical. We want to validate auth reuse, tenant isolation under adversarial prompts, and prompt-to-response performance. We are NOT validating transactional writes — that's a Phase 2 conversation.">
+  <div class="stage">
+    <div class="head">
+      <div>
+        <div class="eyebrow">04 · POC objectives</div>
+        <h2 class="slide-title">What we're proving — and what we are <em>not</em></h2>
+      </div>
+      <div class="right">Scope &amp; success criteria</div>
+    </div>
+    <div class="body cols-2">
+      <div>
+        <h3 class="deck-h3">In scope</h3>
+        <ul class="crisp">
+          <li><strong>Prompt-to-response</strong> over Denticon data via a remote MCP server hosted on Azure.</li>
+          <li><strong>Auth reuse</strong> — existing Identity Server JWTs flow end-to-end; no parallel identity system.</li>
+          <li><strong>Tenant isolation</strong> — PGID and OID claims enforced at every layer, validated by an adversarial test harness.</li>
+          <li><strong>Read-only, analytical workloads</strong> — augment existing reports with conversational data access.</li>
+          <li><strong>Two parallel architecture spikes</strong> (Option A and Option B) measured on a shared prompt-eval set.</li>
+          <li><strong>Cross-region DR posture</strong> — MCP deploys symmetrically into the Central + East stamps and survives a stamp failover.</li>
+          <li><strong>Audit &amp; observability</strong> — every tool call logged with caller, tenant, parameters (PHI-redacted), latency, outcome.</li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="deck-h3">Out of scope (this POC)</h3>
+        <ul class="crisp rose">
+          <li><strong>Writes / transactional flows.</strong> No appointment booking, no patient updates, no ledger writes through MCP in the POC.</li>
+          <li><strong>New user identity primitives.</strong> The POC consumes existing IdP tokens — no new user store, no new password flows.</li>
+          <li><strong>Cross-tenant analytics for Planet DDS itself.</strong> Aggregate views across PGIDs require a separate authorization model; we'll note it but not build it.</li>
+          <li><strong>Production-ready billing meter.</strong> POC uses a carve-out; production metering is a separate decision after we have usage data.</li>
+          <li><strong>Embedded Denticon UI integration.</strong> POC is a partner-facing remote server; embedded surfaces can be added later without re-architecting.</li>
+        </ul>
+
+        <h3 class="deck-h3" style="margin-top: 28px;">Success criteria</h3>
+        <div class="kv" style="margin-top: 6px;">
+          <div class="k">Prompt round-trip</div><div class="v">&lt; 5s p50 on the agreed query set</div>
+          <div class="k">Tenant isolation</div><div class="v">100% block rate on a 200-case cross-PGID attack suite</div>
+          <div class="k">Auth reuse</div><div class="v">Existing JWTs accepted unchanged; no client-side config divergence</div>
+          <div class="k">DR posture</div><div class="v">Stamp failover with no MCP client reconfiguration</div>
+          <div class="k">Decision artifact</div><div class="v">Side-by-side prompt-eval scoreboard for Option A and Option B</div>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><div>RSI · Confidential</div><div>04 / 23</div></div>
+  </div>
+</section>
+<!-- ====================== SLIDE 5: GROUND TRUTH FROM WALKTHROUGH ====================== -->
+<section class="slide" data-notes="This is the page that proves we listened. Left column is what we heard. Right column is how each fact constrains the MCP design. We're not relitigating the architecture — we're showing we understood it.">
+  <div class="stage">
+    <div class="head">
+      <div>
+        <div class="eyebrow">05 · Ground truth</div>
+        <h2 class="slide-title">What we heard on 04 May — and what it means for MCP</h2>
+      </div>
+      <div class="right">Reading the architecture walkthrough</div>
+    </div>
+    <div class="body">
+      <table class="matrix">
+        <thead>
+          <tr><th style="width: 42%;">Architecture fact</th><th>Implication for the MCP design</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="dim">Active/active across Azure Central + East stamps; single <code>denticon.com</code> URL; central metadata DB routes login to region.</td>
+            <td>MCP must respect the same regional routing. Deploy symmetrically and route by stamp, not by treating Denticon as a single backend.</td>
+          </tr>
+          <tr>
+            <td class="dim">SQL Server 2022 Enterprise; Always On availability groups within region; distributed availability groups for cross-region DR.</td>
+            <td>MCP targets <em>read replicas</em> in the same region as the caller. Failover paths inherit existing DAG semantics.</td>
+          </tr>
+          <tr>
+            <td class="dim">18–19 client databases with identical schemas; large clients dedicated, smaller clients pooled.</td>
+            <td>MCP treats all client DBs uniformly. Selection happens through the same metadata routing the app uses. Sharding is invisible above the routing layer.</td>
+          </tr>
+          <tr>
+            <td class="dim">Four-tier hierarchy: PGID → OID → RPID → Patient. PGID is part of every primary key.</td>
+            <td>Every MCP tool invocation must carry PGID context derived from JWT claims. Office-level granularity (OID) is enforced inside the tool, not the prompt.</td>
+          </tr>
+          <tr>
+            <td class="dim">No database-level row-level security; all isolation enforced in the application layer.</td>
+            <td>MCP must reproduce the application's tenancy contract — three-layer isolation, with the database as the last line, not the first.</td>
+          </tr>
+          <tr>
+            <td class="dim">Identity Server issues JWTs with bundle / PGID / OID claims; APIM enforces token validation, rate limit, quota.</td>
+            <td>The MCP server fronts behind APIM exactly like any other Denticon API. Existing <code>validate-jwt</code> policies apply with minimal changes.</td>
+          </tr>
+          <tr>
+            <td class="dim">API access is provisioned at the API level (not endpoint); 403 returned for unauthorized office.</td>
+            <td>For Option A, MCP scopes can map cleanly to API-level claims; tool-level scope (SEP-835) adds a finer-grained layer inside MCP.</td>
+          </tr>
+          <tr>
+            <td class="dim">Hidden &ldquo;Agentic API&rdquo; for AI-friendly workflows (e.g., automated appointment booking).</td>
+            <td>MCP is the natural <em>externalization</em> of this surface. The Agentic API is, in MCP terms, a high-value internal tool set we can either wrap or align with.</td>
+          </tr>
+          <tr>
+            <td class="dim">Some clients use Microsoft SSO; majority use native username/password authentication.</td>
+            <td>Both flows produce JWTs from the same Identity Server, so MCP doesn't care which the user authenticated with — it consumes the token.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="foot"><div>RSI · Confidential</div><div>05 / 23</div></div>
+  </div>
+</section>
+<!-- ====================== SLIDE 6: CURRENT DENTICON PLATFORM ====================== -->
+<section class="slide" data-notes="This is the architecture we heard from DJ on 4 May, drawn back to you. Two Azure regions, single URL, central metadata DB routes login to the right stamp. SQL 2022 AOAG per region, DAG between regions. Identity Server fronted by APIM. Read replicas exist and are where the MCP server will plug in.">
+  <div class="stage">
+    <div class="head">
+      <div>
+        <div class="eyebrow">06 · Current state</div>
+        <h2 class="slide-title">Denticon today — active/active across Azure regions</h2>
+      </div>
+      <div class="right">Reference platform diagram</div>
+    </div>
+    <div class="body">
+      <div class="diagram">
+        <svg viewBox="0 0 1480 720" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Current Denticon platform architecture across Azure regions">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="#5B6B85"/>
+            </marker>
+            <marker id="arrow-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="#0E8C8C"/>
+            </marker>
+            <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="#2456C8"/>
+            </marker>
+            <marker id="arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="#C2820B"/>
+            </marker>
+            <marker id="arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="#6F3DD3"/>
+            </marker>
+          </defs>
+
+          <!-- ============ ZONES ============ -->
+          <text x="40" y="36" class="lbl-zone">Clients</text>
+          <text x="40" y="120" class="lbl-zone">Global edge</text>
+          <text x="40" y="232" class="lbl-zone">Identity</text>
+          <text x="40" y="360" class="lbl-zone">Regional stamps</text>
+          <text x="40" y="660" class="lbl-zone">Cross-region DR</text>
+
+          <!-- ============ CLIENTS ============ -->
+          <rect class="node node-soft" x="200" y="20" width="180" height="56" rx="6"/>
+          <text class="lbl" x="290" y="44" text-anchor="middle">DSO admin / staff</text>
+          <text class="lbl-xs" x="290" y="60" text-anchor="middle">Browser</text>
+
+          <rect class="node node-soft" x="410" y="20" width="180" height="56" rx="6"/>
+          <text class="lbl" x="500" y="44" text-anchor="middle">Partner integrations</text>
+          <text class="lbl-xs" x="500" y="60" text-anchor="middle">Resonate · TensorLinks · Kickcall</text>
+
+          <rect class="node node-soft" x="620" y="20" width="180" height="56" rx="6"/>
+          <text class="lbl" x="710" y="44" text-anchor="middle">Internal services</text>
+          <text class="lbl-xs" x="710" y="60" text-anchor="middle">DentalOS AI Agents · imaging · engagement</text>
+
+          <rect class="node node-soft" x="830" y="20" width="180" height="56" rx="6"/>
+          <text class="lbl" x="920" y="44" text-anchor="middle">Mobile clients</text>
+          <text class="lbl-xs" x="920" y="60" text-anchor="middle">iOS / Android</text>
+
+          <!-- ============ EDGE / ROUTING ============ -->
+          <rect class="node node-teal" x="380" y="104" width="640" height="62" rx="8"/>
+          <text class="lbl" x="700" y="128" text-anchor="middle">denticon.com  ·  Azure Front Door / Traffic Manager</text>
+          <text class="lbl-xs" x="700" y="148" text-anchor="middle">TLS, WAF, geo-aware client routing</text>
+
+          <!-- Central metadata DB (router decision) -->
+          <rect class="node node-amber" x="1080" y="104" width="340" height="62" rx="8"/>
+          <text class="lbl" x="1250" y="128" text-anchor="middle">Central metadata DB</text>
+          <text class="lbl-xs" x="1250" y="148" text-anchor="middle">Client-to-region · client-to-DB mapping</text>
+
+          <!-- Arrows clients → edge -->
+          <path class="edge edge-strong" d="M290 76 L290 100" marker-end="url(#arrow)"/>
+          <path class="edge edge-strong" d="M500 76 L500 100" marker-end="url(#arrow)"/>
+          <path class="edge edge-strong" d="M710 76 L710 100" marker-end="url(#arrow)"/>
+          <path class="edge edge-strong" d="M920 76 L920 100" marker-end="url(#arrow)"/>
+
+          <!-- Edge to metadata DB -->
+          <path class="edge edge-amber edge-dashed" d="M1020 134 L1080 134" marker-end="url(#arrow-amber)"/>
+
+          <!-- ============ IDENTITY ============ -->
+          <rect class="node node-purple" x="60" y="216" width="280" height="100" rx="8"/>
+          <text class="lbl" x="200" y="240" text-anchor="middle">Denticon Identity Server</text>
+          <text class="lbl-xs" x="200" y="258" text-anchor="middle">Native username/password</text>
+          <text class="lbl-xs" x="200" y="274" text-anchor="middle">Microsoft SSO (federated)</text>
+          <text class="lbl-xs" x="200" y="290" text-anchor="middle">Issues JWT · sub, bundle, PGIDs, OIDs</text>
+          <text class="lbl-xs" x="200" y="306" text-anchor="middle" fill="#C2820B" font-weight="700">OAuth 2.0 / OIDC</text>
+
+          <path class="edge edge-purple edge-dashed" d="M340 266 L500 266 L500 168" marker-end="url(#arrow-purple)"/>
+          <text class="lbl-xs" x="430" y="258" fill="#6F3DD3">issues JWT, passed in each request</text>
+
+          <!-- ============ REGION: US CENTRAL ============ -->
+          <rect class="zone-fill" x="380" y="200" width="500" height="440" rx="12"/>
+          <text class="lbl-eyebrow" x="402" y="222">Azure · US Central stamp</text>
+
+          <!-- APIM Central -->
+          <rect class="node node-blue" x="400" y="240" width="460" height="48" rx="6"/>
+          <text class="lbl" x="630" y="262" text-anchor="middle">Azure API Management (APIM)</text>
+          <text class="lbl-xs" x="630" y="278" text-anchor="middle">validate-jwt · rate limit · quota · subscription keys</text>
+
+          <!-- App tier Central -->
+          <rect class="node" x="400" y="306" width="220" height="76" rx="6"/>
+          <text class="lbl" x="510" y="328" text-anchor="middle">Denticon App Tier</text>
+          <text class="lbl-xs" x="510" y="344" text-anchor="middle">PGID session context</text>
+          <text class="lbl-xs" x="510" y="360" text-anchor="middle">Office-access enforcement</text>
+
+          <rect class="node node-soft" x="640" y="306" width="220" height="76" rx="6"/>
+          <text class="lbl" x="750" y="328" text-anchor="middle">Redis (session)</text>
+          <text class="lbl-xs" x="750" y="344" text-anchor="middle">User-scoped state</text>
+          <text class="lbl-xs" x="750" y="360" text-anchor="middle">PGID cache</text>
+
+          <!-- SQL Central -->
+          <rect class="node node-teal" x="400" y="404" width="460" height="56" rx="6"/>
+          <text class="lbl" x="630" y="426" text-anchor="middle">SQL Server 2022 EE · AOAG primary</text>
+          <text class="lbl-xs" x="630" y="442" text-anchor="middle">Synchronous replica (zonal HA)</text>
+          <text class="lbl-xs" x="630" y="455" text-anchor="middle">.</text>
+
+          <rect class="node" x="400" y="476" width="220" height="58" rx="6"/>
+          <text class="lbl" x="510" y="498" text-anchor="middle">Client DBs (dedicated)</text>
+          <text class="lbl-xs" x="510" y="514" text-anchor="middle">Large DSOs · isolated</text>
+
+          <rect class="node" x="640" y="476" width="220" height="58" rx="6"/>
+          <text class="lbl" x="750" y="498" text-anchor="middle">Client DBs (pooled)</text>
+          <text class="lbl-xs" x="750" y="514" text-anchor="middle">Smaller clients · multi-tenant</text>
+
+          <!-- Read replica -->
+          <rect class="node node-green" x="400" y="552" width="460" height="58" rx="6"/>
+          <text class="lbl" x="630" y="574" text-anchor="middle">Read-only replica (analytical)</text>
+          <text class="lbl-xs" x="630" y="590" text-anchor="middle">Real-time replicated · target for MCP</text>
+
+          <!-- ============ REGION: US EAST ============ -->
+          <rect class="zone-fill" x="900" y="200" width="500" height="440" rx="12"/>
+          <text class="lbl-eyebrow" x="922" y="222">Azure · US East stamp</text>
+
+          <rect class="node node-blue" x="920" y="240" width="460" height="48" rx="6"/>
+          <text class="lbl" x="1150" y="262" text-anchor="middle">Azure API Management (APIM)</text>
+          <text class="lbl-xs" x="1150" y="278" text-anchor="middle">validate-jwt · rate limit · quota · subscription keys</text>
+
+          <rect class="node" x="920" y="306" width="220" height="76" rx="6"/>
+          <text class="lbl" x="1030" y="328" text-anchor="middle">Denticon App Tier</text>
+          <text class="lbl-xs" x="1030" y="344" text-anchor="middle">PGID session context</text>
+          <text class="lbl-xs" x="1030" y="360" text-anchor="middle">Office-access enforcement</text>
+
+          <rect class="node node-soft" x="1160" y="306" width="220" height="76" rx="6"/>
+          <text class="lbl" x="1270" y="328" text-anchor="middle">Redis (session)</text>
+          <text class="lbl-xs" x="1270" y="344" text-anchor="middle">User-scoped state</text>
+          <text class="lbl-xs" x="1270" y="360" text-anchor="middle">PGID cache</text>
+
+          <rect class="node node-teal" x="920" y="404" width="460" height="56" rx="6"/>
+          <text class="lbl" x="1150" y="426" text-anchor="middle">SQL Server 2022 EE · AOAG primary</text>
+          <text class="lbl-xs" x="1150" y="442" text-anchor="middle">Synchronous replica (zonal HA)</text>
+
+          <rect class="node" x="920" y="476" width="220" height="58" rx="6"/>
+          <text class="lbl" x="1030" y="498" text-anchor="middle">Client DBs (dedicated)</text>
+          <text class="lbl-xs" x="1030" y="514" text-anchor="middle">Large DSOs · isolated</text>
+
+          <rect class="node" x="1160" y="476" width="220" height="58" rx="6"/>
+          <text class="lbl" x="1270" y="498" text-anchor="middle">Client DBs (pooled)</text>
+          <text class="lbl-xs" x="1270" y="514" text-anchor="middle">Smaller clients · multi-tenant</text>
+
+          <rect class="node node-green" x="920" y="552" width="460" height="58" rx="6"/>
+          <text class="lbl" x="1150" y="574" text-anchor="middle">Read-only replica (analytical)</text>
+          <text class="lbl-xs" x="1150" y="590" text-anchor="middle">Real-time replicated · target for MCP</text>
+
+          <!-- Edge → APIM -->
+          <path class="edge edge-strong" d="M620 166 L620 188 L620 240" marker-end="url(#arrow)"/>
+          <path class="edge edge-strong" d="M780 166 L780 188 L1150 188 L1150 240" marker-end="url(#arrow)"/>
+          <text class="lbl-xs" x="700" y="195">stamp-routed by client-to-region map</text>
+
+          <!-- App ↔ DB -->
+          <path class="edge" d="M510 382 L510 404" marker-end="url(#arrow)"/>
+          <path class="edge" d="M1030 382 L1030 404" marker-end="url(#arrow)"/>
+
+          <!-- AOAG to read replica -->
+          <path class="edge edge-teal edge-dashed" d="M630 460 L630 552" marker-end="url(#arrow-teal)"/>
+          <path class="edge edge-teal edge-dashed" d="M1150 460 L1150 552" marker-end="url(#arrow-teal)"/>
+
+          <!-- ============ CROSS-REGION DR (DAG) ============ -->
+          <path class="edge edge-amber" d="M860 432 C 890 432, 890 432, 920 432" marker-end="url(#arrow-amber)" marker-start="url(#arrow-amber)"/>
+          <text class="lbl-xs" x="846" y="420" fill="#C2820B" font-weight="700">DAG</text>
+          <text class="lbl-xs" x="836" y="476" fill="#C2820B">Distributed Availability Group</text>
+
+          <!-- Footer legend -->
+          <rect x="380" y="670" width="1040" height="36" rx="6" fill="#FFFFFF" stroke="#DCE3EE"/>
+          <circle cx="404" cy="688" r="4" fill="#0E8C8C"/><text class="lbl-xs" x="416" y="692">Read replica · MCP target</text>
+          <circle cx="600" cy="688" r="4" fill="#2456C8"/><text class="lbl-xs" x="612" y="692">APIM gateway</text>
+          <circle cx="752" cy="688" r="4" fill="#6F3DD3"/><text class="lbl-xs" x="764" y="692">Identity Server / JWT</text>
+          <circle cx="924" cy="688" r="4" fill="#C2820B"/><text class="lbl-xs" x="936" y="692">Routing / DR replication</text>
+          <text class="lbl-xs" x="1380" y="692" text-anchor="end" fill="#5B6B85" font-style="italic">As described 04 May 2026</text>
+        </svg>
+        <div class="diagram-cap">Note: cross-region DR pattern — clients in Central have DR in East and vice versa. Read replicas exist within each stamp and are the intended target for read-only MCP traffic.</div>
+      </div>
+    </div>
+    <div class="foot"><div>RSI · Confidential</div><div>06 / 23</div></div>
+  </div>
+</section>
+<!-- ====================== SLIDE 7: MCP REFRESHER ====================== -->
+<section class="slide" data-notes="One-slide refresher on what MCP is and the parts of the spec that actually matter for our design. Skip if the audience is fluent, but useful for the security reviewers who'll see this later.">
+  <div class="stage">
+    <div class="head">
+      <div>
+        <div class="eyebrow">07 · MCP refresher</div>
+        <h2 class="slide-title">The parts of MCP that matter for this design</h2>
+      </div>
+      <div class="right">Spec at a glance</div>
+    </div>
+    <div class="body cols-2">
+      <div>
+        <h3 class="deck-h3">Transport &amp; protocol</h3>
+        <dl class="defs">
+          <div><dt>Streamable HTTP</dt><dd>Replaces HTTP+SSE since the 2025-03-26 spec. Single endpoint <code>/mcp</code>, stateless-capable, plays nicely with load balancers, proxies, and corporate firewalls.</dd></div>
+          <div><dt>JSON-RPC 2.0</dt><dd>Message format. Tool calls in, tool results out. Errors are structured. Easy to log and replay.</dd></div>
+          <div><dt>Three primitives</dt><dd><strong>Tools</strong> (functions the client invokes), <strong>resources</strong> (read-only context blobs), <strong>prompts</strong> (templates). APIM's MCP server support currently covers tools only — that's exactly what we need.</dd></div>
+        </dl>
+
+        <h3 class="deck-h3" style="margin-top: 28px;">Identity &amp; authorization</h3>
+        <dl class="defs">
+          <div><dt>OAuth 2.1 + PKCE</dt><dd>The mandatory baseline. Clients obtain tokens through standard authorization flows; no bespoke MCP auth scheme.</dd></div>
+          <div><dt>Dynamic Client Registration (RFC 7591)</dt><dd>Optional but powerful — MCP clients can register themselves with your authorization server without manual provisioning.</dd></div>
+          <div><dt>Protected Resource Metadata</dt><dd>The MCP server publishes a well-known endpoint advertising its authorization server. Clients discover, then dance.</dd></div>
+          <div><dt>Resource Indicators (RFC 8707)</dt><dd>Tokens are bound to <code>aud=denticon-mcp</code> so a leaked token cannot be replayed against other Denticon resources.</dd></div>
+        </dl>
+      </div>
+      <div>
+        <h3 class="deck-h3">What the 2025-06-18 spec change unlocks</h3>
+        <ul class="crisp">
+          <li><strong>Tool-level scopes (SEP-835).</strong> Authorization can be expressed per-tool, not just per-server — e.g., <code>denticon.appointments:read</code> distinct from <code>denticon.rcm:read</code>.</li>
+          <li><strong>Token exchange (RFC 8693) at trust boundaries.</strong> Tokens received by the MCP server are exchanged for narrower tokens before being passed to backends. The chain of custody is auditable.</li>
+          <li><strong>Closed the &ldquo;rogue server token leak&rdquo; class of attacks</strong> that haunted early remote MCP deployments. The protocol is now safe enough for partner-facing exposure.</li>
+        </ul>
+
+        <h3 class="deck-h3" style="margin-top: 24px;">What this means concretely for Denticon</h3>
+        <div class="card teal">
+          <span class="badge">Design implication</span>
+          <p style="margin: 0 0 8px;"><strong>The MCP server is &ldquo;just another API&rdquo; behind APIM.</strong> Your existing <code>validate-jwt</code> policies, rate limit policies, subscription key model, and observability stack all apply. There's no new identity primitive to introduce.</p>
+          <p style="margin: 0;"><strong>Tool-level scopes give us a clean tenancy model.</strong> A token carries scopes like <code>denticon.appointments:read</code>; APIM enforces the scope claim before the request reaches the MCP server; the MCP server then enforces PGID/OID inside the tool itself.</p>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><div>RSI · Confidential</div><div>07 / 23</div></div>
+  </div>
+</section>
+<!-- ====================== SLIDE 8: REFERENCE AZURE TARGET ====================== -->
+<section class="slide" data-notes="The Azure-side topology both options share. Front Door for global edge, APIM as the AI gateway, Container Apps for the MCP server, Entra ID for the IdP integration, App Insights + Log Analytics for observability, Key Vault for secrets. The only thing that changes between A and B is what hangs off the bottom.">
+  <div class="stage">
+    <div class="head">
+      <div>
+        <div class="eyebrow">08 · Reference target</div>
+        <h2 class="slide-title">The Azure topology — shared by Option A and Option B</h2>
+      </div>
+      <div class="right">Per-region stamp</div>
+    </div>
+    <div class="body">
+      <div class="diagram">
+        <svg viewBox="0 0 1480 720" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Reference Azure architecture for the Denticon MCP server">
+          <defs>
+            <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5B6B85"/></marker>
+            <marker id="ar2-t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0E8C8C"/></marker>
+            <marker id="ar2-b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2456C8"/></marker>
+            <marker id="ar2-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#C2820B"/></marker>
+            <marker id="ar2-p" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6F3DD3"/></marker>
+          </defs>
+
+          <!-- Zones -->
+          <text x="40" y="38" class="lbl-zone">MCP hosts &amp; clients</text>
+          <text x="40" y="140" class="lbl-zone">Azure global edge</text>
+          <text x="40" y="252" class="lbl-zone">AI gateway · APIM</text>
+          <text x="40" y="376" class="lbl-zone">MCP server runtime</text>
+          <text x="40" y="528" class="lbl-zone">Backends (path A or B)</text>
+          <text x="1180" y="38" class="lbl-zone" text-anchor="end">Platform services</text>
+
+          <!-- Clients -->
+          <rect class="node node-soft" x="180" y="22" width="200" height="64" rx="6"/>
+          <text class="lbl" x="280" y="46" text-anchor="middle">Claude · ChatGPT</text>
+          <text class="lbl-xs" x="280" y="62" text-anchor="middle">MCP host</text>
+          <text class="lbl-xs" x="280" y="76" text-anchor="middle">User-driven workflows</text>
+
+          <rect class="node node-soft" x="400" y="22" width="200" height="64" rx="6"/>
+          <text class="lbl" x="500" y="46" text-anchor="middle">GitHub Copilot · IDE</text>
+          <text class="lbl-xs" x="500" y="62" text-anchor="middle">MCP host</text>
+          <text class="lbl-xs" x="500" y="76" text-anchor="middle">Developer-driven analytics</text>
+
+          <rect class="node node-soft" x="620" y="22" width="200" height="64" rx="6"/>
+          <text class="lbl" x="720" y="46" text-anchor="middle">Partner AI agents</text>
+          <text class="lbl-xs" x="720" y="62" text-anchor="middle">MCP host</text>
+          <text class="lbl-xs" x="720" y="76" text-anchor="middle">Resonate · Kickcall · custom</text>
+
+          <rect class="node node-soft" x="840" y="22" width="200" height="64" rx="6"/>
+          <text class="lbl" x="940" y="46" text-anchor="middle">DentalOS AI Agents</text>
+          <text class="lbl-xs" x="940" y="62" text-anchor="middle">MCP host (1st-party)</text>
+          <text class="lbl-xs" x="940" y="76" text-anchor="middle">Confirmation · Scheduling</text>
+
+          <!-- Edge: Front Door -->
+          <rect class="node node-teal" x="220" y="124" width="820" height="60" rx="8"/>
+          <text class="lbl" x="630" y="148" text-anchor="middle">Azure Front Door · WAF · TLS · geo-aware routing</text>
+          <text class="lbl-xs" x="630" y="166" text-anchor="middle">Single hostname (e.g. mcp.denticon.com) — routes to nearest healthy stamp</text>
+
+          <!-- APIM -->
+          <rect class="node node-blue" x="220" y="234" width="820" height="120" rx="8"/>
+          <text class="lbl" x="630" y="258" text-anchor="middle">Azure API Management — AI gateway · streamable HTTP endpoint  /mcp</text>
+          <line x1="240" y1="270" x2="1020" y2="270" stroke="#2456C8" stroke-opacity="0.3"/>
+          <text class="lbl-xs" x="260" y="290" font-weight="700" fill="#2456C8">Inbound policies</text>
+          <text class="lbl-xs" x="260" y="306">validate-jwt (Entra ID / Denticon IdP)</text>
+          <text class="lbl-xs" x="260" y="320">required claim: aud=denticon-mcp</text>
+          <text class="lbl-xs" x="260" y="334">scope check per tool · rate-limit · quota</text>
+          <text class="lbl-xs" x="500" y="290" font-weight="700" fill="#2456C8">Routing</text>
+          <text class="lbl-xs" x="500" y="306">tool name → MCP server route</text>
+          <text class="lbl-xs" x="500" y="320">correlation-id injection</text>
+          <text class="lbl-xs" x="500" y="334">subscription-key on partner edges</text>
+          <text class="lbl-xs" x="780" y="290" font-weight="700" fill="#2456C8">Outbound to MCP server</text>
+          <text class="lbl-xs" x="780" y="306">claims-bound headers (PGID, OID list)</text>
+          <text class="lbl-xs" x="780" y="320">Bearer forward · token-exchange optional</text>
+          <text class="lbl-xs" x="780" y="334">trace policy → Application Insights</text>
+
+          <!-- MCP server -->
+          <rect class="node node-amber" x="220" y="394" width="820" height="120" rx="8"/>
+          <text class="lbl" x="630" y="418" text-anchor="middle">Denticon MCP Server · Azure Container Apps · streamable HTTP</text>
+          <line x1="240" y1="430" x2="1020" y2="430" stroke="#C2820B" stroke-opacity="0.3"/>
+          <text class="lbl-xs" x="260" y="450" font-weight="700" fill="#C2820B">Stateless workers</text>
+          <text class="lbl-xs" x="260" y="466">autoscale per region</text>
+          <text class="lbl-xs" x="260" y="480">User-Assigned Managed Identity</text>
+          <text class="lbl-xs" x="260" y="494">no PHI persistence</text>
+          <text class="lbl-xs" x="500" y="450" font-weight="700" fill="#C2820B">Tool layer</text>
+          <text class="lbl-xs" x="500" y="466">tool definitions + JSON schemas</text>
+          <text class="lbl-xs" x="500" y="480">semantic catalog binding</text>
+          <text class="lbl-xs" x="500" y="494">per-tool authz check</text>
+          <text class="lbl-xs" x="780" y="450" font-weight="700" fill="#C2820B">Adapters</text>
+          <text class="lbl-xs" x="780" y="466">REST adapter (Option A)</text>
+          <text class="lbl-xs" x="780" y="480">SQL adapter w/ allow-list (Option B)</text>
+          <text class="lbl-xs" x="780" y="494">PGID predicate enforcement</text>
+
+          <!-- Backends (split) -->
+          <rect class="node node-soft" x="220" y="544" width="400" height="140" rx="8" stroke-dasharray="4 4"/>
+          <text class="lbl-eyebrow" x="240" y="566" fill="#2456C8">Option A — REST APIs</text>
+          <rect class="node node-blue" x="244" y="578" width="170" height="42" rx="6"/>
+          <text class="lbl" x="329" y="603" text-anchor="middle">Denticon APIM (existing)</text>
+          <rect class="node" x="244" y="628" width="170" height="42" rx="6"/>
+          <text class="lbl" x="329" y="653" text-anchor="middle">Patients · Appts · RCM</text>
+          <rect class="node" x="430" y="578" width="170" height="42" rx="6"/>
+          <text class="lbl" x="515" y="603" text-anchor="middle">Financial · Clinical · Practice</text>
+          <rect class="node" x="430" y="628" width="170" height="42" rx="6"/>
+          <text class="lbl" x="515" y="653" text-anchor="middle">Agentic API (if wrapped)</text>
+
+          <rect class="node node-soft" x="640" y="544" width="400" height="140" rx="8" stroke-dasharray="4 4"/>
+          <text class="lbl-eyebrow" x="660" y="566" fill="#6F3DD3">Option B — Direct SQL replicas</text>
+          <rect class="node node-purple" x="664" y="578" width="170" height="42" rx="6"/>
+          <text class="lbl" x="749" y="603" text-anchor="middle">SQL read replica (regional)</text>
+          <rect class="node" x="664" y="628" width="170" height="42" rx="6"/>
+          <text class="lbl" x="749" y="653" text-anchor="middle">Data API Builder (DAB)</text>
+          <rect class="node" x="850" y="578" width="170" height="42" rx="6"/>
+          <text class="lbl" x="935" y="603" text-anchor="middle">Semantic catalog</text>
+          <rect class="node" x="850" y="628" width="170" height="42" rx="6"/>
+          <text class="lbl" x="935" y="653" text-anchor="middle">Query allow-list</text>
+
+          <!-- Arrows top to bottom -->
+          <path class="edge edge-strong" d="M280 86 L280 110 L280 124" marker-end="url(#ar2)"/>
+          <path class="edge edge-strong" d="M500 86 L500 124" marker-end="url(#ar2)"/>
+          <path class="edge edge-strong" d="M720 86 L720 124" marker-end="url(#ar2)"/>
+          <path class="edge edge-strong" d="M940 86 L940 124" marker-end="url(#ar2)"/>
+          <path class="edge edge-blue" d="M630 184 L630 234" marker-end="url(#ar2-b)"/>
+          <text class="lbl-xs" x="635" y="210" fill="#2456C8">HTTPS · /mcp · Bearer JWT</text>
+          <path class="edge edge-amber" d="M630 354 L630 394" marker-end="url(#ar2-a)"/>
+          <text class="lbl-xs" x="635" y="378" fill="#C2820B">JSON-RPC over HTTP · claims-bound headers</text>
+
+          <!-- MCP → backends -->
+          <path class="edge edge-blue" d="M420 514 L420 544" marker-end="url(#ar2-b)"/>
+          <text class="lbl-xs" x="425" y="535" fill="#2456C8">REST</text>
+          <path class="edge edge-purple" d="M840 514 L840 544" marker-end="url(#ar2-p)"/>
+          <text class="lbl-xs" x="845" y="535" fill="#6F3DD3">SQL</text>
+
+          <!-- Platform sidebar -->
+          <rect class="node node-soft" x="1080" y="44" width="360" height="640" rx="10"/>
+          <text class="lbl-eyebrow" x="1100" y="68">Cross-cutting · platform</text>
+
+          <rect class="node node-purple" x="1100" y="86" width="320" height="62" rx="6"/>
+          <text class="lbl" x="1260" y="110" text-anchor="middle">Identity Server · Microsoft Entra ID</text>
+          <text class="lbl-xs" x="1260" y="126" text-anchor="middle">OAuth 2.1 · PKCE · DCR · Resource Indicators</text>
+          <text class="lbl-xs" x="1260" y="140" text-anchor="middle">tool-level scopes · token exchange (RFC 8693)</text>
+
+          <rect class="node" x="1100" y="160" width="320" height="56" rx="6"/>
+          <text class="lbl" x="1260" y="182" text-anchor="middle">Azure Key Vault</text>
+          <text class="lbl-xs" x="1260" y="198" text-anchor="middle">Secrets · DB connection strings · API subscription keys</text>
+
+          <rect class="node" x="1100" y="226" width="320" height="56" rx="6"/>
+          <text class="lbl" x="1260" y="248" text-anchor="middle">Managed HSM</text>
+          <text class="lbl-xs" x="1260" y="264" text-anchor="middle">CMKs · BYOK posture for PHI-adjacent data</text>
+
+          <rect class="node node-teal" x="1100" y="292" width="320" height="62" rx="6"/>
+          <text class="lbl" x="1260" y="316" text-anchor="middle">Application Insights</text>
+          <text class="lbl-xs" x="1260" y="332" text-anchor="middle">end-to-end traces · per-tool metrics</text>
+          <text class="lbl-xs" x="1260" y="346" text-anchor="middle">prompt-eval correlation</text>
+
+          <rect class="node node-teal" x="1100" y="362" width="320" height="62" rx="6"/>
+          <text class="lbl" x="1260" y="386" text-anchor="middle">Log Analytics · immutable storage</text>
+          <text class="lbl-xs" x="1260" y="402" text-anchor="middle">audit log retention</text>
+          <text class="lbl-xs" x="1260" y="416" text-anchor="middle">HIPAA-aligned PHI-redacted events</text>
+
+          <rect class="node" x="1100" y="432" width="320" height="56" rx="6"/>
+          <text class="lbl" x="1260" y="454" text-anchor="middle">Azure API Center</text>
+          <text class="lbl-xs" x="1260" y="470" text-anchor="middle">private MCP server registry · discovery for partners</text>
+
+          <rect class="node" x="1100" y="498" width="320" height="56" rx="6"/>
+          <text class="lbl" x="1260" y="520" text-anchor="middle">Defender for Cloud</text>
+          <text class="lbl-xs" x="1260" y="536" text-anchor="middle">workload protection · posture management</text>
+
+          <rect class="node" x="1100" y="564" width="320" height="56" rx="6"/>
+          <text class="lbl" x="1260" y="586" text-anchor="middle">Microsoft Purview</text>
+          <text class="lbl-xs" x="1260" y="602" text-anchor="middle">data lineage · classification · governance hooks</text>
+
+          <rect class="node" x="1100" y="630" width="320" height="46" rx="6"/>
+          <text class="lbl" x="1260" y="652" text-anchor="middle">Private DNS · VNet · Private Endpoints</text>
+        </svg>
+        <div class="diagram-cap">Mirrors symmetrically into both Azure stamps (Central + East). Backends in Option A and Option B are alternatives, not both at once in production — though we run them as parallel spikes during the POC.</div>
+      </div>
+    </div>
+    <div class="foot"><div>RSI · Confidential</div><div>08 / 23</div></div>
+  </div>
+</section>
+<!-- ====================== SLIDE 9: OPTION A — ARCHITECTURE ====================== -->
+<section class="slide" data-notes="Option A flow. The MCP server is essentially a translation/composition layer — it converts MCP tool calls into REST calls against your existing public Denticon APIs. APIM-to-APIM. The big win is auth and semantics inherit.">
+  <div class="stage">
+    <div class="head">
+      <div>
+        <div class="eyebrow">09 · Option A</div>
+        <h2 class="slide-title">Wrap the existing REST APIs</h2>
+      </div>
+      <div class="right">Architecture — Option A</div>
+    </div>
+    <div class="body">
+      <div class="diagram">
+        <svg viewBox="0 0 1480 660" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Option A architecture: MCP server wraps existing Denticon REST APIs">
+          <defs>
+            <marker id="a9-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5B6B85"/></marker>
+            <marker id="a9-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2456C8"/></marker>
+            <marker id="a9-3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0E8C8C"/></marker>
+            <marker id="a9-4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#C2820B"/></marker>
+          </defs>
+
+          <text class="lbl-zone" x="40" y="38">MCP client</text>
+          <text class="lbl-zone" x="40" y="138">AI gateway · APIM</text>
+          <text class="lbl-zone" x="40" y="244">MCP server (new)</text>
+          <text class="lbl-zone" x="40" y="430">Existing Denticon plane</text>
+          <text class="lbl-zone" x="40" y="600">Data</text>
+
+          <!-- Client -->
+          <rect class="node node-soft" x="220" y="22" width="1000" height="60" rx="8"/>
+          <text class="lbl" x="720" y="46" text-anchor="middle">Partner / DSO MCP client</text>
+          <text class="lbl-xs" x="720" y="62" text-anchor="middle">obtains access token from Denticon IdP (OAuth 2.1 + PKCE) · aud=denticon-mcp · scope=denticon.&lt;api&gt;:read</text>
+          <text class="lbl-xs" x="720" y="76" text-anchor="middle">streamable HTTP · Bearer ${access_token}</text>
+
+          <path class="edge edge-strong" d="M720 82 L720 130" marker-end="url(#a9-1)"/>
+
+          <!-- APIM (MCP gateway) -->
+          <rect class="node node-blue" x="220" y="130" width="1000" height="92" rx="8"/>
+          <text class="lbl" x="720" y="154" text-anchor="middle">Azure APIM · MCP-gateway product</text>
+          <text class="lbl-xs" x="240" y="174">validate-jwt (issuer = Denticon IdP / Entra) · aud check · scope check · revocation</text>
+          <text class="lbl-xs" x="240" y="190">rate-limit per subscription · quota per tenant · IP allow-list · subscription-key for partners</text>
+          <text class="lbl-xs" x="240" y="206">claims-bound headers: x-pgid, x-oid-list, x-correlation-id</text>
+
+          <path class="edge edge-blue" d="M720 222 L720 250" marker-end="url(#a9-2)"/>
+
+          <!-- MCP server (Option A specialty) -->
+          <rect class="node node-amber" x="220" y="250" width="1000" height="160" rx="8"/>
+          <text class="lbl" x="720" y="274" text-anchor="middle">Denticon MCP Server — REST-adapter mode  ·  Azure Container Apps</text>
+          <line x1="240" y1="288" x2="1200" y2="288" stroke="#C2820B" stroke-opacity="0.3"/>
+
+          <rect class="node" x="240" y="298" width="220" height="100" rx="6"/>
+          <text class="lbl" x="350" y="320" text-anchor="middle">Tool layer</text>
+          <text class="lbl-xs" x="350" y="338" text-anchor="middle">tool definitions + JSON schemas</text>
+          <text class="lbl-xs" x="350" y="354" text-anchor="middle">descriptions = lifted from OpenAPI</text>
+          <text class="lbl-xs" x="350" y="370" text-anchor="middle">prompt → tool intent resolver</text>
+          <text class="lbl-xs" x="350" y="386" text-anchor="middle">N tools = N API operations (curated)</text>
+
+          <rect class="node" x="480" y="298" width="220" height="100" rx="6"/>
+          <text class="lbl" x="590" y="320" text-anchor="middle">Authz binder</text>
+          <text class="lbl-xs" x="590" y="338" text-anchor="middle">PGID + OID rebound from JWT</text>
+          <text class="lbl-xs" x="590" y="354" text-anchor="middle">never read from prompt input</text>
+          <text class="lbl-xs" x="590" y="370" text-anchor="middle">tool-level scope assertion</text>
+          <text class="lbl-xs" x="590" y="386" text-anchor="middle">refuses OID not in claim list</text>
+
+          <rect class="node" x="720" y="298" width="220" height="100" rx="6"/>
+          <text class="lbl" x="830" y="320" text-anchor="middle">REST adapter</text>
+          <text class="lbl-xs" x="830" y="338" text-anchor="middle">composes 1 tool call → N API calls</text>
+          <text class="lbl-xs" x="830" y="354" text-anchor="middle">caching · ETag · conditional GET</text>
+          <text class="lbl-xs" x="830" y="370" text-anchor="middle">retries, circuit breaker, hedging</text>
+          <text class="lbl-xs" x="830" y="386" text-anchor="middle">response shaping for LLM brevity</text>
+
+          <rect class="node" x="960" y="298" width="240" height="100" rx="6"/>
+          <text class="lbl" x="1080" y="320" text-anchor="middle">Token broker</text>
+          <text class="lbl-xs" x="1080" y="338" text-anchor="middle">token exchange (RFC 8693)</text>
+          <text class="lbl-xs" x="1080" y="354" text-anchor="middle">new token aud=denticon-api</text>
+          <text class="lbl-xs" x="1080" y="370" text-anchor="middle">never passes upstream token through</text>
+          <text class="lbl-xs" x="1080" y="386" text-anchor="middle">refresh strategy · short TTL</text>
+
+          <path class="edge edge-amber" d="M720 410 L720 442" marker-end="url(#a9-4)"/>
+          <text class="lbl-xs" x="730" y="428" fill="#C2820B">HTTPS · Bearer (exchanged) · existing API contract</text>
+
+          <!-- Existing Denticon plane (APIM + microservices) -->
+          <rect class="node node-blue" x="220" y="442" width="1000" height="54" rx="8"/>
+          <text class="lbl" x="720" y="464" text-anchor="middle">Denticon APIM (existing — developer.planetdds.com)</text>
+          <text class="lbl-xs" x="720" y="480" text-anchor="middle">unchanged · same auth, billing, observability that 3rd-party integrators use today</text>
+
+          <rect class="node" x="220" y="510" width="180" height="80" rx="6"/>
+          <text class="lbl" x="310" y="532" text-anchor="middle">Patients API</text>
+          <text class="lbl-xs" x="310" y="548" text-anchor="middle">demographics</text>
+          <text class="lbl-xs" x="310" y="562" text-anchor="middle">responsible-party</text>
+          <text class="lbl-xs" x="310" y="576" text-anchor="middle">documents</text>
+
+          <rect class="node" x="410" y="510" width="180" height="80" rx="6"/>
+          <text class="lbl" x="500" y="532" text-anchor="middle">Appointments API</text>
+          <text class="lbl-xs" x="500" y="548" text-anchor="middle">schedule view</text>
+          <text class="lbl-xs" x="500" y="562" text-anchor="middle">availability</text>
+          <text class="lbl-xs" x="500" y="576" text-anchor="middle">status</text>
+
+          <rect class="node" x="600" y="510" width="180" height="80" rx="6"/>
+          <text class="lbl" x="690" y="532" text-anchor="middle">RCM / Financial</text>
+          <text class="lbl-xs" x="690" y="548" text-anchor="middle">claims · insurance</text>
+          <text class="lbl-xs" x="690" y="562" text-anchor="middle">ledger · balances</text>
+          <text class="lbl-xs" x="690" y="576" text-anchor="middle">aging summaries</text>
+
+          <rect class="node" x="790" y="510" width="180" height="80" rx="6"/>
+          <text class="lbl" x="880" y="532" text-anchor="middle">Clinical API</text>
+          <text class="lbl-xs" x="880" y="548" text-anchor="middle">medical history</text>
+          <text class="lbl-xs" x="880" y="562" text-anchor="middle">treatment plans</text>
+          <text class="lbl-xs" x="880" y="576" text-anchor="middle">notes (PHI-careful)</text>
+
+          <rect class="node" x="980" y="510" width="220" height="80" rx="6"/>
+          <text class="lbl" x="1090" y="532" text-anchor="middle">Practice + (Agentic API*)</text>
+          <text class="lbl-xs" x="1090" y="548" text-anchor="middle">offices · providers · setup</text>
+          <text class="lbl-xs" x="1090" y="562" text-anchor="middle">agentic flows (if granted)</text>
+          <text class="lbl-xs" x="1090" y="576" text-anchor="middle">*opt-in surface</text>
+
+          <!-- API to DB layer -->
+          <path class="edge edge-teal edge-dashed" d="M310 590 L310 612"/>
+          <path class="edge edge-teal edge-dashed" d="M500 590 L500 612"/>
+          <path class="edge edge-teal edge-dashed" d="M690 590 L690 612"/>
+          <path class="edge edge-teal edge-dashed" d="M880 590 L880 612"/>
+          <path class="edge edge-teal edge-dashed" d="M1090 590 L1090 612"/>
+
+          <rect class="node node-teal" x="220" y="612" width="1000" height="34" rx="6"/>
+          <text class="lbl" x="720" y="634" text-anchor="middle">SQL Server read replicas (per-stamp) — accessed by existing API backends, not by the MCP server in this option</text>
+
+          <!-- APIM ↔ MCP outbound annotation -->
+          <text class="lbl-xs" x="1230" y="470" fill="#5B6B85" text-anchor="start">backend enforces</text>
+          <text class="lbl-xs" x="1230" y="484" fill="#5B6B85" text-anchor="start">PGID/OID 403 if</text>
+          <text class="lbl-xs" x="1230" y="498" fill="#5B6B85" text-anchor="start">claim missing</text>
+        </svg>
+        <div class="diagram-cap">In Option A, the MCP server is the only new component. Everything below it is unchanged. Auth is inherited via token exchange. *Agentic API exposure is an opt-in design choice — see open-questions slide.</div>
+      </div>
+    </div>
+    <div class="foot"><div>RSI · Confidential</div><div>09 / 23</div></div>
+  </div>
+</section>
+<!-- ====================== SLIDE 10: OPTION A — TOOLS, PROS, CONS ====================== -->
+<section class="slide" data-notes="The tool surface and the trade analysis. Tool names follow a verb-light dotted convention: domain.entity.verb. Avoid surfacing internal API plumbing in tool names — keep them readable for the LLM.">
+  <div class="stage">
+    <div class="head">
+      <div>
+        <div class="eyebrow">10 · Option A · detail</div>
+        <h2 class="slide-title">Tool surface · what we inherit · what we give up</h2>
+      </div>
+      <div class="right">Option A — pros &amp; cons</div>
+    </div>
+    <div class="body cols-2-asym">
+      <div>
+        <h3 class="deck-h3">Tool surface (illustrative, ~12–16 tools for POC)</h3>
+        <table class="matrix">
+          <thead><tr><th>Tool name</th><th>Backed by</th></tr></thead>
+          <tbody>
+            <tr><td><code>denticon.appointments.search</code></td><td>Appointments API · GET schedule</td></tr>
+            <tr><td><code>denticon.appointments.availability</code></td><td>Appointments API · /availability</td></tr>
+            <tr><td><code>denticon.patients.search</code></td><td>Patients API · /v2/patients</td></tr>
+            <tr><td><code>denticon.patients.responsible_party.read</code></td><td>Patients API · /rpid</td></tr>
+            <tr><td><code>denticon.rcm.claims.list</code></td><td>RCM API · /claims</td></tr>
+            <tr><td><code>denticon.rcm.aging.summary</code></td><td>RCM API · /aging (composed)</td></tr>
+            <tr><td><code>denticon.financial.ledger.read</code></td><td>Financial API · /ledger</td></tr>
+            <tr><td><code>denticon.financial.balance.summary</code></td><td>Financial API · /balances (composed)</td></tr>
+            <tr><td><code>denticon.clinical.history.read</code></td><td>Clinical API · /history</td></tr>
+            <tr><td><code>denticon.clinical.treatmentplan.read</code></td><td>Clinical API · /treatment-plans</td></tr>
+            <tr><td><code>denticon.practice.offices.list</code></td><td>Practices API · /offices</td></tr>
+            <tr><td><code>denticon.practice.providers.list</code></td><td>Practices API · /providers</td></tr>
+            <tr><td><code>denticon.production.by_provider</code></td><td>composed: Financial + Practices</td></tr>
+            <tr><td><code>denticon.collections.aging_by_office</code></td><td>composed: RCM + Practices</td></tr>
+          </tbody>
+        </table>
+        <p class="small" style="margin-top: 10px;">Tool descriptions are lifted from the OpenAPI documentation already on developer.planetdds.com — a major content-quality lever.</p>
+
+        <h3 class="deck-h3" style="margin-top: 16px;">Example prompts → tools invoked</h3>
+        <table class="matrix">
+          <thead><tr><th style="width:48%;">Sample prompt</th><th>Tool chain (Option A)</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>&ldquo;Show me Dr.&nbsp;Patel's appointments this week.&rdquo;</td>
+              <td><code>denticon.practice.providers.list</code> &nbsp;→&nbsp; <code>denticon.appointments.search</code></td>
+            </tr>
+            <tr>
+              <td>&ldquo;Which patients have a balance over $500 in Office&nbsp;87?&rdquo;</td>
+              <td><code>denticon.financial.balance.summary</code> &nbsp;→&nbsp; <code>denticon.patients.search</code></td>
+            </tr>
+            <tr>
+              <td>&ldquo;Aging summary for Office&nbsp;87 this month.&rdquo;</td>
+              <td><code>denticon.collections.aging_by_office</code></td>
+            </tr>
+            <tr>
+              <td>&ldquo;What was Q1 production by provider across all my offices?&rdquo;</td>
+              <td><code>denticon.practice.offices.list</code> &nbsp;→&nbsp; <code>denticon.production.by_provider</code> <span class="small">(fan-out ⚠)</span></td>
+            </tr>
+            <tr>
+              <td>&ldquo;Find Michael Andrews and pull his treatment plan.&rdquo;</td>
+              <td><code>denticon.patients.search</code> &nbsp;→&nbsp; <code>denticon.clinical.treatmentplan.read</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h3 class="deck-h3">Why this path is attractive</h3>
+        <ul class="crisp green">
+          <li><strong>Inherits auth, authorization, billing.</strong> The token validation, rate limits, quotas, and per-API claims you've already built work unchanged.</li>
+          <li><strong>Inherits semantics.</strong> Verbose OpenAPI descriptions become high-quality MCP tool descriptions — the dominant accuracy lever for LLMs.</li>
+          <li><strong>Compliance delta is small.</strong> Existing HIPAA posture for the APIs covers MCP-mediated access the same way.</li>
+          <li><strong>Smaller blast radius.</strong> Bugs in the MCP layer can't accidentally bypass tenancy — the underlying API enforces.</li>
+          <li><strong>Stable contract.</strong> When you version your APIs, MCP versions naturally with them.</li>
+          <li><strong>Familiar to partners.</strong> Resonate / Kickcall / TensorLinks already integrate against these APIs — they understand the model.</li>
+        </ul>
+
+        <h3 class="deck-h3" style="margin-top: 22px;">Where it gets uncomfortable</h3>
+        <ul class="crisp rose">
+          <li><strong>Coverage gaps.</strong> Not every column in the DB is exposed via the public API. Analytical questions like &ldquo;what was last quarter's hygiene production by hygienist by office?&rdquo; may need composition across multiple endpoints — or aren't currently expressible.</li>
+          <li><strong>Transactional shape, analytical question.</strong> The APIs were designed for record-level CRUD. Aggregations, joins, and window functions are an awkward fit; some require multiple round-trips.</li>
+          <li><strong>Fan-out cost.</strong> A single prompt can fan out to N API calls — the per-request meter becomes a meaningful billing surface.</li>
+          <li><strong>API enhancement queue.</strong> Tools that need new shapes (e.g., batched availability scans across thousands of slots) may need API additions before the tool can ship.</li>
+          <li><strong>Open: Agentic API coverage.</strong> Is the hidden agentic surface in scope for wrapping, or does it remain Denticon-internal?</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot"><div>RSI · Confidential</div><div>10 / 23</div></div>
+  </div>
+</section>
+<!-- ====================== SLIDE 11: OPTION B — ARCHITECTURE ====================== -->
+<section class="slide" data-notes="Option B flow. The MCP server connects to read replicas directly. The big differentiator is the semantic catalog and the allow-list of query templates — the safety story is harder, but the analytical surface is complete.">
+  <div class="stage">
+    <div class="head">
+      <div>
+        <div class="eyebrow">11 · Option B</div>
+        <h2 class="slide-title">Direct read-only access to the SQL replicas</h2>
+      </div>
+      <div class="right">Architecture — Option B</div>
+    </div>
+    <div class="body">
+      <div class="diagram">
+        <svg viewBox="0 0 1480 680" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Option B architecture: MCP server reads directly from Denticon SQL replicas via a semantic catalog and query allow-list">
+          <defs>
+            <marker id="b9-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5B6B85"/></marker>
+            <marker id="b9-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2456C8"/></marker>
+            <marker id="b9-3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6F3DD3"/></marker>
+            <marker id="b9-4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#C2820B"/></marker>
+            <marker id="b9-5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0E8C8C"/></marker>
+          </defs>
+
+          <text class="lbl-zone" x="40" y="38">MCP client</text>
+          <text class="lbl-zone" x="40" y="138">AI gateway · APIM</text>
+          <text class="lbl-zone" x="40" y="244">MCP server (new)</text>
+          <text class="lbl-zone" x="40" y="500">Data plane</text>
+
+          <!-- Client -->
+          <rect class="node node-soft" x="220" y="22" width="1000" height="60" rx="8"/>
+          <text class="lbl" x="720" y="46" text-anchor="middle">Partner / DSO MCP client</text>
+          <text class="lbl-xs" x="720" y="62" text-anchor="middle">obtains access token from Denticon IdP · aud=denticon-mcp · scope=denticon.&lt;domain&gt;:read</text>
+          <text class="lbl-xs" x="720" y="76" text-anchor="middle">streamable HTTP · Bearer ${access_token}</text>
+          <path class="edge edge-strong" d="M720 82 L720 130" marker-end="url(#b9-1)"/>
+
+          <!-- APIM -->
+          <rect class="node node-blue" x="220" y="130" width="1000" height="92" rx="8"/>
+          <text class="lbl" x="720" y="154" text-anchor="middle">Azure APIM · MCP-gateway product</text>
+          <text class="lbl-xs" x="240" y="174">validate-jwt · aud check · scope check · revocation</text>
+          <text class="lbl-xs" x="240" y="190">rate-limit per subscription · quota per tenant · IP allow-list · subscription-key for partners</text>
+          <text class="lbl-xs" x="240" y="206">claims-bound headers: x-pgid, x-oid-list, x-correlation-id</text>
+          <path class="edge edge-blue" d="M720 222 L720 250" marker-end="url(#b9-2)"/>
+
+          <!-- MCP server (Option B specialty) -->
+          <rect class="node node-amber" x="220" y="250" width="1000" height="220" rx="8"/>
+          <text class="lbl" x="720" y="274" text-anchor="middle">Denticon MCP Server — SQL-adapter mode  ·  Azure Container Apps</text>
+          <line x1="240" y1="288" x2="1200" y2="288" stroke="#C2820B" stroke-opacity="0.3"/>
+
+          <rect class="node" x="240" y="298" width="220" height="80" rx="6"/>
+          <text class="lbl" x="350" y="320" text-anchor="middle">Tool layer</text>
+          <text class="lbl-xs" x="350" y="338" text-anchor="middle">domain-shaped tools</text>
+          <text class="lbl-xs" x="350" y="354" text-anchor="middle">parameterized predicates only</text>
+          <text class="lbl-xs" x="350" y="370" text-anchor="middle">free-form SQL not exposed</text>
+
+          <rect class="node node-purple" x="240" y="388" width="220" height="74" rx="6"/>
+          <text class="lbl" x="350" y="410" text-anchor="middle">Semantic catalog</text>
+          <text class="lbl-xs" x="350" y="426" text-anchor="middle">column-level intent map</text>
+          <text class="lbl-xs" x="350" y="440" text-anchor="middle">business term aliases</text>
+          <text class="lbl-xs" x="350" y="454" text-anchor="middle">disambiguation rules</text>
+
+          <rect class="node" x="480" y="298" width="220" height="80" rx="6"/>
+          <text class="lbl" x="590" y="320" text-anchor="middle">Authz binder</text>
+          <text class="lbl-xs" x="590" y="338" text-anchor="middle">PGID + OID rebound from JWT</text>
+          <text class="lbl-xs" x="590" y="354" text-anchor="middle">never read from prompt</text>
+          <text class="lbl-xs" x="590" y="370" text-anchor="middle">tool-level scope assertion</text>
+
+          <rect class="node" x="480" y="388" width="220" height="74" rx="6"/>
+          <text class="lbl" x="590" y="410" text-anchor="middle">Query allow-list</text>
+          <text class="lbl-xs" x="590" y="426" text-anchor="middle">templates pre-approved by Denticon</text>
+          <text class="lbl-xs" x="590" y="440" text-anchor="middle">no DDL, no DML, no string concat</text>
+          <text class="lbl-xs" x="590" y="454" text-anchor="middle">change-controlled in git</text>
+
+          <rect class="node node-teal" x="720" y="298" width="220" height="80" rx="6"/>
+          <text class="lbl" x="830" y="320" text-anchor="middle">Query builder</text>
+          <text class="lbl-xs" x="830" y="338" text-anchor="middle">PGID predicate mandatory</text>
+          <text class="lbl-xs" x="830" y="354" text-anchor="middle">OID filter when present</text>
+          <text class="lbl-xs" x="830" y="370" text-anchor="middle">row + col masks for PHI</text>
+
+          <rect class="node node-teal" x="720" y="388" width="220" height="74" rx="6"/>
+          <text class="lbl" x="830" y="410" text-anchor="middle">Result shaper</text>
+          <text class="lbl-xs" x="830" y="426" text-anchor="middle">narrow JSON for LLM</text>
+          <text class="lbl-xs" x="830" y="440" text-anchor="middle">caps row count · pagination</text>
+          <text class="lbl-xs" x="830" y="454" text-anchor="middle">PHI redaction at boundary</text>
+
+          <rect class="node" x="960" y="298" width="240" height="80" rx="6"/>
+          <text class="lbl" x="1080" y="320" text-anchor="middle">Routing resolver</text>
+          <text class="lbl-xs" x="1080" y="338" text-anchor="middle">PGID → (region, client-DB)</text>
+          <text class="lbl-xs" x="1080" y="354" text-anchor="middle">re-uses metadata DB lookup</text>
+          <text class="lbl-xs" x="1080" y="370" text-anchor="middle">cached, short TTL</text>
+
+          <rect class="node" x="960" y="388" width="240" height="74" rx="6"/>
+          <text class="lbl" x="1080" y="410" text-anchor="middle">Connection pool</text>
+          <text class="lbl-xs" x="1080" y="426" text-anchor="middle">Managed Identity → SQL replicas</text>
+          <text class="lbl-xs" x="1080" y="440" text-anchor="middle">read-only login per stamp</text>
+          <text class="lbl-xs" x="1080" y="454" text-anchor="middle">circuit breaker · retry</text>
+
+          <path class="edge edge-purple" d="M720 470 L720 502" marker-end="url(#b9-3)"/>
+          <text class="lbl-xs" x="730" y="488" fill="#6F3DD3">parameterized query · WHERE PGID=@pgid AND ... · read-only login</text>
+
+          <!-- Data plane -->
+          <rect class="node node-teal" x="220" y="502" width="1000" height="50" rx="8"/>
+          <text class="lbl" x="720" y="524" text-anchor="middle">SQL Server read replica — regional, real-time replicated from primary AOAG</text>
+          <text class="lbl-xs" x="720" y="540" text-anchor="middle">Always On secondary configured readable · workload isolated from transactional path</text>
+
+          <rect class="node" x="220" y="566" width="240" height="58" rx="6"/>
+          <text class="lbl" x="340" y="588" text-anchor="middle">Client DBs (dedicated)</text>
+          <text class="lbl-xs" x="340" y="604" text-anchor="middle">large DSO tenants</text>
+
+          <rect class="node" x="480" y="566" width="240" height="58" rx="6"/>
+          <text class="lbl" x="600" y="588" text-anchor="middle">Client DBs (pooled)</text>
+          <text class="lbl-xs" x="600" y="604" text-anchor="middle">multi-PGID — RLS not enforced at DB</text>
+
+          <rect class="node node-soft" x="740" y="566" width="240" height="58" rx="6"/>
+          <text class="lbl" x="860" y="588" text-anchor="middle">Reporting indexes / views</text>
+          <text class="lbl-xs" x="860" y="604" text-anchor="middle">optional columnstore for aggregates</text>
+
+          <rect class="node node-soft" x="1000" y="566" width="220" height="58" rx="6"/>
+          <text class="lbl" x="1110" y="588" text-anchor="middle">Audit sink</text>
+          <text class="lbl-xs" x="1110" y="604" text-anchor="middle">SQL Audit · Log Analytics</text>
+
+          <text class="lbl-xs" x="220" y="660" font-style="italic" fill="#5B6B85">Note: tenant isolation is implemented entirely above the DB layer — slide 13 covers the 3-layer model.</text>
+        </svg>
+        <div class="diagram-cap">Option B adds a real semantic and safety layer inside the MCP server: catalog + allow-list + query builder + result shaper. The investment is real, but the analytical surface is complete.</div>
+      </div>
+    </div>
+    <div class="foot"><div>RSI · Confidential</div><div>11 / 23</div></div>
+  </div>
+</section>
+<!-- ====================== SLIDE 12: OPTION B — TOOLS, PROS, CONS ====================== -->
+<section class="slide" data-notes="Tool surface for Option B is shaped differently — fewer, broader tools that the LLM composes. The catalog is the secret sauce. We don't expose raw SQL, we expose intent-shaped tools with parameterized predicates.">
+  <div class="stage">
+    <div class="head">
+      <div>
+        <div class="eyebrow">12 · Option B · detail</div>
+        <h2 class="slide-title">Tool surface · what unlocks · what we own end-to-end</h2>
+      </div>
+      <div class="right">Option B — pros &amp; cons</div>
+    </div>
+    <div class="body cols-2-asym">
+      <div>
+        <h3 class="deck-h3">Tool surface (illustrative, ~8–12 tools for POC)</h3>
+        <table class="matrix">
+          <thead><tr><th>Tool name</th><th>Backed by</th></tr></thead>
+          <tbody>
+            <tr><td><code>denticon.catalog.describe</code></td><td>resource — semantic catalog browse</td></tr>
+            <tr><td><code>denticon.appointments.query</code></td><td>template: schedule by date/office/status</td></tr>
+            <tr><td><code>denticon.appointments.utilization</code></td><td>template: chairtime utilization by provider</td></tr>
+            <tr><td><code>denticon.production.summary</code></td><td>template: ledger production buckets</td></tr>
+            <tr><td><code>denticon.production.by_procedure</code></td><td>template: production by ADA code</td></tr>
+            <tr><td><code>denticon.collections.aging</code></td><td>template: aging buckets · 30/60/90/120+</td></tr>
+            <tr><td><code>denticon.claims.outstanding</code></td><td>template: unpaid + days-outstanding</td></tr>
+            <tr><td><code>denticon.patients.cohort</code></td><td>template: cohort by demographic/clinical filter</td></tr>
+            <tr><td><code>denticon.providers.scorecard</code></td><td>template: per-provider KPIs</td></tr>
+            <tr><td><code>denticon.offices.scorecard</code></td><td>template: per-office KPIs</td></tr>
+          </tbody>
+        </table>
+        <p class="small" style="margin-top: 10px;">Each tool maps to <em>one</em> approved SQL template. Parameters are typed and validated. PGID and OID are bound from claims, never from LLM-supplied input.</p>
+
+        <h3 class="deck-h3" style="margin-top: 16px;">Example prompts → tools invoked</h3>
+        <table class="matrix">
+          <thead><tr><th style="width:48%;">Sample prompt</th><th>Tool chain (Option B)</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>&ldquo;Show me Dr.&nbsp;Patel's appointments this week.&rdquo;</td>
+              <td><code>denticon.appointments.query</code> <span class="small">(provider_name predicate)</span></td>
+            </tr>
+            <tr>
+              <td>&ldquo;Which patients have a balance over $500 in Office&nbsp;87?&rdquo;</td>
+              <td><code>denticon.patients.cohort</code> <span class="small">(balance_gt, oid filter)</span></td>
+            </tr>
+            <tr>
+              <td>&ldquo;Aging buckets for Office&nbsp;87 this month.&rdquo;</td>
+              <td><code>denticon.collections.aging</code></td>
+            </tr>
+            <tr>
+              <td>&ldquo;Q1 production by ADA code across all my offices.&rdquo;</td>
+              <td><code>denticon.production.by_procedure</code> <span class="small">(single aggregate query)</span></td>
+            </tr>
+            <tr>
+              <td>&ldquo;Provider utilization last quarter — who's underbooked?&rdquo;</td>
+              <td><code>denticon.providers.scorecard</code> &nbsp;→&nbsp; <code>denticon.appointments.utilization</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h3 class="deck-h3">Why this path is attractive</h3>
+        <ul class="crisp green">
+          <li><strong>Complete column coverage.</strong> Every column on the ledger — and the ~50 in 100 that matter — is reachable. Custom insights beyond pre-built reports become a one-tool conversation.</li>
+          <li><strong>Analytical joins and aggregates are first-class.</strong> Aging, utilization, production-by-procedure don't require N round-trips.</li>
+          <li><strong>Performance tuning is in our hands.</strong> Columnstore, indexed views, query plan inspection — all available on the replicas without affecting transactional workloads.</li>
+          <li><strong>Future-proofs the analytical surface.</strong> Adding a new tool = adding one template + one catalog entry; no API release cycle.</li>
+        </ul>
+
+        <h3 class="deck-h3" style="margin-top: 22px;">Where it gets uncomfortable</h3>
+        <ul class="crisp rose">
+          <li><strong>Tenant isolation becomes our burden.</strong> No application-layer safety net. The 3-layer model (slide 13) <em>must</em> hold; we own all three layers.</li>
+          <li><strong>Semantic catalog is real work.</strong> The Ledger alone is ~100 cols with ~50 business-relevant. Multiplied across appointments, claims, treatment plans — a serious documentation effort. Without the catalog, accuracy degrades fast.</li>
+          <li><strong>HIPAA / audit posture is a new path.</strong> Audit logging, PHI redaction, immutable retention, and BAA scope all need explicit design — not inheritable from the existing API plane.</li>
+          <li><strong>Billing model has no obvious anchor.</strong> No per-API meter to inherit; a tool-call meter at APIM is the likely production answer.</li>
+          <li><strong>Reverse compatibility with API changes.</strong> If a column's semantics evolve, the catalog and tools must update in lockstep.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot"><div>RSI · Confidential</div><div>12 / 23</div></div>
+  </div>
+</section>
+<!-- ====================== SLIDE 13: COMPARISON MATRIX ====================== -->
+<section class="slide" data-notes="The decision aid. Each row is a dimension we'd score the two options on. Pills are qualitative, intentionally. The point isn't to crown a winner — it's to make the trade-spaces legible.">
+  <div class="stage">
+    <div class="head">
+      <div>
+        <div class="eyebrow">13 · Decision matrix</div>
+        <h2 class="slide-title">Option A vs Option B — side by side</h2>
+      </div>
+      <div class="right">Qualitative · POC-scope</div>
+    </div>
+    <div class="body">
+      <table class="matrix">
+        <thead>
+          <tr><th>Dimension</th><th>Option A — wrap REST APIs</th><th>Option B — direct read replicas</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="dim">Data coverage</td>
+            <td><span class="pill med">Bounded</span>&nbsp; Limited to what the public API exposes; coverage gaps to be confirmed with Mike.</td>
+            <td><span class="pill high">Complete</span>&nbsp; Every column on the replica is reachable; ~50/100 ledger columns are business-relevant.</td>
+          </tr>
+          <tr>
+            <td class="dim">Time to first credible demo</td>
+            <td><span class="pill high">Fastest</span>&nbsp; OpenAPI docs translate into tool descriptions almost mechanically. Days, not weeks.</td>
+            <td><span class="pill med">Moderate</span>&nbsp; Catalog and allow-list need authoring; longer ramp before a prompt-eval suite is meaningful.</td>
+          </tr>
+          <tr>
+            <td class="dim">Semantic-catalog effort</td>
+            <td><span class="pill high">Light</span>&nbsp; Existing OpenAPI is the catalog. Polish, don't invent.</td>
+            <td><span class="pill low">Heavy</span>&nbsp; Per-column intent map across many tables; the most under-estimated cost on this path.</td>
+          </tr>
+          <tr>
+            <td class="dim">Auth &amp; authorization reuse</td>
+            <td><span class="pill high">High</span>&nbsp; Token exchange to existing API audience; backends enforce PGID/OID 403 as today.</td>
+            <td><span class="pill med">Medium</span>&nbsp; JWT validation reused; but PGID predicate enforcement is built fresh and owned in the MCP server.</td>
+          </tr>
+          <tr>
+            <td class="dim">Tenant-isolation risk</td>
+            <td><span class="pill high">Low</span>&nbsp; API layer is the last line — already production-hardened.</td>
+            <td><span class="pill low">Material</span>&nbsp; DB has no RLS; isolation lives in our code. Demands a serious cross-PGID attack test harness.</td>
+          </tr>
+          <tr>
+            <td class="dim">Performance for analytical queries</td>
+            <td><span class="pill low">Awkward</span>&nbsp; Aggregations across patients/dates require fan-out or pre-aggregation APIs.</td>
+            <td><span class="pill high">Native</span>&nbsp; SQL is the right tool for this shape; columnstore + indexed views available.</td>
+          </tr>
+          <tr>
+            <td class="dim">HIPAA compliance delta</td>
+            <td><span class="pill high">Minimal</span>&nbsp; Existing API plane already in HIPAA scope; MCP inherits.</td>
+            <td><span class="pill med">Net new</span>&nbsp; New data path → BAA scope review, audit log design, PHI redaction middleware all owned net new.</td>
+          </tr>
+          <tr>
+            <td class="dim">Billing &amp; metering</td>
+            <td><span class="pill med">Inherit + watch</span>&nbsp; Existing per-API meter; risk of fan-out cost surprises.</td>
+            <td><span class="pill med">Design from scratch</span>&nbsp; Most likely tool-call meter at APIM with a tenant-aware quota policy.</td>
+          </tr>
+          <tr>
+            <td class="dim">Observability</td>
+            <td><span class="pill high">Inherit</span>&nbsp; Existing API monitoring covers the call path; add MCP-layer App Insights.</td>
+            <td><span class="pill med">New + careful</span>&nbsp; SQL audit logs, query plan capture, slow-query tracking — all owned.</td>
+          </tr>
+          <tr>
+            <td class="dim">Coupling to API roadmap</td>
+            <td><span class="pill med">Tight</span>&nbsp; New tool needs sometimes mean an API change first.</td>
+            <td><span class="pill high">Loose</span>&nbsp; New tool = new template + catalog entry. No API release cycle.</td>
+          </tr>
+          <tr>
+            <td class="dim">Future evolution to writes</td>
+            <td><span class="pill high">Natural</span>&nbsp; APIs already do writes; phase 2 is straightforward.</td>
+            <td><span class="pill low">Disallowed</span>&nbsp; Replicas are read-only; writes require routing back through the API/app tier anyway.</td>
+          </tr>
+          <tr>
+            <td class="dim">Operational footprint</td>
+            <td><span class="pill high">Smaller</span>&nbsp; One service (MCP server) plus APIM policy work.</td>
+            <td><span class="pill med">Larger</span>&nbsp; MCP server + catalog repo + allow-list governance process + query review workflow.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="small" style="margin-top: 14px;">Read the matrix as &ldquo;A is faster and safer; B is broader and more flexible.&rdquo; The right answer depends on which axes Denticon prioritizes for the production decision after POC.</p>
+    </div>
+    <div class="foot"><div>RSI · Confidential</div><div>13 / 23</div></div>
+  </div>
+</section>
+<!-- ====================== SLIDE 14: IDENTITY & AUTH FLOW ====================== -->
+<section class="slide" data-notes="The end-to-end identity flow. Two important things to notice: (1) the token aud=denticon-mcp prevents token reuse against other Denticon resources; (2) the MCP server never passes through the upstream token — it always exchanges for a narrower one before calling backends. This is the OAuth 2.1 + RFC 8693 + Resource Indicators stack working as designed.">
+  <div class="stage">
+    <div class="head">
+      <div>
+        <div class="eyebrow">14 · Identity</div>
+        <h2 class="slide-title">End-to-end auth — JWT lifecycle &amp; trust boundaries</h2>
+      </div>
+      <div class="right">Sequence · shared by A &amp; B</div>
+    </div>
+    <div class="body">
+      <div class="diagram">
+        <svg viewBox="0 0 1480 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Identity and authorization sequence flow for the Denticon MCP server">
+          <defs>
+            <marker id="s14" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0B2545"/></marker>
+            <marker id="s14-t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0E8C8C"/></marker>
+            <marker id="s14-p" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6F3DD3"/></marker>
+            <marker id="s14-b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2456C8"/></marker>
+            <marker id="s14-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#C2820B"/></marker>
+          </defs>
+
+          <!-- Actor lanes -->
+          <g>
+            <rect class="node node-soft" x="40" y="30" width="180" height="48" rx="6"/>
+            <text class="lbl" x="130" y="58" text-anchor="middle">MCP client</text>
+
+            <rect class="node node-purple" x="280" y="30" width="200" height="48" rx="6"/>
+            <text class="lbl" x="380" y="58" text-anchor="middle">Denticon IdP</text>
+
+            <rect class="node node-blue" x="540" y="30" width="200" height="48" rx="6"/>
+            <text class="lbl" x="640" y="58" text-anchor="middle">APIM (MCP gateway)</text>
+
+            <rect class="node node-amber" x="800" y="30" width="200" height="48" rx="6"/>
+            <text class="lbl" x="900" y="58" text-anchor="middle">MCP server</text>
+
+            <rect class="node" x="1060" y="30" width="180" height="48" rx="6"/>
+            <text class="lbl" x="1150" y="58" text-anchor="middle">Token exchange</text>
+
+            <rect class="node node-teal" x="1280" y="30" width="160" height="48" rx="6"/>
+            <text class="lbl" x="1360" y="58" text-anchor="middle">Backend (API / SQL)</text>
+          </g>
+
+          <!-- Lanes (vertical dashed) -->
+          <line x1="130" y1="78" x2="130" y2="556" class="zone" stroke-dasharray="2 4"/>
+          <line x1="380" y1="78" x2="380" y2="556" class="zone" stroke-dasharray="2 4"/>
+          <line x1="640" y1="78" x2="640" y2="556" class="zone" stroke-dasharray="2 4"/>
+          <line x1="900" y1="78" x2="900" y2="556" class="zone" stroke-dasharray="2 4"/>
+          <line x1="1150" y1="78" x2="1150" y2="556" class="zone" stroke-dasharray="2 4"/>
+          <line x1="1360" y1="78" x2="1360" y2="556" class="zone" stroke-dasharray="2 4"/>
+
+          <!-- Step 1: discovery -->
+          <path class="edge edge-strong" d="M130 110 L380 110" marker-end="url(#s14)"/>
+          <text class="lbl-sm" x="135" y="104">① Authorization Server discovery (Protected Resource Metadata · /.well-known/oauth-authorization-server)</text>
+
+          <!-- Step 2: DCR -->
+          <path class="edge edge-purple" d="M130 142 L380 142" marker-end="url(#s14-p)"/>
+          <text class="lbl-sm" x="135" y="136">② Dynamic Client Registration (RFC 7591) — partner-owned MCP clients self-register</text>
+
+          <!-- Step 3: PKCE auth flow -->
+          <path class="edge edge-purple" d="M130 178 L380 178" marker-end="url(#s14-p)"/>
+          <text class="lbl-sm" x="135" y="172">③ OAuth 2.1 + PKCE authorization request · user authenticates (Microsoft SSO or Denticon native)</text>
+
+          <!-- Step 4: token issuance -->
+          <path class="edge edge-purple" d="M380 214 L130 214" marker-end="url(#s14-p)"/>
+          <text class="lbl-sm" x="135" y="208">④ access_token issued · aud=denticon-mcp · sub · pgid=[...] · oid=[...] · scope=denticon.appointments:read · exp ~ 15m</text>
+
+          <!-- Step 5: tool call -->
+          <path class="edge edge-strong" d="M130 252 L640 252" marker-end="url(#s14)"/>
+          <text class="lbl-sm" x="135" y="246">⑤ Tool call → POST /mcp · JSON-RPC method=tools/call · Authorization: Bearer ${access_token}</text>
+
+          <!-- Step 6: APIM validate -->
+          <path class="edge edge-blue" d="M640 286 L640 320" marker-end="url(#s14-b)"/>
+          <rect class="node node-blue" x="540" y="288" width="200" height="40" rx="4"/>
+          <text class="lbl-sm" x="640" y="313" text-anchor="middle">⑥ validate-jwt · aud · scope</text>
+
+          <!-- Step 7: claim-bound headers -->
+          <path class="edge edge-blue" d="M640 348 L900 348" marker-end="url(#s14-b)"/>
+          <text class="lbl-sm" x="645" y="342">⑦ APIM forwards: Authorization + x-pgid + x-oid-list + x-correlation-id</text>
+
+          <!-- Step 8: per-tool authz -->
+          <rect class="node node-amber" x="800" y="378" width="200" height="36" rx="4"/>
+          <text class="lbl-sm" x="900" y="401" text-anchor="middle">⑧ per-tool authz check</text>
+          <text class="lbl-xs" x="905" y="370" fill="#C2820B">OID requested ∈ x-oid-list?</text>
+
+          <!-- Step 9: token exchange -->
+          <path class="edge edge-amber" d="M900 426 L1150 426" marker-end="url(#s14-a)"/>
+          <text class="lbl-sm" x="905" y="420">⑨ token exchange (RFC 8693) — request narrower token aud=denticon-api (or sql-replica)</text>
+
+          <path class="edge edge-amber" d="M1150 458 L900 458" marker-end="url(#s14-a)"/>
+          <text class="lbl-sm" x="905" y="452">⑩ exchanged token returned — shorter TTL · narrower scope · auditable record</text>
+
+          <!-- Step 10: backend call -->
+          <path class="edge edge-teal" d="M900 490 L1360 490" marker-end="url(#s14-t)"/>
+          <text class="lbl-sm" x="905" y="484">⑪ backend invocation · exchanged Bearer · PGID predicate enforced inside server</text>
+
+          <!-- Step 11: result -->
+          <path class="edge edge-teal" d="M1360 524 L130 524" marker-end="url(#s14-t)"/>
+          <text class="lbl-sm" x="135" y="518">⑫ result flows back · MCP server shapes for LLM · APIM emits trace + audit · client receives tool-result JSON-RPC envelope</text>
+
+          <!-- Footer annotation -->
+          <text class="lbl-xs" x="40" y="580" fill="#5B6B85" font-style="italic">Token never crosses a trust boundary unchanged. Every claim is re-asserted by the layer that depends on it. The MCP server is a relying party, not a token holder.</text>
+        </svg>
+        <div class="diagram-cap">Two principles to call out: (1) <code>aud=denticon-mcp</code> on the inbound token blocks token replay against other services; (2) the MCP server never forwards the inbound token — it exchanges for a narrower one before each backend call.</div>
+      </div>
+    </div>
+    <div class="foot"><div>RSI · Confidential</div><div>14 / 23</div></div>
+  </div>
+</section>
+<!-- ====================== SLIDE 15: TENANT ISOLATION 3-LAYER ====================== -->
+<section class="slide" data-notes="The most important slide for the security review. The three-layer model is the standard pattern for multi-tenant MCP. Crucial: no single layer should be trusted to hold the boundary alone. The DB doesn't have RLS, so layer 3 is owned by us in Option B — that's the cost.">
+  <div class="stage">
+    <div class="head">
+      <div>
+        <div class="eyebrow">15 · Tenant isolation</div>
+        <h2 class="slide-title">PGID safety in three layers — defense in depth</h2>
+      </div>
+      <div class="right">Shared by A &amp; B · differs at layer 3</div>
+    </div>
+    <div class="body">
+      <div class="diagram">
+        <svg viewBox="0 0 1480 540" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Three-layer tenant isolation model for the Denticon MCP server">
+          <defs>
+            <marker id="t15" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0B2545"/></marker>
+          </defs>
+
+          <!-- Three lanes/columns -->
+          <rect class="node node-blue" x="60" y="40" width="440" height="440" rx="14"/>
+          <text class="lbl-eyebrow" x="80" y="68" fill="#2456C8">Layer 1 · Edge — APIM</text>
+          <text class="lbl" x="80" y="96">validate-jwt · claim extraction</text>
+          <text class="lbl-sm" x="80" y="124">• verifies token signature, issuer, aud, exp</text>
+          <text class="lbl-sm" x="80" y="142">• asserts aud = denticon-mcp</text>
+          <text class="lbl-sm" x="80" y="160">• asserts required scope per tool route</text>
+          <text class="lbl-sm" x="80" y="178">• extracts pgid (single), oid_list, sub, bundle</text>
+          <text class="lbl-sm" x="80" y="196">• rejects (401/403) before request enters server</text>
+          <text class="lbl-sm" x="80" y="214">• rate-limits per pgid → quota guard</text>
+
+          <rect class="node" x="80" y="240" width="400" height="124" rx="6"/>
+          <text class="lbl" x="280" y="262" text-anchor="middle">Forward to MCP server with:</text>
+          <text class="lbl-sm" x="100" y="284" font-family="var(--mono)" font-size="11">x-pgid: 1042</text>
+          <text class="lbl-sm" x="100" y="302" font-family="var(--mono)" font-size="11">x-oid-list: 7,11,23,87,...</text>
+          <text class="lbl-sm" x="100" y="320" font-family="var(--mono)" font-size="11">x-correlation-id: 0bf9c2-...</text>
+          <text class="lbl-sm" x="100" y="338" font-family="var(--mono)" font-size="11">x-subject: usr_3409</text>
+          <text class="lbl-sm" x="100" y="356" font-family="var(--mono)" font-size="11">x-mcp-scope: denticon.appointments:read</text>
+
+          <rect class="node node-rose" x="80" y="380" width="400" height="86" rx="6"/>
+          <text class="lbl" x="280" y="402" text-anchor="middle" fill="#B5325A">Failure mode</text>
+          <text class="lbl-sm" x="100" y="424">Missing or expired claim → 401 / 403</text>
+          <text class="lbl-sm" x="100" y="442">Wrong audience → 403</text>
+          <text class="lbl-sm" x="100" y="460">Wrong scope for tool → 403, no backend call</text>
+
+          <!-- Arrow between lanes -->
+          <path class="edge edge-strong" d="M510 260 L530 260" marker-end="url(#t15)"/>
+
+          <!-- Layer 2 -->
+          <rect class="node node-amber" x="540" y="40" width="440" height="440" rx="14"/>
+          <text class="lbl-eyebrow" x="560" y="68" fill="#C2820B">Layer 2 · MCP server</text>
+          <text class="lbl" x="560" y="96">per-tool authorization · PGID rebind</text>
+          <text class="lbl-sm" x="560" y="124">• always reads PGID from the header, never the prompt</text>
+          <text class="lbl-sm" x="560" y="142">• looks up the tool definition, asserts required scope</text>
+          <text class="lbl-sm" x="560" y="160">• if tool requires OID — must be in x-oid-list</text>
+          <text class="lbl-sm" x="560" y="178">• bounds row count + result size before execution</text>
+          <text class="lbl-sm" x="560" y="196">• emits structured audit event with full context</text>
+          <text class="lbl-sm" x="560" y="214">• rejects with structured error if any check fails</text>
+
+          <rect class="node" x="560" y="240" width="400" height="124" rx="6"/>
+          <text class="lbl" x="760" y="262" text-anchor="middle">Server-side context bind</text>
+          <text class="lbl-sm" x="580" y="284" font-family="var(--mono)" font-size="11">ctx.pgid = headers.x_pgid  // immutable</text>
+          <text class="lbl-sm" x="580" y="302" font-family="var(--mono)" font-size="11">ctx.allowed_oids = parse(x_oid_list)</text>
+          <text class="lbl-sm" x="580" y="320" font-family="var(--mono)" font-size="11">if (tool.requires_oid &amp;&amp; oid ∉ allowed)</text>
+          <text class="lbl-sm" x="580" y="338" font-family="var(--mono)" font-size="11">  throw 403 "office not in user's scope"</text>
+          <text class="lbl-sm" x="580" y="356" font-family="var(--mono)" font-size="11">tool.invoke(ctx, params) // ctx is rebound</text>
+
+          <rect class="node node-rose" x="560" y="380" width="400" height="86" rx="6"/>
+          <text class="lbl" x="760" y="402" text-anchor="middle" fill="#B5325A">Failure mode</text>
+          <text class="lbl-sm" x="580" y="424">Prompt-injected PGID — ignored (server never reads it)</text>
+          <text class="lbl-sm" x="580" y="442">Asked for OID not in claim — 403 with audit event</text>
+          <text class="lbl-sm" x="580" y="460">Tool not in user's scope — 403 before backend touched</text>
+
+          <path class="edge edge-strong" d="M990 260 L1010 260" marker-end="url(#t15)"/>
+
+          <!-- Layer 3 -->
+          <rect class="node node-teal" x="1020" y="40" width="440" height="440" rx="14"/>
+          <text class="lbl-eyebrow" x="1040" y="68" fill="#0E8C8C">Layer 3 · Outbound</text>
+          <text class="lbl" x="1040" y="96">final boundary at the data path</text>
+          <text class="lbl-sm" x="1040" y="124"><tspan font-weight="700">Option A:</tspan> existing API backend re-validates</text>
+          <text class="lbl-sm" x="1040" y="142">  PGID/OID and returns 403 if mismatched</text>
+          <text class="lbl-sm" x="1040" y="160">  → MCP relies on the production-hardened</text>
+          <text class="lbl-sm" x="1040" y="178">  enforcement that already serves Resonate, Kickcall, etc.</text>
+
+          <text class="lbl-sm" x="1040" y="206"><tspan font-weight="700">Option B:</tspan> query builder mandatorily prepends</text>
+          <text class="lbl-sm" x="1040" y="224">  <tspan font-family="var(--mono)" font-size="11">WHERE PGID = @pgid</tspan>  · parameterized only</text>
+          <text class="lbl-sm" x="1040" y="242">  no string concat · template allow-list governs</text>
+
+          <rect class="node" x="1040" y="262" width="400" height="100" rx="6"/>
+          <text class="lbl" x="1240" y="284" text-anchor="middle">Query template (Option B)</text>
+          <text class="lbl-sm" x="1060" y="306" font-family="var(--mono)" font-size="11">SELECT &lt;projection&gt;</text>
+          <text class="lbl-sm" x="1060" y="324" font-family="var(--mono)" font-size="11">FROM &lt;table&gt; WITH(READUNCOMMITTED)</text>
+          <text class="lbl-sm" x="1060" y="342" font-family="var(--mono)" font-size="11">WHERE PGID = @pgid /* mandatory */</text>
+          <text class="lbl-sm" x="1060" y="358" font-family="var(--mono)" font-size="11">  AND OfficeID IN @allowed_oids   /* mandatory */</text>
+
+          <rect class="node node-rose" x="1040" y="380" width="400" height="86" rx="6"/>
+          <text class="lbl" x="1240" y="402" text-anchor="middle" fill="#B5325A">Failure mode</text>
+          <text class="lbl-sm" x="1060" y="424">Template missing PGID predicate — CI lint fails</text>
+          <text class="lbl-sm" x="1060" y="442">Template not on allow-list — server refuses to load</text>
+          <text class="lbl-sm" x="1060" y="460">Connection account is read-only — no DDL/DML possible</text>
+
+          <!-- Bottom annotation -->
+          <text class="lbl-eyebrow" x="60" y="510" fill="#0B2545">Principle</text>
+          <text class="lbl-sm" x="60" y="528">If any single layer fails, the other two still hold the tenant boundary. The DB is the <tspan font-weight="700">last</tspan> line, not the first.</text>
+        </svg>
+        <div class="diagram-cap">A cross-PGID attack test harness runs against every build: 200+ adversarial prompts that try to leak data across tenants. The pass bar is 100%.</div>
+      </div>
+    </div>
+    <div class="foot"><div>RSI · Confidential</div><div>15 / 23</div></div>
+  </div>
+</section>
+<!-- ====================== SLIDE 16: SEMANTIC CATALOG ====================== -->
+<section class="slide" data-notes="The semantic catalog is the accuracy lever. For Option A it's mostly polish on what you already have; for Option B it's a real authoring effort. The 'Michael' example is the one DJ mentioned during the walkthrough.">
+  <div class="stage">
+    <div class="head">
+      <div>
+        <div class="eyebrow">16 · Semantic layer</div>
+        <h2 class="slide-title">The catalog is the accuracy lever — don't underestimate it</h2>
+      </div>
+      <div class="right">Data dictionary &amp; LLM grounding</div>
+    </div>
+    <div class="body cols-2-asym">
+      <div>
+        <h3 class="deck-h3">What the catalog has to do</h3>
+        <ul class="crisp">
+          <li><strong>Map prompt → entity.</strong> &ldquo;Michael&rdquo; — patient, provider, office name, responsible party? The catalog encodes which entity types are searchable for a given phrase shape.</li>
+          <li><strong>Map column → business term.</strong> <code>LDG.AMT_DUE</code> is &ldquo;outstanding patient balance&rdquo;. <code>APT.STAT_CD</code> is the appointment status code with enum decoding. A column without a description is a column the LLM will hallucinate against.</li>
+          <li><strong>Encode units &amp; semantics.</strong> Currency, percentages, statuses, dates with timezone behavior, ADA procedure codes — each gets a typed annotation.</li>
+          <li><strong>Pre-vet examples.</strong> Each tool ships with 2–3 example prompts + expected output shape — the strongest few-shot signal we can give the LLM.</li>
+          <li><strong>Disambiguate on entity collision.</strong> The catalog adds a classifier prompt step: <em>&ldquo;Michael is most likely a [patient · provider · office]&rdquo;</em> before the actual tool fires.</li>
+        </ul>
+
+        <h3 class="deck-h3" style="margin-top: 24px;">Tooling choices we're considering</h3>
+        <ul class="crisp blue">
+          <li><strong>Microsoft Data API Builder (DAB) 1.7</strong> · description fields per entity/field/parameter, RBAC, Redis cache, Entra integration — ships catalog and SQL adapter in one component (relevant for Option B).</li>
+          <li><strong>Catalog-in-git as JSON-LD</strong> with code-gen into both the tool definitions and the prompt-time grounding context. Reviewer-friendly, diffable.</li>
+          <li><strong>Bring-your-own catalog</strong> from Denticon's existing data dictionary if completeness is acceptable.</li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="deck-h3">Sample catalog entry · ledger column</h3>
+<pre>{
+  "table": "LDG",
+  "column": "AMT_DUE",
+  "display_name": "Outstanding patient balance",
+  "intent": "the amount the responsible party owes",
+  "type": "currency_usd",
+  "nullable": false,
+  "phi": false,
+  "aliases": ["balance", "amount due", "what they owe"],
+  "redacted_in_logs": false,
+  "example_questions": [
+    "Which patients have a balance over $500?",
+    "Aging summary by office for outstanding balances"
+  ],
+  "related": ["LDG.AGE_BUCKET", "PAT.RPID"]
+}</pre>
+        <h3 class="deck-h3" style="margin-top: 18px;">Cost framing</h3>
+        <div class="kv">
+          <div class="k">Per relevant column</div><div class="v">~5–10 min to author + review</div>
+          <div class="k">Ledger (50 relevant cols)</div><div class="v">~1 engineer-day inc. review</div>
+          <div class="k">POC scope (2 domains)</div><div class="v">~3–5 engineer-days total</div>
+          <div class="k">Maintenance</div><div class="v">Catalog change must accompany schema change — adds to PR template</div>
+        </div>
+        <div class="lift" style="margin-top: 18px;">
+          <strong>Option A still benefits.</strong> Even with API-wrapping, light catalog work pays off in disambiguation and example-prompts grounding. Don't skip it just because the OpenAPI is good.
+        </div>
+      </div>
+    </div>
+    <div class="foot"><div>RSI · Confidential</div><div>16 / 23</div></div>
+  </div>
+</section>
+<!-- ====================== SLIDE 17: OBSERVABILITY & HIPAA ====================== -->
+<section class="slide" data-notes="The HIPAA story is shorter for Option A — your BAA scope is mostly unchanged. For Option B, we're explicit about what's new: net new data path, net new audit log shape, net new PHI redaction layer. Either way, App Insights + Log Analytics covers the run-time observability story.">
+  <div class="stage">
+    <div class="head">
+      <div>
+        <div class="eyebrow">17 · Observability &amp; compliance</div>
+        <h2 class="slide-title">Telemetry, audit, and HIPAA posture</h2>
+      </div>
+      <div class="right">What we log · what we don't</div>
+    </div>
+    <div class="body cols-3">
+      <div>
+        <h3 class="deck-h3">Observability stack</h3>
+        <ul class="crisp">
+          <li><strong>Azure Application Insights</strong> — end-to-end distributed traces; correlation IDs flow from MCP client through APIM, MCP server, backend.</li>
+          <li><strong>Custom dimensions</strong> per tool call: <code>tool_name</code>, <code>pgid_hash</code> (never raw), <code>oid_count</code>, <code>duration_ms</code>, <code>outcome</code>, <code>tokens_used</code> (if known).</li>
+          <li><strong>APIM diagnostic logs</strong> → Log Analytics workspace per region.</li>
+          <li><strong>Prompt-eval suite</strong> emits a labeled metric per case → live dashboard for accuracy regression detection.</li>
+          <li><strong>Per-tool dashboards</strong> — invocation rate, error rate, p50/p95/p99 latency, top-error reasons.</li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="deck-h3">Audit log (HIPAA-aligned)</h3>
+        <p class="small" style="margin-bottom: 8px;">Every tool invocation emits a structured audit event:</p>
+<pre>{
+  "ts": "2026-05-13T14:22:18Z",
+  "correlation_id": "0bf9c2-...",
+  "sub": "usr_3409",
+  "pgid": 1042,
+  "oid_requested": 87,
+  "oid_allowed": [7,11,23,87],
+  "tool": "denticon.production.summary",
+  "params": { "date_range": "Q1-2026",
+              "office_id": 87 },
+  "outcome": "200",
+  "duration_ms": 412,
+  "row_count": 17
+}</pre>
+        <p class="small" style="margin-top: 8px;">PHI never enters the audit event. Parameters are sanitized; row contents never logged.</p>
+      </div>
+      <div>
+        <h3 class="deck-h3">HIPAA &amp; PHI posture</h3>
+        <ul class="crisp green">
+          <li><strong>BAA</strong> — assumes existing Microsoft Azure BAA covers new Container Apps / APIM resources (to confirm with Mike).</li>
+          <li><strong>Encryption at rest</strong> — Azure-managed encryption for default services; CMK in Managed HSM for any PHI-adjacent caches.</li>
+          <li><strong>Encryption in transit</strong> — TLS 1.2+ end-to-end · Private Endpoints where possible.</li>
+          <li><strong>PHI redaction middleware</strong> at the MCP server boundary — names, SSNs, DOBs scrubbed from any log line.</li>
+          <li><strong>Network</strong> — VNet integration, Private DNS for backend services, restricted egress from MCP server.</li>
+          <li><strong>Identity</strong> — Managed Identity for service-to-service · no static secrets in container env.</li>
+          <li><strong>Retention</strong> — audit logs into immutable storage with 6+ year retention.</li>
+          <li><strong>Defender for Cloud</strong> · Microsoft Purview for governance hooks.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot"><div>RSI · Confidential</div><div>17 / 23</div></div>
+  </div>
+</section>
+<!-- ====================== SLIDE 18: DR / MULTI-REGION ====================== -->
+<section class="slide" data-notes="MCP deploys symmetrically into the same two stamps you already run. Front Door does the global routing; the metadata DB does the client→region mapping; failover is a property of the existing platform that MCP inherits. We're not introducing a new DR story.">
+  <div class="stage">
+    <div class="head">
+      <div>
+        <div class="eyebrow">18 · DR &amp; multi-region</div>
+        <h2 class="slide-title">MCP rides the existing active/active topology</h2>
+      </div>
+      <div class="right">Cross-region resilience</div>
+    </div>
+    <div class="body">
+      <div class="diagram">
+        <svg viewBox="0 0 1480 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MCP server deployed symmetrically across Azure Central and East stamps">
+          <defs>
+            <marker id="d18" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5B6B85"/></marker>
+            <marker id="d18-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#C2820B"/></marker>
+            <marker id="d18-t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0E8C8C"/></marker>
+            <marker id="d18-b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2456C8"/></marker>
+          </defs>
+
+          <text class="lbl-zone" x="40" y="38">Global</text>
+          <text class="lbl-zone" x="40" y="138">Edge / routing</text>
+          <text class="lbl-zone" x="40" y="232">Per-stamp MCP plane</text>
+
+          <!-- Clients -->
+          <rect class="node node-soft" x="380" y="22" width="720" height="56" rx="8"/>
+          <text class="lbl" x="740" y="46" text-anchor="middle">MCP clients — partners, internal agents, IDE assistants</text>
+          <text class="lbl-xs" x="740" y="62" text-anchor="middle">single hostname · mcp.denticon.com · Bearer ${access_token}</text>
+
+          <!-- Edge -->
+          <rect class="node node-teal" x="220" y="112" width="700" height="60" rx="8"/>
+          <text class="lbl" x="570" y="136" text-anchor="middle">Azure Front Door — TLS, WAF, geo-aware routing, health probes</text>
+          <text class="lbl-xs" x="570" y="154" text-anchor="middle">routes to the nearest <tspan font-style="italic">healthy</tspan> stamp · automatic regional failover</text>
+
+          <rect class="node node-amber" x="960" y="112" width="320" height="60" rx="8"/>
+          <text class="lbl" x="1120" y="136" text-anchor="middle">Central metadata DB</text>
+          <text class="lbl-xs" x="1120" y="154" text-anchor="middle">authoritative client→region mapping</text>
+
+          <path class="edge edge-strong" d="M740 78 L740 110" marker-end="url(#d18)"/>
+          <path class="edge edge-amber edge-dashed" d="M920 142 L960 142" marker-end="url(#d18-a)"/>
+
+          <!-- Central stamp -->
+          <rect class="zone-fill" x="80" y="200" width="640" height="380" rx="12"/>
+          <text class="lbl-eyebrow" x="100" y="222">Azure · US Central stamp</text>
+
+          <rect class="node node-blue" x="100" y="240" width="600" height="48" rx="6"/>
+          <text class="lbl" x="400" y="262" text-anchor="middle">APIM (MCP-gateway product) — region-local</text>
+          <text class="lbl-xs" x="400" y="278" text-anchor="middle">validate-jwt · scope · rate-limit · subscription-key</text>
+
+          <rect class="node node-amber" x="100" y="306" width="600" height="60" rx="6"/>
+          <text class="lbl" x="400" y="330" text-anchor="middle">MCP server · Azure Container Apps · revision per release</text>
+          <text class="lbl-xs" x="400" y="346" text-anchor="middle">stateless · autoscales · Managed Identity · App Insights</text>
+          <text class="lbl-xs" x="400" y="360" text-anchor="middle">min replicas ≥ 1 (avoid scale-to-zero cold starts)</text>
+
+          <rect class="node" x="100" y="384" width="290" height="60" rx="6"/>
+          <text class="lbl" x="245" y="406" text-anchor="middle">Routing resolver</text>
+          <text class="lbl-xs" x="245" y="422" text-anchor="middle">caches PGID → DB mapping</text>
+          <text class="lbl-xs" x="245" y="436" text-anchor="middle">short TTL · fail-open to refresh</text>
+
+          <rect class="node" x="410" y="384" width="290" height="60" rx="6"/>
+          <text class="lbl" x="555" y="406" text-anchor="middle">Redis (optional, MCP session)</text>
+          <text class="lbl-xs" x="555" y="422" text-anchor="middle">streamable HTTP session continuity</text>
+          <text class="lbl-xs" x="555" y="436" text-anchor="middle">geo-replicated within region</text>
+
+          <rect class="node node-teal" x="100" y="462" width="600" height="40" rx="6"/>
+          <text class="lbl" x="400" y="484" text-anchor="middle">SQL read replica (Central) — same target as Option B accesses today</text>
+
+          <rect class="node node-soft" x="100" y="516" width="290" height="48" rx="6"/>
+          <text class="lbl" x="245" y="538" text-anchor="middle">Denticon APIM (existing)</text>
+          <text class="lbl-xs" x="245" y="554" text-anchor="middle">Option A back-end target · region-local</text>
+
+          <rect class="node node-soft" x="410" y="516" width="290" height="48" rx="6"/>
+          <text class="lbl" x="555" y="538" text-anchor="middle">Denticon App + DB (existing)</text>
+          <text class="lbl-xs" x="555" y="554" text-anchor="middle">writes target if/when MCP supports writes</text>
+
+          <!-- East stamp (mirror) -->
+          <rect class="zone-fill" x="760" y="200" width="640" height="380" rx="12"/>
+          <text class="lbl-eyebrow" x="780" y="222">Azure · US East stamp</text>
+
+          <rect class="node node-blue" x="780" y="240" width="600" height="48" rx="6"/>
+          <text class="lbl" x="1080" y="262" text-anchor="middle">APIM (MCP-gateway product) — region-local</text>
+          <text class="lbl-xs" x="1080" y="278" text-anchor="middle">validate-jwt · scope · rate-limit · subscription-key</text>
+
+          <rect class="node node-amber" x="780" y="306" width="600" height="60" rx="6"/>
+          <text class="lbl" x="1080" y="330" text-anchor="middle">MCP server · Azure Container Apps · revision per release</text>
+          <text class="lbl-xs" x="1080" y="346" text-anchor="middle">stateless · autoscales · Managed Identity · App Insights</text>
+          <text class="lbl-xs" x="1080" y="360" text-anchor="middle">min replicas ≥ 1 (avoid scale-to-zero cold starts)</text>
+
+          <rect class="node" x="780" y="384" width="290" height="60" rx="6"/>
+          <text class="lbl" x="925" y="406" text-anchor="middle">Routing resolver</text>
+          <text class="lbl-xs" x="925" y="422" text-anchor="middle">caches PGID → DB mapping</text>
+          <text class="lbl-xs" x="925" y="436" text-anchor="middle">short TTL · fail-open to refresh</text>
+
+          <rect class="node" x="1090" y="384" width="290" height="60" rx="6"/>
+          <text class="lbl" x="1235" y="406" text-anchor="middle">Redis (optional, MCP session)</text>
+          <text class="lbl-xs" x="1235" y="422" text-anchor="middle">streamable HTTP session continuity</text>
+          <text class="lbl-xs" x="1235" y="436" text-anchor="middle">geo-replicated within region</text>
+
+          <rect class="node node-teal" x="780" y="462" width="600" height="40" rx="6"/>
+          <text class="lbl" x="1080" y="484" text-anchor="middle">SQL read replica (East) — same target as Option B accesses today</text>
+
+          <rect class="node node-soft" x="780" y="516" width="290" height="48" rx="6"/>
+          <text class="lbl" x="925" y="538" text-anchor="middle">Denticon APIM (existing)</text>
+          <text class="lbl-xs" x="925" y="554" text-anchor="middle">Option A back-end target · region-local</text>
+
+          <rect class="node node-soft" x="1090" y="516" width="290" height="48" rx="6"/>
+          <text class="lbl" x="1235" y="538" text-anchor="middle">Denticon App + DB (existing)</text>
+          <text class="lbl-xs" x="1235" y="554" text-anchor="middle">writes target if/when MCP supports writes</text>
+
+          <!-- Cross region replication -->
+          <path class="edge edge-amber edge-dashed" d="M700 482 C 740 482, 740 482, 780 482" marker-end="url(#d18-a)" marker-start="url(#d18-a)"/>
+          <text class="lbl-xs" x="722" y="472" fill="#C2820B" font-weight="700" text-anchor="middle">DAG</text>
+
+          <!-- Edge to stamps -->
+          <path class="edge edge-strong" d="M400 172 L400 240" marker-end="url(#d18)"/>
+          <path class="edge edge-strong" d="M1080 172 L1080 240" marker-end="url(#d18)"/>
+        </svg>
+        <div class="diagram-cap">Failover semantics: if a stamp goes unhealthy, Front Door reroutes to the other; the metadata DB serves the same client→region mapping the app already uses. MCP introduces no new DR primitive.</div>
+      </div>
+    </div>
+    <div class="foot"><div>RSI · Confidential</div><div>18 / 23</div></div>
+  </div>
+</section>
+<!-- ====================== SLIDE 19: PHASED POC PLAN ====================== -->
+<section class="slide" data-notes="Six-week POC with two parallel architecture spikes through week 3, then converge based on a prompt-eval scoreboard. Team size is small on purpose — three RSI engineers plus three named Denticon roles part-time.">
+  <div class="stage">
+    <div class="head">
+      <div>
+        <div class="eyebrow">19 · Plan</div>
+        <h2 class="slide-title">Six-week POC — two parallel spikes, then converge</h2>
+      </div>
+      <div class="right">Phased delivery</div>
+    </div>
+    <div class="body">
+      <div class="diagram">
+        <svg viewBox="0 0 1480 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Six-week phased POC plan with parallel option-A and option-B spikes">
+          <!-- Week headers -->
+          <g>
+            <rect x="240" y="20" width="200" height="36" rx="6" fill="#F7F9FC" stroke="#DCE3EE"/>
+            <text class="lbl" x="340" y="42" text-anchor="middle">Week 1</text>
+            <rect x="440" y="20" width="200" height="36" rx="6" fill="#F7F9FC" stroke="#DCE3EE"/>
+            <text class="lbl" x="540" y="42" text-anchor="middle">Week 2</text>
+            <rect x="640" y="20" width="200" height="36" rx="6" fill="#F7F9FC" stroke="#DCE3EE"/>
+            <text class="lbl" x="740" y="42" text-anchor="middle">Week 3</text>
+            <rect x="840" y="20" width="200" height="36" rx="6" fill="#F7F9FC" stroke="#DCE3EE"/>
+            <text class="lbl" x="940" y="42" text-anchor="middle">Week 4</text>
+            <rect x="1040" y="20" width="200" height="36" rx="6" fill="#F7F9FC" stroke="#DCE3EE"/>
+            <text class="lbl" x="1140" y="42" text-anchor="middle">Week 5</text>
+            <rect x="1240" y="20" width="200" height="36" rx="6" fill="#F7F9FC" stroke="#DCE3EE"/>
+            <text class="lbl" x="1340" y="42" text-anchor="middle">Week 6</text>
+          </g>
+
+          <!-- Phase labels -->
+          <text class="lbl-eyebrow" x="20" y="82">Phase 0</text>
+          <text class="lbl-sm" x="20" y="100">Foundation</text>
+
+          <text class="lbl-eyebrow" x="20" y="142" fill="#2456C8">Phase 1A</text>
+          <text class="lbl-sm" x="20" y="160">Option A spike</text>
+
+          <text class="lbl-eyebrow" x="20" y="202" fill="#6F3DD3">Phase 1B</text>
+          <text class="lbl-sm" x="20" y="220">Option B spike</text>
+
+          <text class="lbl-eyebrow" x="20" y="262" fill="#C2820B">Phase 2</text>
+          <text class="lbl-sm" x="20" y="280">Isolation · perf · HIPAA</text>
+
+          <text class="lbl-eyebrow" x="20" y="322" fill="#0E8C8C">Phase 3</text>
+          <text class="lbl-sm" x="20" y="340">Decision &amp; demo</text>
+
+          <!-- Bars -->
+          <rect class="node node-teal" x="240" y="70" width="200" height="32" rx="6"/>
+          <text class="lbl-sm" x="340" y="90" text-anchor="middle" fill="#0B2545">Azure RGs · APIM stub · IdP app · App Insights · Container Apps env</text>
+
+          <rect class="node node-blue" x="440" y="130" width="400" height="32" rx="6"/>
+          <text class="lbl-sm" x="640" y="150" text-anchor="middle" fill="#FFFFFF">REST adapter · 8 tools · OpenAPI-driven catalog · prompt-eval set v1</text>
+
+          <rect class="node node-purple" x="540" y="190" width="500" height="32" rx="6"/>
+          <text class="lbl-sm" x="790" y="210" text-anchor="middle" fill="#FFFFFF">SQL adapter · catalog for Appointments + Ledger · 8 templates · same prompt-eval</text>
+
+          <rect class="node node-amber" x="840" y="250" width="400" height="32" rx="6"/>
+          <text class="lbl-sm" x="1040" y="270" text-anchor="middle" fill="#FFFFFF">Cross-PGID attack suite · perf baseline · HIPAA audit-log review</text>
+
+          <rect class="node node-teal" x="1140" y="310" width="300" height="32" rx="6"/>
+          <text class="lbl-sm" x="1290" y="330" text-anchor="middle" fill="#FFFFFF">Comparative demo · decision memo · production path</text>
+
+          <!-- Decision gate -->
+          <line x1="840" y1="60" x2="840" y2="350" stroke="#C2820B" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <text class="lbl-eyebrow" x="848" y="74" fill="#C2820B">Gate 1: spike review</text>
+          <line x1="1140" y1="60" x2="1140" y2="350" stroke="#0E8C8C" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <text class="lbl-eyebrow" x="1148" y="74" fill="#0E8C8C">Gate 2: HIPAA + perf</text>
+        </svg>
+      </div>
+
+      <div class="cols-2" style="margin-top: 22px;">
+        <div>
+          <h3 class="deck-h3">Investment</h3>
+          <div class="card teal" style="margin-top: 4px;">
+            <span class="badge">POC cost · all-in</span>
+            <div style="display:flex; align-items:baseline; gap:14px; margin: 6px 0 4px;">
+              <span style="font-size:48px; font-weight:700; color:var(--ink); letter-spacing:-0.02em;">$20k</span>
+              <span class="small">fixed for the six-week engagement</span>
+            </div>
+            <p class="small" style="margin: 8px 0 0;">Covers both parallel spikes (Option A and Option B), the isolation / perf / HIPAA hardening phase, and the comparative decision memo. No additional Denticon cloud spend beyond a developer-tier APIM product and a Container Apps environment in each stamp.</p>
+          </div>
+        </div>
+        <div>
+          <h3 class="deck-h3">Gates &amp; exit criteria</h3>
+          <div class="kv">
+            <div class="k">Gate 1 — end of Week 3</div><div class="v">Both spikes pass &ldquo;happy path&rdquo; prompt-eval at ≥70% accuracy; live demo on a sample PGID</div>
+            <div class="k">Gate 2 — end of Week 5</div><div class="v">100% cross-PGID isolation pass · audit log review signed off</div>
+            <div class="k">Final — end of Week 6</div><div class="v">Comparative scoreboard delivered to Denticon leadership · go/no-go &amp; A/B path decision</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><div>RSI · Confidential</div><div>19 / 23</div></div>
+  </div>
+</section>
+<!-- ====================== SLIDE 20: RISKS & MITIGATIONS ====================== -->
+<section class="slide" data-notes="Risk register — calibrated for an architecture audience. The cross-tenant query risk is the single biggest one to over-engineer against; we treat it as a 'never' event with multi-layer enforcement and a continuous adversarial test suite.">
+  <div class="stage">
+    <div class="head">
+      <div>
+        <div class="eyebrow">20 · Risks</div>
+        <h2 class="slide-title">Risks &amp; mitigations</h2>
+      </div>
+      <div class="right">Calibrated for POC + early production</div>
+    </div>
+    <div class="body">
+      <table class="matrix">
+        <thead>
+          <tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>LLM-induced cross-tenant query.</strong> An LLM tries to fetch data for a PGID the caller doesn't own.</td>
+            <td><span class="pill med">Med</span></td>
+            <td><span class="pill low">Critical</span></td>
+            <td>3-layer isolation (slide 15) · server never reads PGID from prompt · query templates with mandatory PGID predicate · continuous cross-PGID attack suite gating every build.</td>
+          </tr>
+          <tr>
+            <td><strong>Fan-out cost explosion.</strong> A single user prompt fans out to many backend calls; bills surprise partners.</td>
+            <td><span class="pill med">Med-High</span></td>
+            <td><span class="pill med">High</span></td>
+            <td>APIM quota policy + tenant cache; tool-call meter at the MCP boundary; prompt-eval suite baselines worst-case call counts before partner exposure.</td>
+          </tr>
+          <tr>
+            <td><strong>API coverage gap blocks a tool.</strong> An Option-A tool can't ship because the underlying API doesn't expose what's needed.</td>
+            <td><span class="pill med">Med</span></td>
+            <td><span class="pill med">Med</span></td>
+            <td>Option B fallback path for that specific tool · queue of API enhancements with Mike · accept partial tool surface for the POC.</td>
+          </tr>
+          <tr>
+            <td><strong>PHI leakage in logs or tool output.</strong> A column we forgot to flag as PHI ends up in an audit event or model context.</td>
+            <td><span class="pill med">Med</span></td>
+            <td><span class="pill low">Critical</span></td>
+            <td>Redaction middleware at every emit point · explicit PHI flag in catalog · static lint against tool outputs · regular review with security reviewer.</td>
+          </tr>
+          <tr>
+            <td><strong>Agentic API divergence.</strong> Denticon ships parallel agentic surface; MCP duplicates or contradicts it.</td>
+            <td><span class="pill med">Med</span></td>
+            <td><span class="pill med">Med</span></td>
+            <td>Open question on slide 22 · align early with Denticon product · option: MCP server wraps agentic API instead of competing with it.</td>
+          </tr>
+          <tr>
+            <td><strong>Streamable HTTP / SSE timeout in ACA.</strong> Long-running tools time out on the platform's 240-second ingress limit.</td>
+            <td><span class="pill med">Med</span></td>
+            <td><span class="pill high">Low–Med</span></td>
+            <td>Tools enforce internal timeouts well under 30s · result paging for large responses · App Service or Functions as fallback host if needed.</td>
+          </tr>
+          <tr>
+            <td><strong>Catalog drift.</strong> Schema changes in Denticon's DB or API outpace the catalog; LLM begins hallucinating.</td>
+            <td><span class="pill high">High</span></td>
+            <td><span class="pill med">Med</span></td>
+            <td>Catalog-as-code in git · change requires catalog PR · prompt-eval canary on a frozen set detects regressions before release.</td>
+          </tr>
+          <tr>
+            <td><strong>OAuth scope sprawl.</strong> Each new tool needs a new scope; client tokens balloon.</td>
+            <td><span class="pill high">High</span></td>
+            <td><span class="pill high">Low</span></td>
+            <td>Domain-level scopes (e.g., <code>denticon.appointments:read</code>) cover families of tools; only escalate to tool-level scopes when audit requires.</td>
+          </tr>
+          <tr>
+            <td><strong>BAA scope gap.</strong> New Azure resources (Container Apps, App Insights, etc.) not yet under Denticon's BAA.</td>
+            <td><span class="pill high">Low</span></td>
+            <td><span class="pill low">High</span></td>
+            <td>Mike confirms BAA coverage week 1 · all new resources go into accounts already in BAA scope · gate-1 includes BAA verification.</td>
+          </tr>
+          <tr>
+            <td><strong>POC results don't generalize.</strong> Prompt-eval set is too narrow; production prompts behave differently.</td>
+            <td><span class="pill med">Med</span></td>
+            <td><span class="pill med">Med</span></td>
+            <td>Curate eval set with DJ · include adversarial / ambiguous / long-tail cases · re-baseline after a real partner pilot before broad release.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="foot"><div>RSI · Confidential</div><div>20 / 23</div></div>
+  </div>
+</section>
+<!-- ====================== SLIDE 21: NEXT STEPS ====================== -->
+<section class="slide" data-notes="Next steps for both sides — what closes the proposal and what unblocks the kickoff. Tagged by owner so it's clear who drives each item.">
+  <div class="stage">
+    <div class="head">
+      <div>
+        <div class="eyebrow">21 · Next steps</div>
+        <h2 class="slide-title">Next steps to align on before kickoff</h2>
+      </div>
+      <div class="right">Owner-tagged</div>
+    </div>
+    <div class="body">
+      <p class="lede" style="margin-bottom: 18px;">A short, concrete action register. Each item is a step either side can move forward on this week — together they unblock the Phase&nbsp;0 kickoff outlined in the timeline.</p>
+      <div class="cols-2">
+        <div>
+          <h3 class="deck-h3">Architecture &amp; data</h3>
+          <ul class="crisp">
+            <li><strong>Mike — API coverage map vs DB schema.</strong> Which analytical questions are fully expressible through current APIs? Which require composition? Which need new endpoints? This is the central Option-A unknown.</li>
+            <li><strong>Mike — data-dictionary completeness.</strong> What fraction of the catalog already exists as documented columns? What's the cadence of schema change?</li>
+            <li><strong>Team — Agentic API positioning.</strong> Is MCP the externalization of the Agentic API? Or does the Agentic API remain Denticon-internal and MCP is partner-facing only? Answer drives tool surface.</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="deck-h3">Auth, compliance, commercial</h3>
+          <ul class="crisp">
+            <li><strong>Team — per-tool vs per-API scope.</strong> Your current claims model is per-API; tool-level scopes (SEP-835) would be additive. Which fits your provisioning model better?</li>
+            <li><strong>Team — partner-facing or embedded?</strong> POC is partner-facing; if the production target is also embedded inside the Denticon UI, the auth model converges with first-party SSO and we should design for both now.</li>
+            <li><strong>Mike — HIPAA BAA scope.</strong> Does the existing BAA cover the Azure resources we add (APIM-MCP product, Container Apps, App Insights, Log Analytics)? If not, the path to extension is owned by whom?</li>
+            <li><strong>Team — Phase 1 path choice (A · B · both).</strong> The decision this proposal exists to support.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><div>RSI · Confidential</div><div>21 / 23</div></div>
+  </div>
+</section>
+<!-- ====================== SLIDE 22: PROPOSAL TO KICKOFF ====================== -->
+<section class="slide" data-notes="The 'so what now' slide. Specific owners, specific dates left as placeholders for Denticon to fill in alongside their CEO buy-in package.">
+  <div class="stage">
+    <div class="head">
+      <div>
+        <div class="eyebrow">22 · Next steps</div>
+        <h2 class="slide-title">From proposal to kickoff</h2>
+      </div>
+      <div class="right">Decision &amp; action plan</div>
+    </div>
+    <div class="body">
+      <div class="cols-2-asym">
+        <div>
+          <h3 class="deck-h3">The path from here</h3>
+          <ul class="crisp">
+            <li><strong>RSI — DONE.</strong> Comprehensive POC proposal covering both implementation approaches, with architecture, complexity, risks, and a timeline + resource estimate. <em>(This deck.)</em></li>
+            <li><strong>Denticon — review &amp; select preferred Phase 1 path.</strong> Option A, Option B, or run both as parallel spikes (recommended in the executive summary).</li>
+            <li><strong>Joint — close open questions slide.</strong> Especially API coverage, BAA scope, and the Agentic API positioning — these gate the design.</li>
+            <li><strong>Denticon — secure CEO buy-in.</strong> Recommended package: this deck + risks/mitigations + commercial outline + decision memo template.</li>
+            <li><strong>Joint — kickoff.</strong> Phase 0 (foundation) starts; six-week clock starts on Day 1 of Phase 1.</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="deck-h3">Proposed decision timeline</h3>
+          <div class="kv">
+            <div class="k">Proposal review · internal</div><div class="v">Denticon architecture team — 1 week</div>
+            <div class="k">Proposal review · with CEO</div><div class="v">Following architecture sign-off</div>
+            <div class="k">Phase 1 path decision</div><div class="v">Target: within 2 weeks of review</div>
+            <div class="k">Kickoff &amp; Phase 0</div><div class="v">Target: within 1 week of decision</div>
+            <div class="k">First credible demo</div><div class="v">Phase-1 end (Week 3 of POC)</div>
+            <div class="k">Final POC review</div><div class="v">Phase-3 end (Week 6 of POC)</div>
+            <div class="k">Production path decision</div><div class="v">Within 2 weeks of POC close</div>
+          </div>
+          <div class="lift" style="margin-top: 20px;">
+            <strong>What success looks like 90 days from now:</strong>&nbsp; a working Denticon MCP server, deployed in both stamps, exposed via APIM with Entra-issued tokens, serving 8–12 read-only tools to an internal pilot — and a clear, evidence-backed decision on which production path to invest in.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><div>RSI · Confidential</div><div>22 / 23</div></div>
+  </div>
+</section>
+<!-- ====================== SLIDE 23: THANK YOU + SOURCES ====================== -->
+<section class="slide" data-notes="Closing slide with all the sources used to ground the technical recommendations. The deck is a working document — invite challenge.">
+  <div class="stage">
+    <div class="head">
+      <div>
+        <div class="eyebrow">23 · References</div>
+        <h2 class="slide-title">Thank you — and the references we used</h2>
+      </div>
+      <div class="right">Sources · 2026</div>
+    </div>
+    <div class="body cols-2">
+      <div>
+        <h3 class="deck-h3">Contact</h3>
+        <div class="card teal">
+          <p style="margin: 0 0 4px;"><strong>Harshil Shah</strong> — RSI Technologies</p>
+          <p class="small" style="margin: 0 0 8px;">harshil.shah@velotio.com</p>
+          <p style="margin: 0;">Happy to walk through any diagram in more detail or run a working session with Mike + DJ to close the open questions. This deck is a draft — challenge it.</p>
+        </div>
+
+        <h3 class="deck-h3" style="margin-top: 24px;">Companion artifacts (to follow)</h3>
+        <ul class="crisp">
+          <li>Prompt-eval set (collaborative draft with DJ)</li>
+          <li>BAA + HIPAA gap checklist (with Mike)</li>
+          <li>Sample APIM <code>validate-jwt</code> + tool-route policy snippets</li>
+          <li>Catalog-as-code skeleton (Option B)</li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="deck-h3">Sources</h3>
+        <p class="small">Planet DDS &amp; Denticon</p>
+        <ul class="crisp">
+          <li><a href="https://www.planetdds.com/" target="_blank" rel="noopener">planetdds.com</a> · DentalOS solutions overview</li>
+          <li><a href="https://developer.planetdds.com/" target="_blank" rel="noopener">developer.planetdds.com</a> · API portal (powered by Azure APIM)</li>
+          <li><a href="https://developer.planetdds.com/apis" target="_blank" rel="noopener">developer.planetdds.com/apis</a> · API resources</li>
+          <li><a href="https://www.planetdds.com/newsroom/planet-dds-unveils-dentalos-ai-agents/" target="_blank" rel="noopener">DentalOS AI Agents announcement</a></li>
+          <li><a href="https://www.planetdds.com/newsroom/planet-dds-unveils-open-api-program/" target="_blank" rel="noopener">Open API Program for DSOs &amp; partners</a></li>
+        </ul>
+
+        <p class="small" style="margin-top: 14px;">MCP &amp; Azure</p>
+        <ul class="crisp">
+          <li><a href="https://modelcontextprotocol.io/specification/draft/basic/authorization" target="_blank" rel="noopener">MCP authorization spec</a></li>
+          <li><a href="https://learn.microsoft.com/en-us/azure/api-management/mcp-server-overview" target="_blank" rel="noopener">Microsoft Learn — MCP servers in APIM</a></li>
+          <li><a href="https://learn.microsoft.com/en-us/azure/api-management/secure-mcp-servers" target="_blank" rel="noopener">Microsoft Learn — Securing MCP servers</a></li>
+          <li><a href="https://learn.microsoft.com/en-us/azure/container-apps/mcp-overview" target="_blank" rel="noopener">Microsoft Learn — MCP on Container Apps</a></li>
+          <li><a href="https://learn.microsoft.com/en-us/sql/mcp/" target="_blank" rel="noopener">SQL MCP Server documentation</a></li>
+          <li><a href="https://devblogs.microsoft.com/azure-sql/introducing-sql-mcp-server/" target="_blank" rel="noopener">Introducing SQL MCP Server (Azure SQL devblog)</a></li>
+        </ul>
+
+        <p class="small" style="margin-top: 14px;">Multi-tenant MCP &amp; semantic layers</p>
+        <ul class="crisp">
+          <li><a href="https://prefactor.tech/blog/mcp-security-multi-tenant-ai-agents-explained" target="_blank" rel="noopener">Prefactor — MCP security for multi-tenant AI agents</a></li>
+          <li><a href="https://deepwiki.com/microsoft/mcp-for-beginners/5.5-row-level-security-and-multi-tenancy" target="_blank" rel="noopener">Microsoft MCP for Beginners — Row-level security &amp; multi-tenancy</a></li>
+          <li><a href="https://docs.getdbt.com/blog/semantic-layer-vs-text-to-sql-2026" target="_blank" rel="noopener">dbt — Semantic Layer vs Text-to-SQL benchmark (2026)</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot"><div>RSI · Confidential · Draft 0.1</div><div>23 / 23</div></div>
+  </div>
+</section>
+
+</div>
+
+<div id="hud"><div class="bar" style="width:0%"></div></div>
+<div id="controls">
+  <button class="btn" id="prev" aria-label="Previous">‹</button>
+  <span class="ctr"><span id="cur">1</span> / <span id="tot">1</span></span>
+  <button class="btn" id="next" aria-label="Next">›</button>
+  <span class="sep"></span>
+  <button class="btn" id="notesBtn" title="Speaker notes (n)">N</button>
+  <button class="btn" id="overviewBtn" title="Overview (o)">▦</button>
+  <button class="btn" id="helpBtn" title="Help (?)">?</button>
+</div>
+<div id="notes"><div class="nh">Speaker notes</div><div id="notes-body">—</div></div>
+
+<div id="help" tabindex="-1">
+  <div class="panel">
+    <h3>Keyboard shortcuts</h3>
+    <table>
+      <tr><td><kbd>→</kbd> <kbd>Space</kbd></td><td>Next slide</td></tr>
+      <tr><td><kbd>←</kbd></td><td>Previous slide</td></tr>
+      <tr><td><kbd>Home</kbd></td><td>First slide</td></tr>
+      <tr><td><kbd>End</kbd></td><td>Last slide</td></tr>
+      <tr><td><kbd>1</kbd>–<kbd>9</kbd></td><td>Jump to slide</td></tr>
+      <tr><td><kbd>N</kbd></td><td>Toggle speaker notes</td></tr>
+      <tr><td><kbd>F</kbd></td><td>Toggle fullscreen</td></tr>
+      <tr><td><kbd>P</kbd></td><td>Print to PDF</td></tr>
+      <tr><td><kbd>?</kbd> <kbd>Esc</kbd></td><td>Close this help</td></tr>
+    </table>
+  </div>
+</div>
+
+<script>
+(function() {
+  const deck = document.getElementById('deck');
+  const slides = () => Array.from(deck.querySelectorAll('.slide'));
+  const bar = document.querySelector('#hud .bar');
+  const curEl = document.getElementById('cur');
+  const totEl = document.getElementById('tot');
+  const notesEl = document.getElementById('notes');
+  const notesBody = document.getElementById('notes-body');
+  const help = document.getElementById('help');
+  let idx = 0;
+
+  function refresh() {
+    const all = slides();
+    totEl.textContent = all.length;
+    all.forEach((s, i) => s.classList.toggle('active', i === idx));
+    curEl.textContent = idx + 1;
+    bar.style.width = (((idx+1) / all.length) * 100) + '%';
+    const note = all[idx].getAttribute('data-notes') || '—';
+    notesBody.textContent = note;
+    try { history.replaceState(null, '', '#s=' + (idx+1)); } catch(e){}
+  }
+
+  function go(i) {
+    const all = slides();
+    if (i < 0) i = 0;
+    if (i >= all.length) i = all.length - 1;
+    idx = i;
+    refresh();
+  }
+
+  document.getElementById('next').addEventListener('click', () => go(idx+1));
+  document.getElementById('prev').addEventListener('click', () => go(idx-1));
+  document.getElementById('notesBtn').addEventListener('click', () => notesEl.classList.toggle('open'));
+  document.getElementById('helpBtn').addEventListener('click', () => help.classList.toggle('open'));
+  document.getElementById('overviewBtn').addEventListener('click', () => {});
+
+  document.addEventListener('keydown', (e) => {
+    if (help.classList.contains('open') && (e.key === 'Escape' || e.key === '?')) { help.classList.remove('open'); return; }
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+    switch (e.key) {
+      case 'ArrowRight': case ' ': case 'PageDown': go(idx+1); e.preventDefault(); break;
+      case 'ArrowLeft': case 'PageUp': go(idx-1); e.preventDefault(); break;
+      case 'Home': go(0); break;
+      case 'End': go(slides().length-1); break;
+      case 'n': case 'N': notesEl.classList.toggle('open'); break;
+      case 'f': case 'F':
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+        else document.exitFullscreen();
+        break;
+      case 'p': case 'P': window.print(); break;
+      case '?': help.classList.toggle('open'); break;
+      case 'Escape': notesEl.classList.remove('open'); help.classList.remove('open'); break;
+      default:
+        if (e.key >= '1' && e.key <= '9') go(parseInt(e.key,10)-1);
+    }
+  });
+
+  // Click to advance (left half = back, right half = forward), excluding controls
+  deck.addEventListener('click', (e) => {
+    if (e.target.closest('#controls') || e.target.closest('#notes') || e.target.closest('a')) return;
+    const half = window.innerWidth / 2;
+    if (e.clientX < half) go(idx-1); else go(idx+1);
+  });
+
+  // Restore from hash
+  const m = location.hash.match(/s=(\d+)/);
+  if (m) idx = Math.max(0, parseInt(m[1],10) - 1);
+  refresh();
+})();
+</script>
+
+</body>
+</html>
