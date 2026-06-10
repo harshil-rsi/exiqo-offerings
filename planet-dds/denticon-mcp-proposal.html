@@ -625,7 +625,7 @@
         <strong>Our recommendation for this deck:</strong>&nbsp; run both paths as parallel spikes for the first two weeks, then converge on the path with the better prompt-eval score on a shared test set. The investment to run both in parallel is small relative to the cost of choosing wrong.
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>02 / 23</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>02 / 24</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 3: WHY MCP NOW ====================== -->
@@ -668,7 +668,7 @@
         </div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>03 / 23</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>03 / 24</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 4: POC OBJECTIVES ====================== -->
@@ -714,7 +714,7 @@
         </div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>04 / 23</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>04 / 24</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 5: GROUND TRUTH FROM WALKTHROUGH ====================== -->
@@ -772,7 +772,7 @@
         </tbody>
       </table>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>05 / 23</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>05 / 24</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 6: CURRENT DENTICON PLATFORM ====================== -->
@@ -962,7 +962,7 @@
         <div class="diagram-cap">Note: cross-region DR pattern — clients in Central have DR in East and vice versa. Read replicas exist within each stamp and are the intended target for read-only MCP traffic.</div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>06 / 23</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>06 / 24</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 7: MCP REFRESHER ====================== -->
@@ -1008,7 +1008,7 @@
         </div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>07 / 23</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>07 / 24</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 8: REFERENCE AZURE TARGET ====================== -->
@@ -1184,7 +1184,7 @@
         <div class="diagram-cap">Mirrors symmetrically into both Azure stamps (Central + East). Backends in Option A and Option B are alternatives, not both at once in production — though we run them as parallel spikes during the POC.</div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>08 / 23</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>08 / 24</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 9: OPTION A — ARCHITECTURE ====================== -->
@@ -1319,7 +1319,7 @@
         <div class="diagram-cap">In Option A, the MCP server is the only new component. Everything below it is unchanged. Auth is inherited via token exchange. *Agentic API exposure is an opt-in design choice — see open-questions slide.</div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>09 / 23</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>09 / 24</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 10: OPTION A — TOOLS, PROS, CONS ====================== -->
@@ -1404,7 +1404,7 @@
         </ul>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>10 / 23</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>10 / 24</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 11: OPTION B — ARCHITECTURE ====================== -->
@@ -1525,12 +1525,12 @@
           <text class="lbl" x="1110" y="588" text-anchor="middle">Audit sink</text>
           <text class="lbl-xs" x="1110" y="604" text-anchor="middle">SQL Audit · Log Analytics</text>
 
-          <text class="lbl-xs" x="220" y="660" font-style="italic" fill="#5B6B85">Note: tenant isolation is implemented entirely above the DB layer — slide 13 covers the 3-layer model.</text>
+          <text class="lbl-xs" x="220" y="660" font-style="italic" fill="#5B6B85">Note: tenant isolation is implemented entirely above the DB layer — slide 15 covers the 3-layer model.</text>
         </svg>
         <div class="diagram-cap">Option B adds a real semantic and safety layer inside the MCP server: catalog + allow-list + query builder + result shaper. The investment is real, but the analytical surface is complete.</div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>11 / 23</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>11 / 24</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 12: OPTION B — TOOLS, PROS, CONS ====================== -->
@@ -1601,7 +1601,7 @@
 
         <h3 class="deck-h3" style="margin-top: 22px;">Where it gets uncomfortable</h3>
         <ul class="crisp rose">
-          <li><strong>Tenant isolation becomes our burden.</strong> No application-layer safety net. The 3-layer model (slide 13) <em>must</em> hold; we own all three layers.</li>
+          <li><strong>Tenant isolation becomes our burden.</strong> No application-layer safety net. The 3-layer model (slide 15) <em>must</em> hold; we own all three layers.</li>
           <li><strong>Semantic catalog is real work.</strong> The Ledger alone is ~100 cols with ~50 business-relevant. Multiplied across appointments, claims, treatment plans — a serious documentation effort. Without the catalog, accuracy degrades fast.</li>
           <li><strong>HIPAA / audit posture is a new path.</strong> Audit logging, PHI redaction, immutable retention, and BAA scope all need explicit design — not inheritable from the existing API plane.</li>
           <li><strong>Billing model has no obvious anchor.</strong> No per-API meter to inherit; a tool-call meter at APIM is the likely production answer.</li>
@@ -1609,7 +1609,7 @@
         </ul>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>12 / 23</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>12 / 24</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 13: COMPARISON MATRIX ====================== -->
@@ -1692,7 +1692,7 @@
       </table>
       <p class="small" style="margin-top: 14px;">Read the matrix as &ldquo;A is faster and safer; B is broader and more flexible.&rdquo; The right answer depends on which axes Denticon prioritizes for the production decision after POC.</p>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>13 / 23</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>13 / 24</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 14: IDENTITY & AUTH FLOW ====================== -->
@@ -1800,7 +1800,7 @@
         <div class="diagram-cap">Two principles to call out: (1) <code>aud=denticon-mcp</code> on the inbound token blocks token replay against other services; (2) the MCP server never forwards the inbound token — it exchanges for a narrower one before each backend call.</div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>14 / 23</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>14 / 24</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 15: TENANT ISOLATION 3-LAYER ====================== -->
@@ -1908,15 +1908,15 @@
         <div class="diagram-cap">A cross-PGID attack test harness runs against every build: 200+ adversarial prompts that try to leak data across tenants. The pass bar is 100%.</div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>15 / 23</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>15 / 24</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 16: SEMANTIC CATALOG ====================== -->
-<section class="slide" data-notes="The semantic catalog is the accuracy lever. For Option A it's mostly polish on what you already have; for Option B it's a real authoring effort. The 'Michael' example is the one DJ mentioned during the walkthrough.">
+<section class="slide" data-notes="The semantic catalog is the accuracy lever. For Option A it's mostly polish on what you already have; for Option B it's a real authoring effort. The 'Michael' example is the one DJ mentioned during the walkthrough. The next slide shows the end-to-end architecture.">
   <div class="stage">
     <div class="head">
       <div>
-        <div class="eyebrow">16 · Semantic layer</div>
+        <div class="eyebrow">16 · Semantic layer · part 1 of 2</div>
         <h2 class="slide-title">The catalog is the accuracy lever — don't underestimate it</h2>
       </div>
       <div class="right">Data dictionary &amp; LLM grounding</div>
@@ -1932,52 +1932,265 @@
           <li><strong>Disambiguate on entity collision.</strong> The catalog adds a classifier prompt step: <em>&ldquo;Michael is most likely a [patient · provider · office]&rdquo;</em> before the actual tool fires.</li>
         </ul>
 
-        <h3 class="deck-h3" style="margin-top: 24px;">Tooling choices we're considering</h3>
+        <h3 class="deck-h3" style="margin-top: 24px;">Tooling choices for the POC</h3>
         <ul class="crisp blue">
-          <li><strong>Microsoft Data API Builder (DAB) 1.7</strong> · description fields per entity/field/parameter, RBAC, Redis cache, Entra integration — ships catalog and SQL adapter in one component (relevant for Option B).</li>
-          <li><strong>Catalog-in-git as JSON-LD</strong> with code-gen into both the tool definitions and the prompt-time grounding context. Reviewer-friendly, diffable.</li>
-          <li><strong>Bring-your-own catalog</strong> from Denticon's existing data dictionary if completeness is acceptable.</li>
+          <li><strong>Source of truth · OSI-aligned YAML in git.</strong> No DB writes. The catalog repo is the canonical surface; the schema is read-only ground truth that CI cross-checks against. Built on the Open Semantic Interchange spec (Jan 2026) for vendor-neutral durability.</li>
+          <li><strong>Authoring · LLM-assisted drafts with human review.</strong> An offline pass introspects the replica and drafts column descriptions from (column name, type, sample values, FK context); humans approve in a PR queue. Drops authoring cost from minutes to seconds per column.</li>
+          <li><strong>Runtime · Microsoft SQL MCP Server (DAB 1.7).</strong> Native <code>describe_entities</code> MCP tool reads our YAML as its description source; ships with Redis cache, Entra integration, App Insights telemetry.</li>
         </ul>
+        <p class="small" style="margin-top: 10px;">→ See <strong>slide 17</strong> for the end-to-end architecture: authoring pipeline, governance, runtime serve, MCP surface.</p>
       </div>
       <div>
-        <h3 class="deck-h3">Sample catalog entry · ledger column</h3>
-<pre>{
-  "table": "LDG",
-  "column": "AMT_DUE",
-  "display_name": "Outstanding patient balance",
-  "intent": "the amount the responsible party owes",
-  "type": "currency_usd",
-  "nullable": false,
-  "phi": false,
-  "aliases": ["balance", "amount due", "what they owe"],
-  "redacted_in_logs": false,
-  "example_questions": [
-    "Which patients have a balance over $500?",
-    "Aging summary by office for outstanding balances"
-  ],
-  "related": ["LDG.AGE_BUCKET", "PAT.RPID"]
-}</pre>
-        <h3 class="deck-h3" style="margin-top: 18px;">Cost framing</h3>
+        <h3 class="deck-h3">Sample catalog entry · ledger column (YAML)</h3>
+<pre>table: LDG
+column: AMT_DUE
+display_name: Outstanding patient balance
+intent: the amount the responsible party owes
+type: currency_usd
+nullable: false
+phi: false
+aliases: [balance, amount due, what they owe]
+redacted_in_logs: false
+example_questions:
+  - Which patients have a balance over $500?
+  - Aging summary by office for outstanding balances
+related: [LDG.AGE_BUCKET, PAT.RPID]
+templates: [denticon.collections.aging,
+            denticon.production.summary]</pre>
+        <h3 class="deck-h3" style="margin-top: 18px;">Cost framing (with LLM-drafted seeds)</h3>
         <div class="kv">
-          <div class="k">Per relevant column</div><div class="v">~5–10 min to author + review</div>
-          <div class="k">Ledger (50 relevant cols)</div><div class="v">~1 engineer-day inc. review</div>
-          <div class="k">POC scope (2 domains)</div><div class="v">~3–5 engineer-days total</div>
-          <div class="k">Maintenance</div><div class="v">Catalog change must accompany schema change — adds to PR template</div>
+          <div class="k">Per relevant column</div><div class="v">~30 sec of human review on an LLM-drafted description</div>
+          <div class="k">Ledger (50 relevant cols)</div><div class="v">~25 min of review time</div>
+          <div class="k">POC scope (2 domains)</div><div class="v">~half a day of review total — well within Phase 1</div>
+          <div class="k">Maintenance</div><div class="v">Schema change blocked at CI until matching catalog PR merges (drift check)</div>
         </div>
         <div class="lift" style="margin-top: 18px;">
           <strong>Option A still benefits.</strong> Even with API-wrapping, light catalog work pays off in disambiguation and example-prompts grounding. Don't skip it just because the OpenAPI is good.
         </div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>16 / 23</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>16 / 24</div></div>
   </div>
 </section>
-<!-- ====================== SLIDE 17: OBSERVABILITY & HIPAA ====================== -->
+<!-- ====================== SLIDE 17: CATALOG ARCHITECTURE ====================== -->
+<section class="slide" data-notes="The end-to-end catalog architecture. Three tiers: authoring (build-time), governance (CI), and serve (runtime + MCP surface). YAML in git is the single source of truth — no DB writes. LLM-drafted descriptions with human-PR review handle the authoring scale. CI cross-checks against the live replica to prevent drift. POC runs keyword retrieval; vector RAG slots in later without changing the MCP surface that agents see.">
+  <div class="stage">
+    <div class="head">
+      <div>
+        <div class="eyebrow">17 · Semantic layer · part 2 of 2</div>
+        <h2 class="slide-title">Catalog architecture — scalable from POC to production</h2>
+      </div>
+      <div class="right">End-to-end semantic plane</div>
+    </div>
+    <div class="body">
+      <p class="lede" style="margin-bottom: 14px;">Catalog-as-code, YAML in git, served by the MCP server as both <em>tools</em> and <em>resources</em>. POC uses keyword retrieval over ~80–100 columns; vector RAG slots in later for the full schema without changing the MCP surface that agents see.</p>
+      <div class="diagram">
+        <svg viewBox="0 0 1480 660" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Semantic catalog architecture: authoring, governance, and serve tiers">
+          <defs>
+            <marker id="cx" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5B6B85"/></marker>
+            <marker id="cx-t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0E8C8C"/></marker>
+            <marker id="cx-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#C2820B"/></marker>
+            <marker id="cx-p" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6F3DD3"/></marker>
+            <marker id="cx-b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2456C8"/></marker>
+            <marker id="cx-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#B5325A"/></marker>
+          </defs>
+
+          <!-- Main flow area: x=0 to x=1140 ; Right panel: x=1160 to x=1460 -->
+
+          <!-- ============ TIER 1: AUTHORING ============ -->
+          <rect class="zone-fill" x="10" y="14" width="1130" height="170" rx="10"/>
+          <text class="lbl-eyebrow" x="30" y="36">1 · Authoring — build-time, run once + on each schema bump</text>
+
+          <rect class="node node-teal" x="40" y="58" width="170" height="80" rx="6"/>
+          <text class="lbl" x="125" y="82" text-anchor="middle">SQL read replica</text>
+          <text class="lbl-xs" x="125" y="100" text-anchor="middle">authoritative schema</text>
+          <text class="lbl-xs" x="125" y="116" text-anchor="middle">+ sample values for context</text>
+
+          <rect class="node" x="240" y="58" width="170" height="80" rx="6"/>
+          <text class="lbl" x="325" y="82" text-anchor="middle">Introspection job</text>
+          <text class="lbl-xs" x="325" y="100" text-anchor="middle">walks INFORMATION_SCHEMA</text>
+          <text class="lbl-xs" x="325" y="116" text-anchor="middle">emits column manifest</text>
+
+          <rect class="node node-purple" x="440" y="58" width="200" height="80" rx="6"/>
+          <text class="lbl" x="540" y="82" text-anchor="middle">LLM-assisted seeding</text>
+          <text class="lbl-xs" x="540" y="100" text-anchor="middle">Azure OpenAI</text>
+          <text class="lbl-xs" x="540" y="116" text-anchor="middle">drafts description per column</text>
+
+          <rect class="node node-amber" x="670" y="58" width="190" height="80" rx="6"/>
+          <text class="lbl" x="765" y="82" text-anchor="middle">PR queue · human review</text>
+          <text class="lbl-xs" x="765" y="100" text-anchor="middle">~30s per column</text>
+          <text class="lbl-xs" x="765" y="116" text-anchor="middle">approve · edit · reject</text>
+
+          <rect class="node node-blue" x="890" y="58" width="220" height="80" rx="6"/>
+          <text class="lbl" x="1000" y="82" text-anchor="middle">denticon-catalog repo</text>
+          <text class="lbl-xs" x="1000" y="100" text-anchor="middle">OSI-aligned YAML</text>
+          <text class="lbl-xs" x="1000" y="116" text-anchor="middle">single source of truth</text>
+
+          <path class="edge edge-strong" d="M210 98 L240 98" marker-end="url(#cx)"/>
+          <path class="edge edge-strong" d="M410 98 L440 98" marker-end="url(#cx)"/>
+          <path class="edge edge-strong" d="M640 98 L670 98" marker-end="url(#cx)"/>
+          <path class="edge edge-strong" d="M860 98 L890 98" marker-end="url(#cx)"/>
+
+          <text class="lbl-xs" x="40" y="160" font-style="italic" fill="#5B6B85">Output of Tier 1 is just a folder of YAML files. No DB writes anywhere in the pipeline.</text>
+
+          <!-- ============ TIER 2: GOVERNANCE / CI ============ -->
+          <rect class="zone-fill" x="10" y="194" width="1130" height="160" rx="10"/>
+          <text class="lbl-eyebrow" x="30" y="216">2 · Governance — CI gates every catalog PR</text>
+
+          <rect class="node" x="40" y="236" width="200" height="74" rx="6"/>
+          <text class="lbl" x="140" y="258" text-anchor="middle">YAML schema validate</text>
+          <text class="lbl-xs" x="140" y="276" text-anchor="middle">required fields present</text>
+          <text class="lbl-xs" x="140" y="290" text-anchor="middle">types &amp; enums correct</text>
+
+          <rect class="node" x="260" y="236" width="200" height="74" rx="6"/>
+          <text class="lbl" x="360" y="258" text-anchor="middle">PHI flag lint</text>
+          <text class="lbl-xs" x="360" y="276" text-anchor="middle">sensitive-column allow-list</text>
+          <text class="lbl-xs" x="360" y="290" text-anchor="middle">block missing phi: true</text>
+
+          <rect class="node node-rose" x="480" y="236" width="200" height="74" rx="6"/>
+          <text class="lbl" x="580" y="258" text-anchor="middle">Drift check vs replica</text>
+          <text class="lbl-xs" x="580" y="276" text-anchor="middle">column added / removed?</text>
+          <text class="lbl-xs" x="580" y="290" text-anchor="middle">fail build on divergence</text>
+
+          <rect class="node node-green" x="700" y="236" width="200" height="74" rx="6"/>
+          <text class="lbl" x="800" y="258" text-anchor="middle">Build catalog artifact</text>
+          <text class="lbl-xs" x="800" y="276" text-anchor="middle">versioned bundle</text>
+          <text class="lbl-xs" x="800" y="290" text-anchor="middle">published to artifact store</text>
+
+          <rect class="node" x="920" y="236" width="190" height="74" rx="6"/>
+          <text class="lbl" x="1015" y="258" text-anchor="middle">Embeddings (future)</text>
+          <text class="lbl-xs" x="1015" y="276" text-anchor="middle">re-index on merge</text>
+          <text class="lbl-xs" x="1015" y="290" text-anchor="middle">deferred for POC</text>
+
+          <path class="edge edge-strong" d="M240 273 L260 273" marker-end="url(#cx)"/>
+          <path class="edge edge-strong" d="M460 273 L480 273" marker-end="url(#cx)"/>
+          <path class="edge edge-strong" d="M680 273 L700 273" marker-end="url(#cx)"/>
+          <path class="edge edge-strong edge-dashed" d="M900 273 L920 273" marker-end="url(#cx)"/>
+
+          <!-- Tier 1 to Tier 2 -->
+          <path class="edge edge-blue" d="M1000 138 L1000 194" marker-end="url(#cx-b)"/>
+          <text class="lbl-xs" x="1006" y="170" fill="#2456C8">PR merge</text>
+
+          <!-- Drift check feedback to replica -->
+          <path class="edge edge-rose edge-dashed" d="M580 236 L580 168 L210 168 L210 138" marker-end="url(#cx-r)"/>
+          <text class="lbl-xs" x="320" y="160" fill="#B5325A">read live schema</text>
+
+          <text class="lbl-xs" x="40" y="334" font-style="italic" fill="#5B6B85">Drift CI is the hard guarantee that catalog and schema can't silently diverge. A schema PR without a matching catalog PR fails build.</text>
+
+          <!-- ============ TIER 3: SERVE ============ -->
+          <rect class="zone-fill" x="10" y="364" width="1130" height="282" rx="10"/>
+          <text class="lbl-eyebrow" x="30" y="386">3 · Serve — MCP server loads the artifact and exposes it</text>
+
+          <rect class="node node-green" x="40" y="408" width="170" height="86" rx="6"/>
+          <text class="lbl" x="125" y="432" text-anchor="middle">Catalog artifact</text>
+          <text class="lbl-xs" x="125" y="450" text-anchor="middle">pulled on container start</text>
+          <text class="lbl-xs" x="125" y="464" text-anchor="middle">cached in memory</text>
+          <text class="lbl-xs" x="125" y="478" text-anchor="middle">refreshed on revision deploy</text>
+
+          <rect class="node node-amber" x="240" y="408" width="420" height="200" rx="8"/>
+          <text class="lbl" x="450" y="432" text-anchor="middle">Catalog service · inside the MCP server</text>
+          <line x1="260" y1="444" x2="640" y2="444" stroke="#C2820B" stroke-opacity="0.3"/>
+
+          <rect class="node" x="260" y="454" width="180" height="68" rx="6"/>
+          <text class="lbl" x="350" y="476" text-anchor="middle">Keyword index</text>
+          <text class="lbl-xs" x="350" y="492" text-anchor="middle">BM25 / token overlap</text>
+          <text class="lbl-xs" x="350" y="506" text-anchor="middle">POC default</text>
+
+          <rect class="node node-soft" x="450" y="454" width="180" height="68" rx="6" stroke-dasharray="4 4"/>
+          <text class="lbl" x="540" y="476" text-anchor="middle">Vector index</text>
+          <text class="lbl-xs" x="540" y="492" text-anchor="middle">Azure AI Search</text>
+          <text class="lbl-xs" x="540" y="506" text-anchor="middle">later · production scale</text>
+
+          <rect class="node" x="260" y="534" width="370" height="62" rx="6"/>
+          <text class="lbl" x="445" y="556" text-anchor="middle">Description cache · disambiguation rules · template index</text>
+          <text class="lbl-xs" x="445" y="574" text-anchor="middle">in-memory · Redis-backed for warm restarts</text>
+
+          <rect class="node node-blue" x="690" y="408" width="200" height="200" rx="8"/>
+          <text class="lbl" x="790" y="432" text-anchor="middle">MCP Tools</text>
+          <line x1="710" y1="444" x2="870" y2="444" stroke="#2456C8" stroke-opacity="0.3"/>
+          <text class="lbl-xs" x="710" y="464" font-family="var(--mono)" font-size="10.5">catalog.search</text>
+          <text class="lbl-xs" x="710" y="480" font-family="var(--mono)" font-size="10.5">  (query, top_k)</text>
+          <text class="lbl-xs" x="710" y="500" font-family="var(--mono)" font-size="10.5">catalog.describe</text>
+          <text class="lbl-xs" x="710" y="516" font-family="var(--mono)" font-size="10.5">  (entity)</text>
+          <text class="lbl-xs" x="710" y="536" font-family="var(--mono)" font-size="10.5">catalog.suggest_</text>
+          <text class="lbl-xs" x="710" y="552" font-family="var(--mono)" font-size="10.5">  template(intent)</text>
+          <text class="lbl-xs" x="710" y="580" fill="#2456C8">active retrieval</text>
+
+          <rect class="node node-purple" x="910" y="408" width="200" height="200" rx="8"/>
+          <text class="lbl" x="1010" y="432" text-anchor="middle">MCP Resources</text>
+          <line x1="930" y1="444" x2="1090" y2="444" stroke="#6F3DD3" stroke-opacity="0.3"/>
+          <text class="lbl-xs" x="930" y="464" font-family="var(--mono)" font-size="10.5">catalog://domains</text>
+          <text class="lbl-xs" x="930" y="486" font-family="var(--mono)" font-size="10.5">catalog://domain/</text>
+          <text class="lbl-xs" x="930" y="500" font-family="var(--mono)" font-size="10.5">  {name}</text>
+          <text class="lbl-xs" x="930" y="520" font-family="var(--mono)" font-size="10.5">catalog://table/</text>
+          <text class="lbl-xs" x="930" y="534" font-family="var(--mono)" font-size="10.5">  {schema}.{name}</text>
+          <text class="lbl-xs" x="930" y="554" font-family="var(--mono)" font-size="10.5">catalog://template/</text>
+          <text class="lbl-xs" x="930" y="568" font-family="var(--mono)" font-size="10.5">  {name}</text>
+          <text class="lbl-xs" x="930" y="592" fill="#6F3DD3">browse / passive</text>
+
+          <!-- Arrows in tier 3 -->
+          <path class="edge edge-green" d="M210 451 L240 451" marker-end="url(#cx-t)"/>
+          <path class="edge edge-amber" d="M660 470 L690 470" marker-end="url(#cx-a)"/>
+          <path class="edge edge-amber" d="M660 530 L910 530" marker-end="url(#cx-a)"/>
+
+          <!-- Tier 2 to Tier 3 -->
+          <path class="edge edge-green" d="M800 310 L800 340 L125 340 L125 408" marker-end="url(#cx-t)"/>
+          <text class="lbl-xs" x="400" y="334" fill="#1F8049">artifact published</text>
+
+          <!-- ============ RIGHT PANEL ============ -->
+          <rect class="node node-soft" x="1160" y="14" width="300" height="632" rx="10"/>
+          <text class="lbl-eyebrow" x="1180" y="40">POC → Production scale path</text>
+
+          <text class="lbl" x="1180" y="72" font-weight="700">POC (this engagement)</text>
+          <text class="lbl-xs" x="1180" y="92">• Keyword retrieval (BM25-style)</text>
+          <text class="lbl-xs" x="1180" y="108">• 2 domains · ~80–100 columns</text>
+          <text class="lbl-xs" x="1180" y="124">• YAML in git only · no DB writes</text>
+          <text class="lbl-xs" x="1180" y="140">• Single canonical catalog</text>
+          <text class="lbl-xs" x="1180" y="156">• LLM-seeded · human-reviewed</text>
+
+          <line x1="1180" y1="186" x2="1440" y2="186" stroke="#DCE3EE"/>
+
+          <text class="lbl" x="1180" y="210" font-weight="700">Production add-ons</text>
+          <text class="lbl-xs" x="1180" y="230">• Vector embeddings in</text>
+          <text class="lbl-xs" x="1180" y="244">  Azure AI Search</text>
+          <text class="lbl-xs" x="1180" y="260">• Hybrid retrieval</text>
+          <text class="lbl-xs" x="1180" y="274">  (BM25 + vector + reranker)</text>
+          <text class="lbl-xs" x="1180" y="290">• All 6 Denticon domains</text>
+          <text class="lbl-xs" x="1180" y="306">• Catalog change webhook</text>
+          <text class="lbl-xs" x="1180" y="320">  re-indexes on PR merge</text>
+          <text class="lbl-xs" x="1180" y="336">• Optional · Purview as</text>
+          <text class="lbl-xs" x="1180" y="350">  downstream governance view</text>
+
+          <line x1="1180" y1="380" x2="1440" y2="380" stroke="#DCE3EE"/>
+
+          <text class="lbl" x="1180" y="404" font-weight="700">Why this is scalable</text>
+          <text class="lbl-xs" x="1180" y="424">• Authoring cost drops 10× via</text>
+          <text class="lbl-xs" x="1180" y="438">  LLM-drafted seeds</text>
+          <text class="lbl-xs" x="1180" y="454">• Retrieval injects ~5 tables</text>
+          <text class="lbl-xs" x="1180" y="468">  per prompt — context cheap</text>
+          <text class="lbl-xs" x="1180" y="484">• Drift CI prevents silent</text>
+          <text class="lbl-xs" x="1180" y="498">  catalog rot</text>
+          <text class="lbl-xs" x="1180" y="514">• Hybrid MCP surface lets agents</text>
+          <text class="lbl-xs" x="1180" y="528">  search OR browse</text>
+
+          <line x1="1180" y1="558" x2="1440" y2="558" stroke="#DCE3EE"/>
+
+          <rect class="node node-teal" x="1180" y="574" width="260" height="58" rx="6"/>
+          <text class="lbl" x="1310" y="596" text-anchor="middle">Same MCP surface</text>
+          <text class="lbl-xs" x="1310" y="614" text-anchor="middle">agents don't see the upgrade</text>
+        </svg>
+        <div class="diagram-cap">The keyword-only POC ships with the same tool and resource interface that the production vector-RAG variant will use. Upgrading from BM25 to hybrid retrieval is a swap inside the catalog service — clients re-issue the same MCP calls and get sharper answers.</div>
+      </div>
+    </div>
+    <div class="foot"><div>RSI · Confidential</div><div>17 / 24</div></div>
+  </div>
+</section>
+<!-- ====================== SLIDE 18: OBSERVABILITY & HIPAA ====================== -->
 <section class="slide" data-notes="The HIPAA story is shorter for Option A — your BAA scope is mostly unchanged. For Option B, we're explicit about what's new: net new data path, net new audit log shape, net new PHI redaction layer. Either way, App Insights + Log Analytics covers the run-time observability story.">
   <div class="stage">
     <div class="head">
       <div>
-        <div class="eyebrow">17 · Observability &amp; compliance</div>
+        <div class="eyebrow">18 · Observability &amp; compliance</div>
         <h2 class="slide-title">Telemetry, audit, and HIPAA posture</h2>
       </div>
       <div class="right">What we log · what we don't</div>
@@ -2026,7 +2239,7 @@
         </ul>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>17 / 23</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>18 / 24</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 18: DR / MULTI-REGION ====================== -->
@@ -2034,7 +2247,7 @@
   <div class="stage">
     <div class="head">
       <div>
-        <div class="eyebrow">18 · DR &amp; multi-region</div>
+        <div class="eyebrow">19 · DR &amp; multi-region</div>
         <h2 class="slide-title">MCP rides the existing active/active topology</h2>
       </div>
       <div class="right">Cross-region resilience</div>
@@ -2149,7 +2362,7 @@
         <div class="diagram-cap">Failover semantics: if a stamp goes unhealthy, Front Door reroutes to the other; the metadata DB serves the same client→region mapping the app already uses. MCP introduces no new DR primitive.</div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>18 / 23</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>19 / 24</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 19: PHASED POC PLAN ====================== -->
@@ -2157,7 +2370,7 @@
   <div class="stage">
     <div class="head">
       <div>
-        <div class="eyebrow">19 · Plan</div>
+        <div class="eyebrow">20 · Plan</div>
         <h2 class="slide-title">Six-week POC — two parallel spikes, then converge</h2>
       </div>
       <div class="right">Phased delivery</div>
@@ -2243,7 +2456,7 @@
         </div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>19 / 23</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>20 / 24</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 20: RISKS & MITIGATIONS ====================== -->
@@ -2251,7 +2464,7 @@
   <div class="stage">
     <div class="head">
       <div>
-        <div class="eyebrow">20 · Risks</div>
+        <div class="eyebrow">21 · Risks</div>
         <h2 class="slide-title">Risks &amp; mitigations</h2>
       </div>
       <div class="right">Calibrated for POC + early production</div>
@@ -2302,7 +2515,7 @@
             <td><strong>Catalog drift.</strong> Schema changes in Denticon's DB or API outpace the catalog; LLM begins hallucinating.</td>
             <td><span class="pill high">High</span></td>
             <td><span class="pill med">Med</span></td>
-            <td>Catalog-as-code in git · change requires catalog PR · prompt-eval canary on a frozen set detects regressions before release.</td>
+            <td>Catalog-as-code in git · CI drift check fails build if replica schema diverges from catalog (slide 17) · prompt-eval canary on a frozen set detects regressions before release.</td>
           </tr>
           <tr>
             <td><strong>OAuth scope sprawl.</strong> Each new tool needs a new scope; client tokens balloon.</td>
@@ -2325,7 +2538,7 @@
         </tbody>
       </table>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>20 / 23</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>21 / 24</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 21: NEXT STEPS ====================== -->
@@ -2333,7 +2546,7 @@
   <div class="stage">
     <div class="head">
       <div>
-        <div class="eyebrow">21 · Next steps</div>
+        <div class="eyebrow">22 · Next steps</div>
         <h2 class="slide-title">Next steps to align on before kickoff</h2>
       </div>
       <div class="right">Owner-tagged</div>
@@ -2360,7 +2573,7 @@
         </div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>21 / 23</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>22 / 24</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 22: PROPOSAL TO KICKOFF ====================== -->
@@ -2368,7 +2581,7 @@
   <div class="stage">
     <div class="head">
       <div>
-        <div class="eyebrow">22 · Next steps</div>
+        <div class="eyebrow">23 · Next steps</div>
         <h2 class="slide-title">From proposal to kickoff</h2>
       </div>
       <div class="right">Decision &amp; action plan</div>
@@ -2402,7 +2615,7 @@
         </div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>22 / 23</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>23 / 24</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 23: THANK YOU + SOURCES ====================== -->
@@ -2410,7 +2623,7 @@
   <div class="stage">
     <div class="head">
       <div>
-        <div class="eyebrow">23 · References</div>
+        <div class="eyebrow">24 · References</div>
         <h2 class="slide-title">Thank you — and the references we used</h2>
       </div>
       <div class="right">Sources · 2026</div>
@@ -2461,7 +2674,7 @@
         </ul>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential · Draft 0.1</div><div>23 / 23</div></div>
+    <div class="foot"><div>RSI · Confidential · Draft 0.1</div><div>24 / 24</div></div>
   </div>
 </section>
 
