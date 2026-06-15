@@ -625,7 +625,7 @@
         <strong>Our recommendation for this deck:</strong>&nbsp; run both paths as parallel spikes for the first two weeks, then converge on the path with the better prompt-eval score on a shared test set. The investment to run both in parallel is small relative to the cost of choosing wrong.
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>02 / 24</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>02 / 25</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 3: WHY MCP NOW ====================== -->
@@ -645,7 +645,7 @@
           <li><strong>Linux Foundation governance &amp; 18,000+ community servers.</strong> MCP has moved from interesting experiment to enterprise infrastructure in twelve months.</li>
           <li><strong>Streamable HTTP transport</strong> (2025-06-18 spec) replaced HTTP+SSE — single-endpoint, stateless-capable, load-balancer friendly.</li>
           <li><strong>OAuth 2.1 + PKCE, DCR (RFC 7591), Resource Indicators (RFC 8707), Protected Resource Metadata.</strong> The authorization story finally matches enterprise expectations.</li>
-          <li><strong>Tool-level scopes</strong> (SEP-835, June 2025) and <strong>token exchange</strong> (RFC 8693) at trust boundaries give multi-tenant MCP a clean isolation model.</li>
+          <li><strong>Tool-level scopes</strong> (SEP-835, June 2025) and <strong>multi-audience access tokens</strong> let a remote MCP server fit alongside existing API tiers without re-keying — RFC 8693 token exchange is available as an optional production hardening, not a baseline requirement.</li>
           <li><strong>Microsoft, Anthropic, Google, OpenAI</strong> all ship MCP clients now. Building a server is building to a market, not a vendor.</li>
         </ul>
       </div>
@@ -668,7 +668,7 @@
         </div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>03 / 24</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>03 / 25</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 4: POC OBJECTIVES ====================== -->
@@ -714,7 +714,7 @@
         </div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>04 / 24</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>04 / 25</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 5: GROUND TRUTH FROM WALKTHROUGH ====================== -->
@@ -772,7 +772,7 @@
         </tbody>
       </table>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>05 / 24</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>05 / 25</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 6: CURRENT DENTICON PLATFORM ====================== -->
@@ -962,7 +962,7 @@
         <div class="diagram-cap">Note: cross-region DR pattern — clients in Central have DR in East and vice versa. Read replicas exist within each stamp and are the intended target for read-only MCP traffic.</div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>06 / 24</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>06 / 25</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 7: MCP REFRESHER ====================== -->
@@ -996,8 +996,8 @@
         <h3 class="deck-h3">What the 2025-06-18 spec change unlocks</h3>
         <ul class="crisp">
           <li><strong>Tool-level scopes (SEP-835).</strong> Authorization can be expressed per-tool, not just per-server — e.g., <code>denticon.appointments:read</code> distinct from <code>denticon.rcm:read</code>.</li>
-          <li><strong>Token exchange (RFC 8693) at trust boundaries.</strong> Tokens received by the MCP server are exchanged for narrower tokens before being passed to backends. The chain of custody is auditable.</li>
-          <li><strong>Closed the &ldquo;rogue server token leak&rdquo; class of attacks</strong> that haunted early remote MCP deployments. The protocol is now safe enough for partner-facing exposure.</li>
+          <li><strong>Multi-audience access tokens.</strong> Tokens are issued with <code>aud=[denticon-mcp, denticon-api]</code> so the MCP server can forward the same Bearer to existing backends without re-keying — aligns with Denticon's current IdP capabilities. (RFC 8693 token exchange is a recognized production-hardening option for a later phase, not a POC requirement.)</li>
+          <li><strong>Narrowed the &ldquo;rogue server token leak&rdquo; surface</strong> that haunted early remote MCP deployments. Multi-audience binding confines tokens to Denticon-issued resources; tool-level scopes confine them to specific operations. RFC 8693 closes the surface further at the cost of a new IdP endpoint — a production-hardening trade we recommend deferring.</li>
         </ul>
 
         <h3 class="deck-h3" style="margin-top: 24px;">What this means concretely for Denticon</h3>
@@ -1008,7 +1008,7 @@
         </div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>07 / 24</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>07 / 25</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 8: REFERENCE AZURE TARGET ====================== -->
@@ -1080,7 +1080,7 @@
           <text class="lbl-xs" x="500" y="334">subscription-key on partner edges</text>
           <text class="lbl-xs" x="780" y="290" font-weight="700" fill="#2456C8">Outbound to MCP server</text>
           <text class="lbl-xs" x="780" y="306">claims-bound headers (PGID, OID list)</text>
-          <text class="lbl-xs" x="780" y="320">Bearer forward · token-exchange optional</text>
+          <text class="lbl-xs" x="780" y="320">Bearer forwarded (multi-aud) · same token end-to-end</text>
           <text class="lbl-xs" x="780" y="334">trace policy → Application Insights</text>
 
           <!-- MCP server -->
@@ -1146,7 +1146,7 @@
           <rect class="node node-purple" x="1100" y="86" width="320" height="62" rx="6"/>
           <text class="lbl" x="1260" y="110" text-anchor="middle">Identity Server · Microsoft Entra ID</text>
           <text class="lbl-xs" x="1260" y="126" text-anchor="middle">OAuth 2.1 · PKCE · DCR · Resource Indicators</text>
-          <text class="lbl-xs" x="1260" y="140" text-anchor="middle">tool-level scopes · token exchange (RFC 8693)</text>
+          <text class="lbl-xs" x="1260" y="140" text-anchor="middle">tool-level scopes · multi-audience tokens (aud=mcp+api)</text>
 
           <rect class="node" x="1100" y="160" width="320" height="56" rx="6"/>
           <text class="lbl" x="1260" y="182" text-anchor="middle">Azure Key Vault</text>
@@ -1184,7 +1184,7 @@
         <div class="diagram-cap">Mirrors symmetrically into both Azure stamps (Central + East). Backends in Option A and Option B are alternatives, not both at once in production — though we run them as parallel spikes during the POC.</div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>08 / 24</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>08 / 25</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 9: OPTION A — ARCHITECTURE ====================== -->
@@ -1257,14 +1257,14 @@
           <text class="lbl-xs" x="830" y="386" text-anchor="middle">response shaping for LLM brevity</text>
 
           <rect class="node" x="960" y="298" width="240" height="100" rx="6"/>
-          <text class="lbl" x="1080" y="320" text-anchor="middle">Token broker</text>
-          <text class="lbl-xs" x="1080" y="338" text-anchor="middle">token exchange (RFC 8693)</text>
-          <text class="lbl-xs" x="1080" y="354" text-anchor="middle">new token aud=denticon-api</text>
-          <text class="lbl-xs" x="1080" y="370" text-anchor="middle">never passes upstream token through</text>
-          <text class="lbl-xs" x="1080" y="386" text-anchor="middle">refresh strategy · short TTL</text>
+          <text class="lbl" x="1080" y="320" text-anchor="middle">Outbound + telemetry</text>
+          <text class="lbl-xs" x="1080" y="338" text-anchor="middle">forwards same Bearer as received</text>
+          <text class="lbl-xs" x="1080" y="354" text-anchor="middle">aud=[denticon-mcp, denticon-api]</text>
+          <text class="lbl-xs" x="1080" y="370" text-anchor="middle">correlation-id propagated</text>
+          <text class="lbl-xs" x="1080" y="386" text-anchor="middle">structured audit per tool call</text>
 
           <path class="edge edge-amber" d="M720 410 L720 442" marker-end="url(#a9-4)"/>
-          <text class="lbl-xs" x="730" y="428" fill="#C2820B">HTTPS · Bearer (exchanged) · existing API contract</text>
+          <text class="lbl-xs" x="730" y="428" fill="#C2820B">HTTPS · same Bearer · existing API contract unchanged</text>
 
           <!-- Existing Denticon plane (APIM + microservices) -->
           <rect class="node node-blue" x="220" y="442" width="1000" height="54" rx="8"/>
@@ -1316,10 +1316,10 @@
           <text class="lbl-xs" x="1230" y="484" fill="#5B6B85" text-anchor="start">PGID/OID 403 if</text>
           <text class="lbl-xs" x="1230" y="498" fill="#5B6B85" text-anchor="start">claim missing</text>
         </svg>
-        <div class="diagram-cap">In Option A, the MCP server is the only new component. Everything below it is unchanged. Auth is inherited via token exchange. *Agentic API exposure is an opt-in design choice — see open-questions slide.</div>
+        <div class="diagram-cap">In Option A, the MCP server is the only new component. Everything below it is unchanged. Auth is inherited via a multi-audience access token: the same Bearer rides from client through APIM and the MCP server to the existing API tier, with each layer validating its own audience claim. *Agentic API exposure is an opt-in design choice — see open-questions slide.</div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>09 / 24</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>09 / 25</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 10: OPTION A — TOOLS, PROS, CONS ====================== -->
@@ -1338,23 +1338,24 @@
         <table class="matrix">
           <thead><tr><th>Tool name</th><th>Backed by</th></tr></thead>
           <tbody>
-            <tr><td><code>denticon.appointments.search</code></td><td>Appointments API · GET schedule</td></tr>
-            <tr><td><code>denticon.appointments.availability</code></td><td>Appointments API · /availability</td></tr>
-            <tr><td><code>denticon.patients.search</code></td><td>Patients API · /v2/patients</td></tr>
-            <tr><td><code>denticon.patients.responsible_party.read</code></td><td>Patients API · /rpid</td></tr>
-            <tr><td><code>denticon.rcm.claims.list</code></td><td>RCM API · /claims</td></tr>
-            <tr><td><code>denticon.rcm.aging.summary</code></td><td>RCM API · /aging (composed)</td></tr>
-            <tr><td><code>denticon.financial.ledger.read</code></td><td>Financial API · /ledger</td></tr>
-            <tr><td><code>denticon.financial.balance.summary</code></td><td>Financial API · /balances (composed)</td></tr>
-            <tr><td><code>denticon.clinical.history.read</code></td><td>Clinical API · /history</td></tr>
-            <tr><td><code>denticon.clinical.treatmentplan.read</code></td><td>Clinical API · /treatment-plans</td></tr>
-            <tr><td><code>denticon.practice.offices.list</code></td><td>Practices API · /offices</td></tr>
-            <tr><td><code>denticon.practice.providers.list</code></td><td>Practices API · /providers</td></tr>
-            <tr><td><code>denticon.production.by_provider</code></td><td>composed: Financial + Practices</td></tr>
-            <tr><td><code>denticon.collections.aging_by_office</code></td><td>composed: RCM + Practices</td></tr>
+            <tr><td><code>denticon.appointments.search</code> <span class="tag green">POC</span></td><td>Appointments API · GET schedule</td></tr>
+            <tr><td><code>denticon.appointments.availability</code> <span class="tag green">POC</span></td><td>Appointments API · /availability</td></tr>
+            <tr><td><code>denticon.patients.search</code> <span class="tag green">POC</span></td><td>Patients API · /v2/patients</td></tr>
+            <tr><td><code>denticon.patients.responsible_party.read</code> <span class="tag" style="background:#F1F5F9;color:#94A3B8;border-color:#DCE3EE;">ext</span></td><td>Patients API · /rpid</td></tr>
+            <tr><td><code>denticon.rcm.claims.list</code> <span class="tag" style="background:#F1F5F9;color:#94A3B8;border-color:#DCE3EE;">ext</span></td><td>RCM API · /claims</td></tr>
+            <tr><td><code>denticon.rcm.aging.summary</code> <span class="tag" style="background:#F1F5F9;color:#94A3B8;border-color:#DCE3EE;">ext</span></td><td>RCM API · /aging (composed)</td></tr>
+            <tr><td><code>denticon.financial.ledger.read</code> <span class="tag green">POC</span></td><td>Financial API · /ledger</td></tr>
+            <tr><td><code>denticon.financial.balance.summary</code> <span class="tag green">POC</span></td><td>Financial API · /balances (composed)</td></tr>
+            <tr><td><code>denticon.clinical.history.read</code> <span class="tag" style="background:#F1F5F9;color:#94A3B8;border-color:#DCE3EE;">ext</span></td><td>Clinical API · /history</td></tr>
+            <tr><td><code>denticon.clinical.treatmentplan.read</code> <span class="tag" style="background:#F1F5F9;color:#94A3B8;border-color:#DCE3EE;">ext</span></td><td>Clinical API · /treatment-plans</td></tr>
+            <tr><td><code>denticon.practice.offices.list</code> <span class="tag green">POC</span></td><td>Practices API · /offices</td></tr>
+            <tr><td><code>denticon.practice.providers.list</code> <span class="tag green">POC</span></td><td>Practices API · /providers</td></tr>
+            <tr><td><code>denticon.production.by_provider</code> <span class="tag green">POC</span></td><td>composed: Financial + Practices</td></tr>
+            <tr><td><code>denticon.production.by_procedure</code> <span class="tag green">POC</span></td><td>composed: Financial · group by ADA code</td></tr>
+            <tr><td><code>denticon.collections.aging_by_office</code> <span class="tag green">POC</span></td><td>composed: RCM + Practices</td></tr>
           </tbody>
         </table>
-        <p class="small" style="margin-top: 10px;">Tool descriptions are lifted from the OpenAPI documentation already on developer.planetdds.com — a major content-quality lever.</p>
+        <p class="small" style="margin-top: 10px;"><span class="tag green">POC</span> tools (10) ship in the six-week build · <span class="tag" style="background:#F1F5F9;color:#94A3B8;border-color:#DCE3EE;">ext</span> tools are the extension surface for production. Tool descriptions are lifted from the OpenAPI documentation already on developer.planetdds.com — a major content-quality lever.</p>
 
         <h3 class="deck-h3" style="margin-top: 16px;">Example prompts → tools invoked</h3>
         <table class="matrix">
@@ -1404,7 +1405,7 @@
         </ul>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>10 / 24</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>10 / 25</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 11: OPTION B — ARCHITECTURE ====================== -->
@@ -1525,12 +1526,12 @@
           <text class="lbl" x="1110" y="588" text-anchor="middle">Audit sink</text>
           <text class="lbl-xs" x="1110" y="604" text-anchor="middle">SQL Audit · Log Analytics</text>
 
-          <text class="lbl-xs" x="220" y="660" font-style="italic" fill="#5B6B85">Note: tenant isolation is implemented entirely above the DB layer — slide 15 covers the 3-layer model.</text>
+          <text class="lbl-xs" x="220" y="660" font-style="italic" fill="#5B6B85">Note: tenant isolation is implemented entirely above the DB layer — slide 16 covers the 3-layer model.</text>
         </svg>
         <div class="diagram-cap">Option B adds a real semantic and safety layer inside the MCP server: catalog + allow-list + query builder + result shaper. The investment is real, but the analytical surface is complete.</div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>11 / 24</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>11 / 25</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 12: OPTION B — TOOLS, PROS, CONS ====================== -->
@@ -1549,19 +1550,20 @@
         <table class="matrix">
           <thead><tr><th>Tool name</th><th>Backed by</th></tr></thead>
           <tbody>
-            <tr><td><code>denticon.catalog.describe</code></td><td>resource — semantic catalog browse</td></tr>
-            <tr><td><code>denticon.appointments.query</code></td><td>template: schedule by date/office/status</td></tr>
-            <tr><td><code>denticon.appointments.utilization</code></td><td>template: chairtime utilization by provider</td></tr>
-            <tr><td><code>denticon.production.summary</code></td><td>template: ledger production buckets</td></tr>
-            <tr><td><code>denticon.production.by_procedure</code></td><td>template: production by ADA code</td></tr>
-            <tr><td><code>denticon.collections.aging</code></td><td>template: aging buckets · 30/60/90/120+</td></tr>
-            <tr><td><code>denticon.claims.outstanding</code></td><td>template: unpaid + days-outstanding</td></tr>
-            <tr><td><code>denticon.patients.cohort</code></td><td>template: cohort by demographic/clinical filter</td></tr>
-            <tr><td><code>denticon.providers.scorecard</code></td><td>template: per-provider KPIs</td></tr>
-            <tr><td><code>denticon.offices.scorecard</code></td><td>template: per-office KPIs</td></tr>
+            <tr><td><code>denticon.catalog.describe</code> <span class="tag green">POC</span></td><td>resource — semantic catalog browse</td></tr>
+            <tr><td><code>denticon.appointments.query</code> <span class="tag green">POC</span></td><td>template: schedule by date/office/status</td></tr>
+            <tr><td><code>denticon.appointments.utilization</code> <span class="tag green">POC</span></td><td>template: chairtime utilization by provider</td></tr>
+            <tr><td><code>denticon.appointments.no_show_rate</code> <span class="tag green">POC</span></td><td>template: calculated metric · rolling window</td></tr>
+            <tr><td><code>denticon.production.summary</code> <span class="tag green">POC</span></td><td>template: ledger production buckets</td></tr>
+            <tr><td><code>denticon.production.by_procedure</code> <span class="tag green">POC</span></td><td>template: production by ADA code</td></tr>
+            <tr><td><code>denticon.collections.aging</code> <span class="tag green">POC</span></td><td>template: aging buckets · 30/60/90/120+</td></tr>
+            <tr><td><code>denticon.patients.cohort</code> <span class="tag green">POC</span></td><td>template: cohort by demographic/clinical filter</td></tr>
+            <tr><td><code>denticon.claims.outstanding</code> <span class="tag" style="background:#F1F5F9;color:#94A3B8;border-color:#DCE3EE;">ext</span></td><td>template: unpaid + days-outstanding</td></tr>
+            <tr><td><code>denticon.providers.scorecard</code> <span class="tag" style="background:#F1F5F9;color:#94A3B8;border-color:#DCE3EE;">ext</span></td><td>template: per-provider KPIs</td></tr>
+            <tr><td><code>denticon.offices.scorecard</code> <span class="tag" style="background:#F1F5F9;color:#94A3B8;border-color:#DCE3EE;">ext</span></td><td>template: per-office KPIs</td></tr>
           </tbody>
         </table>
-        <p class="small" style="margin-top: 10px;">Each tool maps to <em>one</em> approved SQL template. Parameters are typed and validated. PGID and OID are bound from claims, never from LLM-supplied input.</p>
+        <p class="small" style="margin-top: 10px;"><span class="tag green">POC</span> tools (8) ship in the six-week build · <span class="tag" style="background:#F1F5F9;color:#94A3B8;border-color:#DCE3EE;">ext</span> tools are the extension surface for production. Each tool maps to <em>one</em> approved SQL template; parameters are typed and validated; PGID and OID are bound from claims, never from LLM-supplied input.</p>
 
         <h3 class="deck-h3" style="margin-top: 16px;">Example prompts → tools invoked</h3>
         <table class="matrix">
@@ -1601,7 +1603,7 @@
 
         <h3 class="deck-h3" style="margin-top: 22px;">Where it gets uncomfortable</h3>
         <ul class="crisp rose">
-          <li><strong>Tenant isolation becomes our burden.</strong> No application-layer safety net. The 3-layer model (slide 15) <em>must</em> hold; we own all three layers.</li>
+          <li><strong>Tenant isolation becomes our burden.</strong> No application-layer safety net. The 3-layer model (slide 16) <em>must</em> hold; we own all three layers.</li>
           <li><strong>Semantic catalog is real work.</strong> The Ledger alone is ~100 cols with ~50 business-relevant. Multiplied across appointments, claims, treatment plans — a serious documentation effort. Without the catalog, accuracy degrades fast.</li>
           <li><strong>HIPAA / audit posture is a new path.</strong> Audit logging, PHI redaction, immutable retention, and BAA scope all need explicit design — not inheritable from the existing API plane.</li>
           <li><strong>Billing model has no obvious anchor.</strong> No per-API meter to inherit; a tool-call meter at APIM is the likely production answer.</li>
@@ -1609,15 +1611,137 @@
         </ul>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>12 / 24</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>12 / 25</div></div>
   </div>
 </section>
-<!-- ====================== SLIDE 13: COMPARISON MATRIX ====================== -->
+<!-- ====================== SLIDE 13: POC SLICE ====================== -->
+<section class="slide" data-notes="The defined POC slice. Three domains, ~95 catalog columns, 10 anchor prompts that both options answer on the same data, 10 Option A tools and 8 Option B tools committed. The anchor prompts are the shared eval set — same questions, two architectures, scored side by side. Clinical and full RCM are deferred because they need the audit-log review at Gate 2 first; writes are deferred entirely.">
+  <div class="stage">
+    <div class="head">
+      <div>
+        <div class="eyebrow">13 · POC slice</div>
+        <h2 class="slide-title">What we ship in six weeks — defined scope</h2>
+      </div>
+      <div class="right">Tool surface + catalog coverage commitment</div>
+    </div>
+    <div class="body">
+      <p class="lede" style="margin-bottom: 18px;">Slides 10 and 12 show the long-term tool surface. This slide commits to what actually ships in the POC: <strong>three domains of catalog coverage, ten anchor prompts that drive evaluation, and ten Option&nbsp;A or eight Option&nbsp;B tools</strong> — chosen so we can score both spikes against the same questions on the same data.</p>
+
+      <div class="cols-3" style="margin-bottom: 18px;">
+        <div class="card teal">
+          <span class="badge">Domain coverage</span>
+          <div style="display:flex; align-items:baseline; gap:10px; margin: 4px 0 6px;">
+            <span style="font-size:36px; font-weight:700; color:var(--ink); letter-spacing:-0.02em;">3</span>
+            <span class="small">domains · ~95 columns catalogued</span>
+          </div>
+          <p class="small" style="margin: 0;">Appointments · Ledger / Financial · thin Practice slice for entity joins. Sits inside the 80–100 column ceiling from slide 17.</p>
+        </div>
+        <div class="card amber">
+          <span class="badge amber">Eval set</span>
+          <div style="display:flex; align-items:baseline; gap:10px; margin: 4px 0 6px;">
+            <span style="font-size:36px; font-weight:700; color:var(--ink); letter-spacing:-0.02em;">10</span>
+            <span class="small">anchor prompts · shared by A and B</span>
+          </div>
+          <p class="small" style="margin: 0;">Stress entity resolution, joins, aggregation, cohort filtering, decoded enums, calculated metrics, and the &ldquo;Michael&rdquo; disambiguation.</p>
+        </div>
+        <div class="card blue">
+          <span class="badge blue">Tool commitment</span>
+          <div style="display:flex; align-items:baseline; gap:10px; margin: 4px 0 6px;">
+            <span style="font-size:36px; font-weight:700; color:var(--ink); letter-spacing:-0.02em;">10 / 8</span>
+            <span class="small">Option A tools / Option B tools</span>
+          </div>
+          <p class="small" style="margin: 0;">Option B is coarser because one SQL template covers more ground than a single REST endpoint. Both answer the same 10 prompts.</p>
+        </div>
+      </div>
+
+      <div class="cols-2-asym">
+        <div>
+          <h3 class="deck-h3">Anchor prompts — the shared eval set</h3>
+          <table class="matrix">
+            <thead><tr><th style="width:34px;">#</th><th>Prompt</th><th style="width:200px;">Stress</th></tr></thead>
+            <tbody>
+              <tr><td><strong>1</strong></td><td>&ldquo;Show me Dr.&nbsp;Patel's appointments this week.&rdquo;</td><td>entity res · schedule</td></tr>
+              <tr><td><strong>2</strong></td><td>&ldquo;How full is each operatory at Office&nbsp;87 next Tuesday?&rdquo;</td><td>utilization · group-by</td></tr>
+              <tr><td><strong>3</strong></td><td>&ldquo;What's our hygiene production for Q1 across all my offices?&rdquo;</td><td>role filter · aggregate</td></tr>
+              <tr><td><strong>4</strong></td><td>&ldquo;Q1 production by ADA code, top 10 procedures.&rdquo;</td><td>group · rank</td></tr>
+              <tr><td><strong>5</strong></td><td>&ldquo;Which patients have a balance over $500 in Office&nbsp;87?&rdquo;</td><td>cohort · predicate</td></tr>
+              <tr><td><strong>6</strong></td><td>&ldquo;30/60/90 day aging by office this month.&rdquo;</td><td>aging buckets</td></tr>
+              <tr><td><strong>7</strong></td><td>&ldquo;No-show rate by provider for last 30 days.&rdquo;</td><td>calculated metric</td></tr>
+              <tr><td><strong>8</strong></td><td>&ldquo;Provider utilization last quarter — who's underbooked?&rdquo;</td><td>multi-metric · threshold</td></tr>
+              <tr><td><strong>9</strong></td><td>&ldquo;Find Michael Andrews and show his appointment history.&rdquo;</td><td>disambiguation</td></tr>
+              <tr><td><strong>10</strong></td><td>&ldquo;Cancellations and reasons this week at Office&nbsp;7.&rdquo;</td><td>enum decode · facet</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <h3 class="deck-h3">Catalog coverage — three domains, ~95 columns</h3>
+          <div class="card teal" style="margin-bottom: 10px; padding: 14px 18px;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom: 4px;">
+              <strong style="color:var(--ink); font-size:14px;">Appointments</strong>
+              <span class="small">~35 columns</span>
+            </div>
+            <p class="small" style="margin: 0;"><code>APT</code> — PGID, OID, PROV_ID, PAT_ID, APT_DT/TM, STAT_CD (enum decoded), DUR_MIN, OP_ID, PROC_CD, CANCEL_RSN, status timestamps · joined with <code>OP</code> (operatory)</p>
+          </div>
+          <div class="card teal" style="margin-bottom: 10px; padding: 14px 18px;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom: 4px;">
+              <strong style="color:var(--ink); font-size:14px;">Ledger / Financial</strong>
+              <span class="small">~50 columns</span>
+            </div>
+            <p class="small" style="margin: 0;"><code>LDG</code> — PGID, OID, PAT_ID, RPID, PROV_ID, TXN_DT, PROC_CD, FEE, CHARGE/ADJUST/PAYMENT_AMT, INS_PAID, PAT_PAID, BALANCE, AGE_BUCKET, WRITE_OFF, CDT_CATEGORY, TOOTH_NUM, SURFACE · <code>AB</code> account-balance buckets</p>
+          </div>
+          <div class="card teal" style="margin-bottom: 14px; padding: 14px 18px;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom: 4px;">
+              <strong style="color:var(--ink); font-size:14px;">Practice (thin slice)</strong>
+              <span class="small">~10 columns</span>
+            </div>
+            <p class="small" style="margin: 0;"><code>OFFICE</code> — OID, NAME, TIME_ZONE · <code>PROV</code> — ID, NAME, SPECIALTY (DDS / RDH / specialist), STATUS · entity directory only, used for joins and disambiguation</p>
+          </div>
+
+          <h3 class="deck-h3" style="margin-top: 18px;">Tool commitment per option</h3>
+          <table class="matrix" style="font-size: 12.5px;">
+            <thead><tr><th style="width:50%;">Option A · 10 tools</th><th>Hits prompts</th></tr></thead>
+            <tbody>
+              <tr><td><code>appointments.search</code></td><td>1, 10</td></tr>
+              <tr><td><code>appointments.availability</code></td><td>2</td></tr>
+              <tr><td><code>practice.offices.list</code></td><td>many</td></tr>
+              <tr><td><code>practice.providers.list</code></td><td>1, 7, 8</td></tr>
+              <tr><td><code>patients.search</code></td><td>5, 9</td></tr>
+              <tr><td><code>financial.ledger.read</code></td><td>3, 4, 5</td></tr>
+              <tr><td><code>financial.balance.summary</code></td><td>5</td></tr>
+              <tr><td><code>production.by_provider</code></td><td>3, 7</td></tr>
+              <tr><td><code>production.by_procedure</code></td><td>4</td></tr>
+              <tr><td><code>collections.aging_by_office</code></td><td>6</td></tr>
+            </tbody>
+          </table>
+          <table class="matrix" style="font-size: 12.5px; margin-top: 12px;">
+            <thead><tr><th style="width:50%;">Option B · 8 tools</th><th>Hits prompts</th></tr></thead>
+            <tbody>
+              <tr><td><code>catalog.describe</code></td><td>meta</td></tr>
+              <tr><td><code>appointments.query</code></td><td>1, 10</td></tr>
+              <tr><td><code>appointments.utilization</code></td><td>2, 8</td></tr>
+              <tr><td><code>appointments.no_show_rate</code></td><td>7</td></tr>
+              <tr><td><code>production.summary</code></td><td>3</td></tr>
+              <tr><td><code>production.by_procedure</code></td><td>4</td></tr>
+              <tr><td><code>collections.aging</code></td><td>6</td></tr>
+              <tr><td><code>patients.cohort</code></td><td>5, 9</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="lift rose" style="margin-top: 18px;">
+        <strong>Explicitly out of scope for the POC:</strong>&nbsp; Clinical domain (treatment plans, medical history, notes) — PHI sensitivity needs the audit-log review at Gate&nbsp;2 first · full RCM domain detail (claims line items, writebacks) — not on the anchor prompt set · all writes / transactional flows · imaging metadata (Apteryx surface) · cross-PGID analytics for Denticon itself.
+      </div>
+    </div>
+    <div class="foot"><div>RSI · Confidential</div><div>13 / 25</div></div>
+  </div>
+</section>
+<!-- ====================== SLIDE 14: COMPARISON MATRIX ====================== -->
 <section class="slide" data-notes="The decision aid. Each row is a dimension we'd score the two options on. Pills are qualitative, intentionally. The point isn't to crown a winner — it's to make the trade-spaces legible.">
   <div class="stage">
     <div class="head">
       <div>
-        <div class="eyebrow">13 · Decision matrix</div>
+        <div class="eyebrow">14 · Decision matrix</div>
         <h2 class="slide-title">Option A vs Option B — side by side</h2>
       </div>
       <div class="right">Qualitative · POC-scope</div>
@@ -1645,7 +1769,7 @@
           </tr>
           <tr>
             <td class="dim">Auth &amp; authorization reuse</td>
-            <td><span class="pill high">High</span>&nbsp; Token exchange to existing API audience; backends enforce PGID/OID 403 as today.</td>
+            <td><span class="pill high">High</span>&nbsp; Multi-audience access token (<code>aud=[denticon-mcp, denticon-api]</code>); same Bearer forwarded to existing API tier; backends enforce PGID/OID 403 as today.</td>
             <td><span class="pill med">Medium</span>&nbsp; JWT validation reused; but PGID predicate enforcement is built fresh and owned in the MCP server.</td>
           </tr>
           <tr>
@@ -1692,22 +1816,22 @@
       </table>
       <p class="small" style="margin-top: 14px;">Read the matrix as &ldquo;A is faster and safer; B is broader and more flexible.&rdquo; The right answer depends on which axes Denticon prioritizes for the production decision after POC.</p>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>13 / 24</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>14 / 25</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 14: IDENTITY & AUTH FLOW ====================== -->
-<section class="slide" data-notes="The end-to-end identity flow. Two important things to notice: (1) the token aud=denticon-mcp prevents token reuse against other Denticon resources; (2) the MCP server never passes through the upstream token — it always exchanges for a narrower one before calling backends. This is the OAuth 2.1 + RFC 8693 + Resource Indicators stack working as designed.">
+<section class="slide" data-notes="The end-to-end identity flow. Two things to call out: (1) the access token is issued with a multi-audience claim — aud=[denticon-mcp, denticon-api] — so the same Bearer is acceptable to APIM, the MCP server, and the existing Denticon API tier without a token-exchange round trip; (2) each layer still validates that its own audience is present before processing. This aligns with Denticon's current implementation. RFC 8693 token exchange is recorded as an optional production-hardening step for a later phase.">
   <div class="stage">
     <div class="head">
       <div>
-        <div class="eyebrow">14 · Identity</div>
-        <h2 class="slide-title">End-to-end auth — JWT lifecycle &amp; trust boundaries</h2>
+        <div class="eyebrow">15 · Identity</div>
+        <h2 class="slide-title">End-to-end auth — multi-audience JWT, no token exchange in POC</h2>
       </div>
       <div class="right">Sequence · shared by A &amp; B</div>
     </div>
     <div class="body">
       <div class="diagram">
-        <svg viewBox="0 0 1480 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Identity and authorization sequence flow for the Denticon MCP server">
+        <svg viewBox="0 0 1480 540" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Identity and authorization sequence flow for the Denticon MCP server">
           <defs>
             <marker id="s14" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0B2545"/></marker>
             <marker id="s14-t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0E8C8C"/></marker>
@@ -1730,20 +1854,16 @@
             <rect class="node node-amber" x="800" y="30" width="200" height="48" rx="6"/>
             <text class="lbl" x="900" y="58" text-anchor="middle">MCP server</text>
 
-            <rect class="node" x="1060" y="30" width="180" height="48" rx="6"/>
-            <text class="lbl" x="1150" y="58" text-anchor="middle">Token exchange</text>
-
-            <rect class="node node-teal" x="1280" y="30" width="160" height="48" rx="6"/>
-            <text class="lbl" x="1360" y="58" text-anchor="middle">Backend (API / SQL)</text>
+            <rect class="node node-teal" x="1060" y="30" width="220" height="48" rx="6"/>
+            <text class="lbl" x="1170" y="58" text-anchor="middle">Backend (API / SQL)</text>
           </g>
 
           <!-- Lanes (vertical dashed) -->
-          <line x1="130" y1="78" x2="130" y2="556" class="zone" stroke-dasharray="2 4"/>
-          <line x1="380" y1="78" x2="380" y2="556" class="zone" stroke-dasharray="2 4"/>
-          <line x1="640" y1="78" x2="640" y2="556" class="zone" stroke-dasharray="2 4"/>
-          <line x1="900" y1="78" x2="900" y2="556" class="zone" stroke-dasharray="2 4"/>
-          <line x1="1150" y1="78" x2="1150" y2="556" class="zone" stroke-dasharray="2 4"/>
-          <line x1="1360" y1="78" x2="1360" y2="556" class="zone" stroke-dasharray="2 4"/>
+          <line x1="130" y1="78" x2="130" y2="490" class="zone" stroke-dasharray="2 4"/>
+          <line x1="380" y1="78" x2="380" y2="490" class="zone" stroke-dasharray="2 4"/>
+          <line x1="640" y1="78" x2="640" y2="490" class="zone" stroke-dasharray="2 4"/>
+          <line x1="900" y1="78" x2="900" y2="490" class="zone" stroke-dasharray="2 4"/>
+          <line x1="1170" y1="78" x2="1170" y2="490" class="zone" stroke-dasharray="2 4"/>
 
           <!-- Step 1: discovery -->
           <path class="edge edge-strong" d="M130 110 L380 110" marker-end="url(#s14)"/>
@@ -1757,9 +1877,9 @@
           <path class="edge edge-purple" d="M130 178 L380 178" marker-end="url(#s14-p)"/>
           <text class="lbl-sm" x="135" y="172">③ OAuth 2.1 + PKCE authorization request · user authenticates (Microsoft SSO or Denticon native)</text>
 
-          <!-- Step 4: token issuance -->
+          <!-- Step 4: token issuance — multi-audience -->
           <path class="edge edge-purple" d="M380 214 L130 214" marker-end="url(#s14-p)"/>
-          <text class="lbl-sm" x="135" y="208">④ access_token issued · aud=denticon-mcp · sub · pgid=[...] · oid=[...] · scope=denticon.appointments:read · exp ~ 15m</text>
+          <text class="lbl-sm" x="135" y="208">④ access_token issued · aud=[denticon-mcp, denticon-api] · sub · pgid=[...] · oid=[...] · scope=denticon.appointments:read · exp ~ 15m</text>
 
           <!-- Step 5: tool call -->
           <path class="edge edge-strong" d="M130 252 L640 252" marker-end="url(#s14)"/>
@@ -1768,39 +1888,32 @@
           <!-- Step 6: APIM validate -->
           <path class="edge edge-blue" d="M640 286 L640 320" marker-end="url(#s14-b)"/>
           <rect class="node node-blue" x="540" y="288" width="200" height="40" rx="4"/>
-          <text class="lbl-sm" x="640" y="313" text-anchor="middle">⑥ validate-jwt · aud · scope</text>
+          <text class="lbl-sm" x="640" y="313" text-anchor="middle">⑥ validate-jwt · denticon-mcp ∈ aud · scope</text>
 
           <!-- Step 7: claim-bound headers -->
           <path class="edge edge-blue" d="M640 348 L900 348" marker-end="url(#s14-b)"/>
-          <text class="lbl-sm" x="645" y="342">⑦ APIM forwards: Authorization + x-pgid + x-oid-list + x-correlation-id</text>
+          <text class="lbl-sm" x="645" y="342">⑦ APIM forwards: Authorization (Bearer unchanged) + x-pgid + x-oid-list + x-correlation-id</text>
 
           <!-- Step 8: per-tool authz -->
           <rect class="node node-amber" x="800" y="378" width="200" height="36" rx="4"/>
           <text class="lbl-sm" x="900" y="401" text-anchor="middle">⑧ per-tool authz check</text>
           <text class="lbl-xs" x="905" y="370" fill="#C2820B">OID requested ∈ x-oid-list?</text>
 
-          <!-- Step 9: token exchange -->
-          <path class="edge edge-amber" d="M900 426 L1150 426" marker-end="url(#s14-a)"/>
-          <text class="lbl-sm" x="905" y="420">⑨ token exchange (RFC 8693) — request narrower token aud=denticon-api (or sql-replica)</text>
+          <!-- Step 9: backend invocation — same Bearer -->
+          <path class="edge edge-teal" d="M900 426 L1170 426" marker-end="url(#s14-t)"/>
+          <text class="lbl-sm" x="905" y="420">⑨ backend invocation · same Bearer forwarded · existing API tier validates denticon-api ∈ aud · enforces PGID/OID 403 as today</text>
 
-          <path class="edge edge-amber" d="M1150 458 L900 458" marker-end="url(#s14-a)"/>
-          <text class="lbl-sm" x="905" y="452">⑩ exchanged token returned — shorter TTL · narrower scope · auditable record</text>
-
-          <!-- Step 10: backend call -->
-          <path class="edge edge-teal" d="M900 490 L1360 490" marker-end="url(#s14-t)"/>
-          <text class="lbl-sm" x="905" y="484">⑪ backend invocation · exchanged Bearer · PGID predicate enforced inside server</text>
-
-          <!-- Step 11: result -->
-          <path class="edge edge-teal" d="M1360 524 L130 524" marker-end="url(#s14-t)"/>
-          <text class="lbl-sm" x="135" y="518">⑫ result flows back · MCP server shapes for LLM · APIM emits trace + audit · client receives tool-result JSON-RPC envelope</text>
+          <!-- Step 10: result -->
+          <path class="edge edge-teal" d="M1170 460 L130 460" marker-end="url(#s14-t)"/>
+          <text class="lbl-sm" x="135" y="454">⑩ result flows back · MCP server shapes for LLM · APIM emits trace + audit · client receives tool-result JSON-RPC envelope</text>
 
           <!-- Footer annotation -->
-          <text class="lbl-xs" x="40" y="580" fill="#5B6B85" font-style="italic">Token never crosses a trust boundary unchanged. Every claim is re-asserted by the layer that depends on it. The MCP server is a relying party, not a token holder.</text>
+          <text class="lbl-xs" x="40" y="514" fill="#5B6B85" font-style="italic">Same Bearer end-to-end. Multi-audience binding confines the token to Denticon-issued resources; APIM and the API tier each validate that their own audience is in the claim list before processing. RFC 8693 token exchange is recorded as a production-hardening enhancement, not a POC requirement.</text>
         </svg>
-        <div class="diagram-cap">Two principles to call out: (1) <code>aud=denticon-mcp</code> on the inbound token blocks token replay against other services; (2) the MCP server never forwards the inbound token — it exchanges for a narrower one before each backend call.</div>
+        <div class="diagram-cap">Two principles to call out: (1) the multi-audience <code>aud=[denticon-mcp, denticon-api]</code> claim is the trust binding — each receiving layer validates its own audience before accepting; (2) the MCP server forwards the same Bearer to existing backends — no token-exchange dance, no new IdP endpoint required, aligns with Denticon's current implementation.</div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>14 / 24</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>15 / 25</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 15: TENANT ISOLATION 3-LAYER ====================== -->
@@ -1808,7 +1921,7 @@
   <div class="stage">
     <div class="head">
       <div>
-        <div class="eyebrow">15 · Tenant isolation</div>
+        <div class="eyebrow">16 · Tenant isolation</div>
         <h2 class="slide-title">PGID safety in three layers — defense in depth</h2>
       </div>
       <div class="right">Shared by A &amp; B · differs at layer 3</div>
@@ -1908,7 +2021,7 @@
         <div class="diagram-cap">A cross-PGID attack test harness runs against every build: 200+ adversarial prompts that try to leak data across tenants. The pass bar is 100%.</div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>15 / 24</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>16 / 25</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 16: SEMANTIC CATALOG ====================== -->
@@ -1916,7 +2029,7 @@
   <div class="stage">
     <div class="head">
       <div>
-        <div class="eyebrow">16 · Semantic layer · part 1 of 2</div>
+        <div class="eyebrow">17 · Semantic layer · part 1 of 2</div>
         <h2 class="slide-title">The catalog is the accuracy lever — don't underestimate it</h2>
       </div>
       <div class="right">Data dictionary &amp; LLM grounding</div>
@@ -1938,7 +2051,7 @@
           <li><strong>Authoring · LLM-assisted drafts with human review.</strong> An offline pass introspects the replica and drafts column descriptions from (column name, type, sample values, FK context); humans approve in a PR queue. Drops authoring cost from minutes to seconds per column.</li>
           <li><strong>Runtime · Microsoft SQL MCP Server (DAB 1.7).</strong> Native <code>describe_entities</code> MCP tool reads our YAML as its description source; ships with Redis cache, Entra integration, App Insights telemetry.</li>
         </ul>
-        <p class="small" style="margin-top: 10px;">→ See <strong>slide 17</strong> for the end-to-end architecture: authoring pipeline, governance, runtime serve, MCP surface.</p>
+        <p class="small" style="margin-top: 10px;">→ See <strong>slide 18</strong> for the end-to-end architecture: authoring pipeline, governance, runtime serve, MCP surface.</p>
       </div>
       <div>
         <h3 class="deck-h3">Sample catalog entry · ledger column (YAML)</h3>
@@ -1969,7 +2082,7 @@ templates: [denticon.collections.aging,
         </div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>16 / 24</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>17 / 25</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 17: CATALOG ARCHITECTURE ====================== -->
@@ -1977,7 +2090,7 @@ templates: [denticon.collections.aging,
   <div class="stage">
     <div class="head">
       <div>
-        <div class="eyebrow">17 · Semantic layer · part 2 of 2</div>
+        <div class="eyebrow">18 · Semantic layer · part 2 of 2</div>
         <h2 class="slide-title">Catalog architecture — scalable from POC to production</h2>
       </div>
       <div class="right">End-to-end semantic plane</div>
@@ -2182,7 +2295,7 @@ templates: [denticon.collections.aging,
         <div class="diagram-cap">The keyword-only POC ships with the same tool and resource interface that the production vector-RAG variant will use. Upgrading from BM25 to hybrid retrieval is a swap inside the catalog service — clients re-issue the same MCP calls and get sharper answers.</div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>17 / 24</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>18 / 25</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 18: OBSERVABILITY & HIPAA ====================== -->
@@ -2190,7 +2303,7 @@ templates: [denticon.collections.aging,
   <div class="stage">
     <div class="head">
       <div>
-        <div class="eyebrow">18 · Observability &amp; compliance</div>
+        <div class="eyebrow">19 · Observability &amp; compliance</div>
         <h2 class="slide-title">Telemetry, audit, and HIPAA posture</h2>
       </div>
       <div class="right">What we log · what we don't</div>
@@ -2239,7 +2352,7 @@ templates: [denticon.collections.aging,
         </ul>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>18 / 24</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>19 / 25</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 18: DR / MULTI-REGION ====================== -->
@@ -2247,7 +2360,7 @@ templates: [denticon.collections.aging,
   <div class="stage">
     <div class="head">
       <div>
-        <div class="eyebrow">19 · DR &amp; multi-region</div>
+        <div class="eyebrow">20 · DR &amp; multi-region</div>
         <h2 class="slide-title">MCP rides the existing active/active topology</h2>
       </div>
       <div class="right">Cross-region resilience</div>
@@ -2362,7 +2475,7 @@ templates: [denticon.collections.aging,
         <div class="diagram-cap">Failover semantics: if a stamp goes unhealthy, Front Door reroutes to the other; the metadata DB serves the same client→region mapping the app already uses. MCP introduces no new DR primitive.</div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>19 / 24</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>20 / 25</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 19: PHASED POC PLAN ====================== -->
@@ -2370,7 +2483,7 @@ templates: [denticon.collections.aging,
   <div class="stage">
     <div class="head">
       <div>
-        <div class="eyebrow">20 · Plan</div>
+        <div class="eyebrow">21 · Plan</div>
         <h2 class="slide-title">Six-week POC — two parallel spikes, then converge</h2>
       </div>
       <div class="right">Phased delivery</div>
@@ -2456,7 +2569,7 @@ templates: [denticon.collections.aging,
         </div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>20 / 24</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>21 / 25</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 20: RISKS & MITIGATIONS ====================== -->
@@ -2464,7 +2577,7 @@ templates: [denticon.collections.aging,
   <div class="stage">
     <div class="head">
       <div>
-        <div class="eyebrow">21 · Risks</div>
+        <div class="eyebrow">22 · Risks</div>
         <h2 class="slide-title">Risks &amp; mitigations</h2>
       </div>
       <div class="right">Calibrated for POC + early production</div>
@@ -2479,7 +2592,7 @@ templates: [denticon.collections.aging,
             <td><strong>LLM-induced cross-tenant query.</strong> An LLM tries to fetch data for a PGID the caller doesn't own.</td>
             <td><span class="pill med">Med</span></td>
             <td><span class="pill low">Critical</span></td>
-            <td>3-layer isolation (slide 15) · server never reads PGID from prompt · query templates with mandatory PGID predicate · continuous cross-PGID attack suite gating every build.</td>
+            <td>3-layer isolation (slide 16) · server never reads PGID from prompt · query templates with mandatory PGID predicate · continuous cross-PGID attack suite gating every build.</td>
           </tr>
           <tr>
             <td><strong>Fan-out cost explosion.</strong> A single user prompt fans out to many backend calls; bills surprise partners.</td>
@@ -2503,7 +2616,7 @@ templates: [denticon.collections.aging,
             <td><strong>Agentic API divergence.</strong> Denticon ships parallel agentic surface; MCP duplicates or contradicts it.</td>
             <td><span class="pill med">Med</span></td>
             <td><span class="pill med">Med</span></td>
-            <td>Open question on slide 22 · align early with Denticon product · option: MCP server wraps agentic API instead of competing with it.</td>
+            <td>Open question on slide 23 · align early with Denticon product · option: MCP server wraps agentic API instead of competing with it.</td>
           </tr>
           <tr>
             <td><strong>Streamable HTTP / SSE timeout in ACA.</strong> Long-running tools time out on the platform's 240-second ingress limit.</td>
@@ -2515,7 +2628,7 @@ templates: [denticon.collections.aging,
             <td><strong>Catalog drift.</strong> Schema changes in Denticon's DB or API outpace the catalog; LLM begins hallucinating.</td>
             <td><span class="pill high">High</span></td>
             <td><span class="pill med">Med</span></td>
-            <td>Catalog-as-code in git · CI drift check fails build if replica schema diverges from catalog (slide 17) · prompt-eval canary on a frozen set detects regressions before release.</td>
+            <td>Catalog-as-code in git · CI drift check fails build if replica schema diverges from catalog (slide 18) · prompt-eval canary on a frozen set detects regressions before release.</td>
           </tr>
           <tr>
             <td><strong>OAuth scope sprawl.</strong> Each new tool needs a new scope; client tokens balloon.</td>
@@ -2538,7 +2651,7 @@ templates: [denticon.collections.aging,
         </tbody>
       </table>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>21 / 24</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>22 / 25</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 21: NEXT STEPS ====================== -->
@@ -2546,7 +2659,7 @@ templates: [denticon.collections.aging,
   <div class="stage">
     <div class="head">
       <div>
-        <div class="eyebrow">22 · Next steps</div>
+        <div class="eyebrow">23 · Next steps</div>
         <h2 class="slide-title">Next steps to align on before kickoff</h2>
       </div>
       <div class="right">Owner-tagged</div>
@@ -2573,7 +2686,7 @@ templates: [denticon.collections.aging,
         </div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>22 / 24</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>23 / 25</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 22: PROPOSAL TO KICKOFF ====================== -->
@@ -2581,7 +2694,7 @@ templates: [denticon.collections.aging,
   <div class="stage">
     <div class="head">
       <div>
-        <div class="eyebrow">23 · Next steps</div>
+        <div class="eyebrow">24 · Next steps</div>
         <h2 class="slide-title">From proposal to kickoff</h2>
       </div>
       <div class="right">Decision &amp; action plan</div>
@@ -2615,7 +2728,7 @@ templates: [denticon.collections.aging,
         </div>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential</div><div>23 / 24</div></div>
+    <div class="foot"><div>RSI · Confidential</div><div>24 / 25</div></div>
   </div>
 </section>
 <!-- ====================== SLIDE 23: THANK YOU + SOURCES ====================== -->
@@ -2623,7 +2736,7 @@ templates: [denticon.collections.aging,
   <div class="stage">
     <div class="head">
       <div>
-        <div class="eyebrow">24 · References</div>
+        <div class="eyebrow">25 · References</div>
         <h2 class="slide-title">Thank you — and the references we used</h2>
       </div>
       <div class="right">Sources · 2026</div>
@@ -2674,7 +2787,7 @@ templates: [denticon.collections.aging,
         </ul>
       </div>
     </div>
-    <div class="foot"><div>RSI · Confidential · Draft 0.1</div><div>24 / 24</div></div>
+    <div class="foot"><div>RSI · Confidential · Draft 0.1</div><div>25 / 25</div></div>
   </div>
 </section>
 
