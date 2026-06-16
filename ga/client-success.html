@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G&A Partners | AI Client Success Operations PRD</title>
+<style>
+:root{--red:#C60C30;--navy:#23394A;--grey:#6B6F70;--lgrey:#A8ACAE;--fog:#F5F7F9;--rule:#E2E8ED;--white:#FFFFFF;--pos:#2A8F60;--c2:#0088CE;--amber:#FF9E1B;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:var(--navy);background:var(--fog);font-size:13px;line-height:1.5;}
+.hdr{background:var(--navy);padding:0 48px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
+.logo-area{padding:12px 0;display:flex;align-items:center;}
+.hdr-right{display:flex;align-items:center;gap:10px;}
+.hdr-badge{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:3px;background:rgba(198,12,48,.3);color:rgba(255,255,255,.8);border:1px solid rgba(198,12,48,.4);}
+.tab-nav{background:var(--navy);display:flex;padding:0 48px;border-bottom:1px solid rgba(255,255,255,.08);overflow-x:auto;}
+.tab-nav::-webkit-scrollbar{height:0;}
+.tab-btn{padding:11px 18px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.4);border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:color .15s;flex-shrink:0;}
+.tab-btn:hover{color:rgba(255,255,255,.75);}
+.tab-btn.active{color:#fff;border-bottom-color:var(--red);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.page{max-width:1060px;margin:0 auto;padding:36px 48px 60px;}
+.pg-eye{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--red);font-weight:700;margin-bottom:5px;}
+.pg-h1{font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.4px;margin-bottom:8px;line-height:1.2;}
+.pg-sub{font-size:12px;color:var(--grey);margin-bottom:24px;max-width:700px;line-height:1.7;}
+.section-title{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--rule);margin-top:28px;}
+.divider{border:none;border-top:1px solid var(--rule);margin:24px 0;}
+.card{background:var(--white);border:1px solid var(--rule);border-radius:8px;padding:18px 20px;margin-bottom:12px;box-shadow:0 1px 4px rgba(35,57,74,.05);}
+.card-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px;}
+.card-sub{font-size:11px;color:var(--grey);line-height:1.65;}
+.card.accent-red{border-left:4px solid var(--red);border-radius:0 8px 8px 0;}
+.card.accent-blue{border-left:4px solid var(--c2);border-radius:0 8px 8px 0;}
+.card.accent-green{border-left:4px solid var(--pos);border-radius:0 8px 8px 0;}
+.card.accent-amber{border-left:4px solid var(--amber);border-radius:0 8px 8px 0;}
+.card.accent-navy{border-left:4px solid var(--navy);border-radius:0 8px 8px 0;}
+.callout{border-radius:0 6px 6px 0;padding:12px 18px;font-size:11px;line-height:1.65;margin-bottom:16px;}
+.callout.info{border-left:4px solid var(--c2);background:#EBF4FB;color:#1a4f72;}
+.callout.warn{border-left:4px solid var(--amber);background:#FEF9EE;color:#5c3c00;}
+.callout.success{border-left:4px solid var(--pos);background:#E9F5EF;color:#1a4a2e;}
+.callout strong{font-weight:700;}
+.tbl{width:100%;border-collapse:collapse;background:var(--white);border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin-bottom:18px;box-shadow:0 1px 5px rgba(35,57,74,.06);}
+.tbl thead th{background:var(--red);color:rgba(255,255,255,.9);padding:9px 14px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-align:left;border-right:1px solid rgba(255,255,255,.1);}
+.tbl thead th:last-child{border-right:none;}
+.tbl tbody td{padding:9px 14px;border-bottom:1px solid var(--rule);font-size:11px;color:var(--navy);vertical-align:top;}
+.tbl tbody tr:last-child td{border-bottom:none;}
+.tbl tbody tr:nth-child(even) td{background:#F8FAFB;}
+.tbl .subhead td{background:#EDF1F5;font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#3a5068;}
+.tbl-bullets{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:5px;}
+.tbl-bullets li{font-size:11px;color:var(--navy);line-height:1.5;padding-left:12px;position:relative;}
+.tbl-bullets li::before{content:"";position:absolute;left:1px;top:6px;width:5px;height:5px;border-radius:50%;background:var(--lgrey);}
+.tbl-bullets-pain li::before{background:var(--red);opacity:.7;}
+.tbl-bullets-opp li{color:#1a5c38;}
+.tbl-bullets-opp li::before{background:var(--pos);}
+.metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px;}
+.metric-tile{background:var(--white);border:1px solid var(--rule);border-radius:6px;padding:14px 16px;border-top:3px solid var(--navy);}
+.metric-tile.c2{border-top-color:var(--c2);}
+.metric-tile.cr{border-top-color:var(--red);}
+.metric-tile.cg{border-top-color:var(--pos);}
+.metric-tile.ca{border-top-color:var(--amber);}
+.metric-val{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-.5px;line-height:1;margin-bottom:4px;}
+.metric-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--lgrey);}
+.index-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:24px;}
+.index-card{background:var(--white);border:1px solid var(--rule);border-radius:10px;padding:20px 22px;display:flex;gap:16px;align-items:flex-start;box-shadow:0 1px 5px rgba(35,57,74,.06);cursor:pointer;transition:box-shadow .15s;}
+.index-card:hover{box-shadow:0 3px 12px rgba(35,57,74,.12);}
+.index-num{width:36px;height:36px;border-radius:50%;background:var(--red);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.index-body h3{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px;}
+.index-body p{font-size:11px;color:var(--grey);line-height:1.6;}
+.gloss-item{display:flex;gap:20px;padding:10px 0;border-bottom:1px solid var(--rule);align-items:flex-start;}
+.gloss-item:last-child{border-bottom:none;}
+.gloss-term{font-size:12px;font-weight:700;color:var(--navy);width:190px;min-width:190px;flex-shrink:0;}
+.gloss-def{font-size:11px;color:var(--grey);line-height:1.6;flex:1;}
+.submit-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--rule);}
+.submit-item:last-child{border-bottom:none;}
+.submit-num{width:28px;height:28px;border-radius:50%;background:var(--red);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.submit-body h4{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:3px;}
+.submit-body p{font-size:11px;color:var(--grey);line-height:1.6;}
+.foot{border-top:1px solid var(--rule);padding-top:14px;display:flex;justify-content:space-between;font-size:10px;color:var(--lgrey);margin-top:36px;}
+.pri-high{display:inline-block;padding:2px 9px;border-radius:99px;font-size:10px;font-weight:700;background:#FDECEA;color:#8a000a;border:1px solid #C60C3044;}
+.pri-med{display:inline-block;padding:2px 9px;border-radius:99px;font-size:10px;font-weight:700;background:#EBF4FB;color:#1a4f72;border:1px solid #0088CE44;}
+.pri-low{display:inline-block;padding:2px 9px;border-radius:99px;font-size:10px;font-weight:700;background:#E6F4EC;color:#1a5c38;border:1px solid #2A8F6044;}
+/* LIFECYCLE DIAGRAM */
+.lc-wrap{overflow-x:auto;padding-bottom:16px;}
+.lc-inner{min-width:960px;}
+.lc-phase-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;margin-bottom:6px;border-radius:8px;overflow:hidden;}
+.lc-phase{padding:11px 14px;font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;text-align:center;color:#fff;}
+.lc-phase.p1{background:#C60C30;}
+.lc-phase.p2{background:#0088CE;}
+.lc-phase.p3{background:#23394A;}
+.lc-phase.p4{background:#2A8F60;}
+.lc-phase.p5{background:#6B6F70;}
+.lc-body{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;}
+.lc-col{display:flex;flex-direction:column;gap:6px;}
+.lc-proc{background:var(--white);border:1px solid var(--rule);border-radius:6px;padding:10px 12px;}
+.lc-proc-name{font-size:10px;font-weight:700;color:var(--navy);line-height:1.4;margin-bottom:4px;}
+.lc-proc-id{font-size:9px;color:var(--lgrey);margin-bottom:4px;}
+.lc-proc.p1{border-top:3px solid #C60C30;}
+.lc-proc.p2{border-top:3px solid #0088CE;}
+.lc-proc.p3{border-top:3px solid #23394A;}
+.lc-proc.p4{border-top:3px solid #2A8F60;}
+.lc-proc.p5{border-top:3px solid #6B6F70;}
+.lc-badge{font-size:8px;font-weight:700;padding:2px 6px;border-radius:99px;display:inline-block;}
+.lc-react{background:#FEF9EE;color:#7a4800;border:1px solid #FF9E1B50;}
+.lc-sched{background:#EBF4FB;color:#1a4f72;border:1px solid #0088CE50;}
+.lc-ongo{background:#E6F4EC;color:#1a5c38;border:1px solid #2A8F6050;}
+.lc-triggers{background:var(--white);border:1px solid var(--rule);border-radius:8px;padding:14px 18px;}
+.lc-trig-title{font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--lgrey);margin-bottom:10px;}
+.lc-trig-row{display:flex;align-items:flex-start;gap:8px;font-size:10px;padding:5px 0;border-bottom:1px solid var(--rule);}
+.lc-trig-row:last-child{border-bottom:none;}
+.lc-trig-from{font-weight:700;color:var(--navy);min-width:180px;flex-shrink:0;}
+.lc-trig-arrow{color:var(--lgrey);flex-shrink:0;}
+.lc-trig-to{color:var(--navy);}
+.lc-trig-cond{color:var(--grey);font-style:italic;font-size:9px;}
+/* SYSTEMS */
+.sys-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;}
+.sys-card{background:var(--white);border:1px solid var(--rule);border-radius:8px;padding:16px 18px;}
+.sys-name{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:2px;}
+.sys-role{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--lgrey);margin-bottom:6px;}
+.sys-desc{font-size:11px;color:var(--grey);line-height:1.6;}
+.sys-tag-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
+.sys-tag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;}
+.st-core{background:#EDF1F5;color:var(--navy);}
+.st-gap{background:#FDECEA;color:#8a000a;}
+.st-target{background:#E6F4EC;color:#1a5c38;}
+/* INITIATIVE CARDS */
+.init-card{background:var(--white);border:1px solid var(--rule);border-radius:8px;margin-bottom:14px;overflow:hidden;}
+.init-header{display:grid;grid-template-columns:44px 1fr;gap:0;}
+.init-num-col{background:var(--navy);display:flex;align-items:center;justify-content:center;padding:18px 0;}
+.init-num-circle{width:28px;height:28px;border-radius:50%;background:var(--red);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.init-body{padding:16px 20px;}
+.init-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:3px;}
+.init-sub{font-size:11px;color:var(--grey);margin-bottom:12px;}
+.init-cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.init-col-head{font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px;}
+.init-col-head.cur{color:var(--c2);}
+.init-col-head.chal{color:var(--red);}
+.init-col-head.tgt{color:var(--pos);}
+.init-tag{font-size:10px;font-weight:700;padding:2px 8px;background:#C60C3022;color:#C60C30;border-radius:3px;border:1px solid #C60C3044;display:inline-block;margin-right:6px;margin-bottom:3px;}
+.init-tag.blue{background:#0088CE22;color:var(--c2);border-color:#0088CE44;}
+.init-tag.green{background:#2A8F6022;color:var(--pos);border-color:#2A8F6044;}
+.init-tag.amber{background:#FF9E1B22;color:#7a4800;border-color:#FF9E1B44;}
+/* SUB-INITIATIVE */
+.sub-init{background:#F8FAFB;border:1px solid var(--rule);border-radius:6px;padding:12px 16px;margin-bottom:10px;}
+.sub-init-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.sub-num{width:22px;height:22px;border-radius:50%;background:var(--c2);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sub-title{font-size:12px;font-weight:700;color:var(--navy);}
+.sub-cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+/* IMPACT TABLE */
+.impact-table{width:100%;border-collapse:collapse;margin-bottom:22px;}
+.impact-table th{background:var(--navy);color:#fff;padding:10px 14px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-align:center;border-right:1px solid rgba(255,255,255,.1);}
+.impact-table th:first-child{text-align:left;}
+.impact-table td{padding:11px 14px;border-bottom:1px solid var(--rule);font-size:11px;text-align:center;vertical-align:middle;}
+.impact-table td:first-child{text-align:left;font-weight:600;}
+.impact-table tr:last-child td{border-bottom:none;}
+.impact-table tr:nth-child(even) td{background:#F8FAFB;}
+.impact-table .total-row td{background:#EDF1F5;font-weight:700;font-size:12px;}
+.badge-now{display:inline-block;padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;background:#FEF3E2;color:#7a4800;}
+.badge-tgt{display:inline-block;padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;background:#E6F4EC;color:#1a5c38;}
+.badge-sav{display:inline-block;padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;background:#EBF4FB;color:#1a4f72;}
+.arrow-up{color:var(--pos);font-size:16px;font-weight:800;}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="logo-area">
+    <img src="data:image/png;base64,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" alt="G&A Partners" style="height:48px;display:block;">
+  </div>
+  <div class="hdr-right">
+    <span class="hdr-badge">Confidential · Partners Only</span>
+  </div>
+</div>
+
+<!-- TAB NAV -->
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="showTab('index')">01 · Overview</button>
+  <button class="tab-btn" onclick="showTab('context')">02 · Business Context</button>
+  <button class="tab-btn" onclick="showTab('flow')">03 · Process Map</button>
+  <button class="tab-btn" onclick="showTab('deepdive')">04 · Initiative Deep Dive</button>
+  <button class="tab-btn" onclick="showTab('impact')">05 · Business Impact</button>
+  <button class="tab-btn" onclick="showTab('systems')">06 · Systems &amp; Technical</button>
+  <button class="tab-btn" onclick="showTab('glossary')">07 · Glossary</button>
+  <button class="tab-btn" onclick="showTab('submission')">08 · Submission</button>
+</div>
+
+
+<!-- ══ TAB 1: OVERVIEW ══ -->
+<div id="tab-index" class="tab-panel active">
+<div class="page">
+  <div class="pg-eye">Partner Evaluation Package · June 2026</div>
+  <div class="pg-h1">AI-Enabled Client Success<br>Product Requirements Document</div>
+  <div class="pg-sub">G&amp;A Partners is evaluating strategic AI development and implementation partners to design and build an AI-enabled operations workflow for its Client Success division. This document provides everything a partner needs to understand the opportunity, current state, and what a winning response looks like. Navigate using the tabs above.</div>
+
+  <div class="section-title">What's Inside</div>
+  <div class="index-grid">
+    <div class="index-card" onclick="showTab('index')">
+      <div class="index-num">01</div>
+      <div class="index-body"><h3>Overview</h3><p>Key contents, scope, timeline for the partner evaluation, and the point of contact for all questions and submissions.</p></div>
+    </div>
+    <div class="index-card" onclick="showTab('context')">
+      <div class="index-num">02</div>
+      <div class="index-body"><h3>Business Context</h3><p>What the Client Success division does, its operational processes, team structure, P&amp;L position, and the margin improvement mandate. Read this first.</p></div>
+    </div>
+    <div class="index-card" onclick="showTab('flow')">
+      <div class="index-num">03</div>
+      <div class="index-body"><h3>Process Map</h3><p>A swimlane diagram mapping all Client Success processes across various roles and lifecycle phases.</p></div>
+    </div>
+    <div class="index-card" onclick="showTab('deepdive')">
+      <div class="index-num">04</div>
+      <div class="index-body"><h3>Initiative Deep Dive</h3><p>Initiative-level breakdowns covering current state, pain points, and what an AI and automation solution must deliver. This is where partners should spend most of their time.</p></div>
+    </div>
+    <div class="index-card" onclick="showTab('impact')">
+      <div class="index-num">05</div>
+      <div class="index-body"><h3>Business Impact</h3><p>Client Success operational and activity baseline, annual attrition metrics, and automation / AI-enablement goals to improve current pain points across various processes.</p></div>
+    </div>
+    <div class="index-card" onclick="showTab('systems')">
+      <div class="index-num">06</div>
+      <div class="index-body"><h3>Systems &amp; Technical</h3><p>Full inventory of systems in scope, integration gaps, broken integrations, and API considerations. For the partner's technical team.</p></div>
+    </div>
+    <div class="index-card" onclick="showTab('glossary')">
+      <div class="index-num">07</div>
+      <div class="index-body"><h3>Glossary</h3><p>Definitions of Client Success terminology, G&amp;A-specific acronyms, tier definitions, and system names used throughout this document.</p></div>
+    </div>
+    <div class="index-card" onclick="showTab('submission')">
+      <div class="index-num">08</div>
+      <div class="index-body"><h3>Submission Guide</h3><p>What we need from partners, how we will evaluate responses, and what a winning submission looks like.</p></div>
+    </div>
+  </div>
+
+  <div class="section-title">Scope &amp; Timeline</div>
+  <table class="tbl" style="margin-bottom:22px;">
+    <thead><tr><th>Milestone</th><th>Date</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><strong>PRD Shared</strong></td><td>June 15, 2026</td><td>This document distributed to select partners</td></tr>
+      <tr><td><strong>Partner Response Deadline</strong></td><td>June 25, 2026</td><td>Approach, architecture, cost, demo/POC, and relevant experience required</td></tr>
+      <tr><td><strong>Partner Presentations</strong></td><td>TBD</td><td>Live Q&amp;A and demo walk-through with G&amp;A leadership</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">Point of Contact</div>
+  <div class="card">
+    <div class="card-title">Engagement Lead</div>
+    <div class="card-sub">All questions and submissions should be directed to:<br><br><strong>Tilak Sagireddy</strong><br>tsagireddy@alixpartners.com</div>
+  </div>
+
+  <div class="foot">
+    <span>G&amp;A Partners · AI Client Success Operations PRD · Confidential</span>
+    <span>Preliminary — Subject to Change · TBD</span>
+  </div>
+</div>
+</div>
+
+
+<!-- ══ TAB 2: BUSINESS CONTEXT ══ -->
+<div id="tab-context" class="tab-panel">
+<div class="page">
+  <div class="pg-eye">Business Context</div>
+  <div class="pg-h1">G&A Partners Client Success — Business Overview</div>
+  <div class="pg-sub">A concise summary of the Client Success division's business, operating model, team structure, account tier framework, and performance context. Read this before reviewing the process and technical sections.</div>
+
+  <div class="section-title">What the Client Success Division Does</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:4px;">
+    <div class="card">
+      <div class="card-title">The Business</div>
+      <div class="card-sub">G&amp;A Partners Client Success group manages the post-sale client relationship across G&amp;A's PEO and ASO book of business. The division is responsible for client retention, satisfaction, upsell/cross-sell, escalation resolution, and broker relationship management. Revenue is indirectly driven by this team — every client that renews, expands, or refers another client does so because of the relationship quality delivered by Client Success. The team manages approximately 4,900 total parent accounts across two service tiers.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Operational Processes</div>
+      <div class="card-sub">
+        <strong>Client Onboarding</strong> — CSM assignment of new accounts from implementation handoff.<br><br>
+        <strong>Client Relationship</strong> — Proactive outreach (Silver/Bronze) and lifecycle management (Platinum/Gold).<br><br>
+        <strong>Account Management</strong> — Daily/weekly case oversight and aging case management across all clients.<br><br>
+        <strong>Inbound Call Handling</strong> — Live call triage, case creation, and routing for inbound client calls.<br><br>
+        <strong>Escalation Management</strong> — Investigation and resolution of escalated client issues.<br><br>
+        <strong>Value-Add / Upsell</strong> — Identifying and closing service expansion opportunities.<br><br>
+        <strong>Broker Relationship Management</strong> — Managing broker-referred client relationships and satisfaction.<br><br>
+        <strong>Client Surveys &amp; NPS</strong> — NPS survey case management, root cause investigation, and reporting.
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Client Success Business at a Glance</div>
+  <div class="metric-row">
+    <div class="metric-tile c2"><div class="metric-val">4,900</div><div class="metric-lbl">Total Accounts Managed</div></div>
+    <div class="metric-tile cg"><div class="metric-val">65</div><div class="metric-lbl">Total Onshore FTEs</div></div>
+    <div class="metric-tile ca"><div class="metric-val">$8.4M</div><div class="metric-lbl">Total Onshore FLC</div></div>
+    <div class="metric-tile cr"><div class="metric-val">18</div><div class="metric-lbl">Offshore FTEs</div></div>
+  </div>
+
+  <div class="section-title">Account Tier Framework</div>
+  <table class="tbl" style="margin-bottom:22px;">
+    <thead><tr><th>Tier</th><th>Accounts</th><th>FTEs Serving</th><th>Coverage Ratio</th><th>Avg. Time / Account / Month</th><th>Service Model</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Platinum / Gold</strong></td><td>~1,700</td><td>34 (CSMs + Mgrs)</td><td>50 accts/FTE</td><td>192 min</td><td>Dedicated CSM; monthly QBRs, full lifecycle mgmt.</td></tr>
+      <tr><td><strong>Silver / Bronze</strong></td><td>~3,200</td><td>16 (Advocates + Mgrs)</td><td>200 accts/FTE</td><td>48 min</td><td>Pooled advocates; proactive outreach 5x/week per advocate</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">Current Team Structure</div>
+  <div style="background:var(--navy);border-radius:8px;padding:10px 18px;margin-bottom:4px;">
+    <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:10px;">CLIENT SUPPORT TEAM — 65 ONSHORE FTEs</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0;">
+      <div style="border-right:1px solid rgba(255,255,255,.1);padding:8px 14px 8px 0;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px;">CSMs + Managers</div>
+        <div style="font-size:28px;font-weight:800;color:#fff;line-height:1;">34</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:4px;">Platinum / Gold</div>
+      </div>
+      <div style="border-right:1px solid rgba(255,255,255,.1);padding:8px 14px;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px;">Client Advocates + Managers</div>
+        <div style="font-size:28px;font-weight:800;color:#fff;line-height:1;">16</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:4px;">Silver / Bronze</div>
+      </div>
+      <div style="border-right:1px solid rgba(255,255,255,.1);padding:8px 14px;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px;">Inbound CSM Team</div>
+        <div style="font-size:28px;font-weight:800;color:#fff;line-height:1;">4</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:4px;">Client inbound calls</div>
+      </div>
+      <div style="border-right:1px solid rgba(255,255,255,.1);padding:8px 14px;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px;">HR Support Spec.</div>
+        <div style="font-size:28px;font-weight:800;color:#fff;line-height:1;">6</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:4px;">WSE inbound calls</div>
+      </div>
+      <div style="padding:8px 14px;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px;">Other</div>
+        <div style="font-size:28px;font-weight:800;color:#fff;line-height:1;">5</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:4px;">Mgmt. &amp; specialist roles</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px;margin-bottom:22px;">
+    <div class="card">
+      <div class="card-title" style="font-size:12px;">Client Success Managers (CSMs)</div>
+      <div class="card-sub">Own the full lifecycle for Platinum/Gold accounts: onboarding handoff, monthly touchpoints, case oversight, escalation management, renewal, and upsell conversations.</div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="font-size:12px;">Client Advocates</div>
+      <div class="card-sub">Manage proactive outreach for Silver/Bronze accounts. Each outreach involves client scoring, CRM case creation, email drafting, Teams notification, and follow-up — all done manually across multiple disconnected systems.</div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="font-size:12px;">Inbound CSM Team</div>
+      <div class="card-sub">Handle inbound calls from clients, performing initial triage, case creation, and routing. Serve as the first point of contact for clients who call in rather than reaching out to their dedicated CSM.</div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="font-size:12px;">HR Support Specialists</div>
+      <div class="card-sub">Handle inbound calls and chats from Worksite Employees (WSEs) on platform navigation, payroll, benefits, and HR questions. A significant portion of call types are routine and repeatable.</div>
+    </div>
+  </div>
+
+  <div class="section-title">What We Are Looking For</div>
+
+  <!-- Bucket 1: Cost Efficiency -->
+  <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--lgrey);padding:4px 0 10px;border-bottom:2px solid var(--rule);margin-bottom:14px;">1 · Cost Efficiency — Coverage Ratio &amp; Operational Improvement</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;">
+    <div class="card accent-red">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <div class="card-title" style="margin-bottom:0;">A · Unified Client 360 Dashboard</div>
+        <span style="font-size:9px;font-weight:700;padding:2px 8px;background:#C60C30;color:#fff;border-radius:3px;white-space:nowrap;margin-left:4px;">PRD Priority</span>
+      </div>
+      <div class="card-sub">A single ClientSpace screen aggregating services, case history, NPS trends, open escalations, and AI-computed health score eliminates the need to navigate five systems before every touchpoint meeting and enables proactive client health monitoring at scale.</div>
+    </div>
+    <div class="card accent-amber">
+      <div class="card-title">B · Automated Escalation Routing with SLA Enforcement</div>
+      <div class="card-sub">When a case is escalated, the system auto-notifies the case owner, starts a response timer, and escalates through the management chain if unacknowledged — eliminating the manual follow-up cycle identified as the single largest time waste across Client Success.</div>
+    </div>
+    <div class="card accent-green">
+      <div class="card-title">C · AI Assisted Case Updates &amp; Aged Case Alerts</div>
+      <div class="card-sub">AI-generated case notes after every client interaction replace manual documentation — ensuring every case has a clear current status and explicit next action. Automated alerts proactively surface cases open beyond SLA thresholds before they stall, eliminating the manual daily scan.</div>
+    </div>
+    <div class="card" style="background:#F5F7F9;border-color:var(--rule);border-left:4px solid var(--lgrey);border-radius:0 8px 8px 0;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+        <div class="card-title" style="color:var(--grey);">D · AI Customer Experience — Inbound &amp; Silver/Bronze</div>
+        <span style="font-size:9px;font-weight:700;padding:2px 7px;background:#EDF1F5;color:var(--lgrey);border-radius:3px;border:1px solid var(--rule);white-space:nowrap;">Outside PRD Scope</span>
+      </div>
+      <div class="card-sub" style="color:var(--lgrey);">Auto case creation on call pickup, AI-generated call summaries, and an AI search layer over WorkSight reduce handle time and documentation burden for the inbound and Silver/Bronze channels — where high account volume makes every minute of manual overhead disproportionately costly.</div>
+    </div>
+  </div>
+
+  <!-- Bucket 2: Customer Retention -->
+  <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--lgrey);padding:4px 0 10px;border-bottom:2px solid var(--rule);margin-bottom:14px;">2 · Customer Retention &amp; Gross Margin Protection</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px;">
+    <div class="card" style="border-left:4px solid #7B4FD6;border-radius:0 8px 8px 0;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <div class="card-title" style="margin-bottom:0;">E · AI Churn Propensity Model</div>
+        <span style="font-size:9px;font-weight:700;padding:2px 8px;background:#C60C30;color:#fff;border-radius:3px;white-space:nowrap;margin-left:4px;">PRD Priority</span>
+      </div>
+      <div class="card-sub">A machine-learning model that aggregates client data (e.g. NPS scores, case volume and aging, escalation history, onboarding recency, and service utilization) signals to generate a continuous churn risk score for each account — proactively surfacing at-risk accounts to CSMs/Client Advocates before churn occurs and enabling earlier, targeted intervention to protect gross revenue retention.</div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>G&amp;A Partners · AI Client Success Operations PRD · Confidential</span>
+    <span>Preliminary — Subject to Change · TBD</span>
+  </div>
+</div>
+</div>
+
+
+<!-- ══ TAB 3: PROCESS MAP ══ -->
+<div id="tab-flow" class="tab-panel">
+<div class="page" style="max-width:100%;padding:28px 32px 60px;">
+  <div class="pg-eye">Process Map · Current State Swimlane</div>
+  <div class="pg-h1">Client Success — Customer Journey Map</div>
+  <div class="pg-sub">Four roles across four lifecycle phases. Column colors indicate the lifecycle phase; row labels identify the team responsible.</div>
+
+  <div style="overflow-x:auto;padding-bottom:16px;">
+  <div style="min-width:1040px;border:1px solid var(--rule);border-radius:8px;overflow:hidden;box-shadow:0 1px 5px rgba(35,57,74,.06);">
+
+  <!-- PHASE HEADER -->
+  <div style="display:grid;grid-template-columns:122px 130px 230px 360px 220px;gap:0;">
+    <div style="background:var(--white);padding:11px 8px;font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--navy);display:flex;align-items:center;justify-content:center;text-align:center;border-right:1px solid var(--rule);">Role</div>
+    <div style="background:#C60C30;padding:11px 10px;font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#fff;text-align:center;border-right:1px solid rgba(255,255,255,.15);">Client<br>Onboarding</div>
+    <div style="background:#1a3649;padding:11px 10px;font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#fff;text-align:center;border-right:1px solid rgba(255,255,255,.15);">Relationship Management</div>
+    <div style="background:#006fa6;padding:11px 10px;font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#fff;text-align:center;border-right:1px solid rgba(255,255,255,.15);">Service &amp; Support</div>
+    <div style="background:#1a6b40;padding:11px 10px;font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#fff;text-align:center;">Retention &amp; Growth<div style="margin-top:6px;"><span style="font-size:8px;font-weight:700;padding:2px 7px;background:rgba(123,79,214,0.35);color:#fff;border-radius:3px;border:1px solid rgba(255,255,255,0.3);letter-spacing:0;text-transform:none;display:inline-block;">E · AI Churn Model</span></div></div>
+  </div>
+
+  <!-- ROW 1: CSM -->
+  <div style="display:grid;grid-template-columns:122px 130px 230px 360px 220px;gap:0;border-bottom:1px solid var(--rule);background:var(--white);">
+    <div style="background:#2a3f52;padding:14px 8px;font-size:10px;font-weight:800;letter-spacing:.3px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1.4;border-right:1px solid rgba(255,255,255,.08);">
+      <span>CSM</span>
+      <div style="width:28px;height:1px;background:rgba(255,255,255,.2);margin:5px auto;"></div>
+      <span style="font-size:8px;font-weight:500;opacity:.65;letter-spacing:.2px;">Platinum / Gold</span>
+    </div>
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:180px;background:var(--white);display:flex;flex-direction:column;gap:7px;"><div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #C60C30;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Sales Handoff &amp; Kick-off</div><div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #C60C30;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">CSM Assignment &amp; Introduction</div></div>
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:180px;background:var(--white);display:flex;flex-direction:column;gap:7px;"><div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #1a3649;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Establish Meeting Cadence<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#2A8F6018;color:#1a6b3c;border:1px solid #2A8F6030;display:inline-block;">Opp A</span></div></div><div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #1a3649;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Recurring Touchpoints &amp; QBRs<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#2A8F6018;color:#1a6b3c;border:1px solid #2A8F6030;display:inline-block;">Opp A</span></div></div><div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #1a3649;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Client Action Plan Maintenance<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#2A8F6018;color:#1a6b3c;border:1px solid #2A8F6030;display:inline-block;">Opp A</span></div></div></div>
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:180px;display:flex;gap:8px;">
+      <div style="flex:1;display:flex;flex-direction:column;gap:7px;">
+        <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #006fa6;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Daily Case Review &amp; Oversight<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#C60C3018;color:#C60C30;border:1px solid #C60C3030;display:inline-block;">Opp C</span></div></div>
+        <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #006fa6;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Case Investigation &amp; Resolution<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#C60C3018;color:#C60C30;border:1px solid #C60C3030;display:inline-block;">Opp C</span></div></div>
+        <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #006fa6;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Weekly Delegated Case Audit<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#C60C3018;color:#C60C30;border:1px solid #C60C3030;display:inline-block;">Opp C</span></div></div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:7px;">
+        <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #006fa6;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Manage Escalations<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#FF9E1B18;color:#8a4e00;border:1px solid #FF9E1B30;display:inline-block;">Opp B</span></div></div>
+        <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #006fa6;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Root Cause Classification<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#FF9E1B18;color:#8a4e00;border:1px solid #FF9E1B30;display:inline-block;">Opp B</span></div></div>
+        <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #006fa6;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Aging Case Follow-up<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#C60C3018;color:#C60C30;border:1px solid #C60C3030;display:inline-block;">Opp C</span></div></div>
+      </div>
+    </div>
+    <div style="padding:10px 8px;min-height:180px;display:flex;flex-direction:column;gap:7px;">
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #1a6b40;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Broker Relationship Mgmt.<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#2A8F6018;color:#1a6b3c;border:1px solid #2A8F6030;display:inline-block;">Opp A</span></div></div>
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #1a6b40;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Process NPS Survey Cases<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#2A8F6018;color:#1a6b3c;border:1px solid #2A8F6030;display:inline-block;">Opp A</span></div></div>
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #1a6b40;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Value-Add / Upsell Conversations<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#2A8F6018;color:#1a6b3c;border:1px solid #2A8F6030;display:inline-block;">Opp A</span></div></div>
+      <div style="display:flex;align-items:center;gap:7px;margin-top:2px;">
+        <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #1a6b40;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);flex:1;margin:0;">Client Exit Coordination<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#2A8F6018;color:#1a6b3c;border:1px solid #2A8F6030;display:inline-block;">Opp A</span></div></div>
+        <div style="background:#C60C30;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:7px;font-weight:800;text-align:center;line-height:1.2;flex-shrink:0;">EXIT<br>RISK</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 2: Client Advocate -->
+  <div style="display:grid;grid-template-columns:122px 130px 230px 360px 220px;gap:0;border-bottom:1px solid var(--rule);background:#FAFBFC;">
+    <div style="background:#23394A;padding:14px 8px;font-size:10px;font-weight:800;letter-spacing:.3px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1.4;border-right:1px solid rgba(255,255,255,.08);">
+      <span>Client Advocate</span>
+      <div style="width:28px;height:1px;background:rgba(255,255,255,.2);margin:5px auto;"></div>
+      <span style="font-size:8px;font-weight:500;opacity:.65;letter-spacing:.2px;">Silver / Bronze</span>
+    </div>
+    <div style="border-right:1px solid var(--rule);min-height:145px;background:#FAFBFC;"></div>
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:145px;background:#FAFBFC;display:flex;flex-direction:column;gap:7px;"><div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #1a3649;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Client Scoring &amp; Prioritisation<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#2A8F6018;color:#1a6b3c;border:1px solid #2A8F6030;display:inline-block;">Opp A</span></div></div><div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #1a3649;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Outreach Email &amp; Case Creation<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#2A8F6018;color:#1a6b3c;border:1px solid #2A8F6030;display:inline-block;">Opp A</span></div></div><div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #1a3649;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Internal Team Notification</div></div>
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:145px;background:#FAFBFC;display:flex;gap:8px;">
+      <div style="flex:1;display:flex;flex-direction:column;gap:7px;">
+        <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #006fa6;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Case Triage &amp; Routing<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#FF9E1B18;color:#8a4e00;border:1px solid #FF9E1B30;display:inline-block;">Opp B</span></div></div>
+        <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #006fa6;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Account Case Oversight<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#C60C3018;color:#C60C30;border:1px solid #C60C3030;display:inline-block;">Opp C</span></div></div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:7px;">
+        <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #006fa6;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Escalation Follow-up<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#FF9E1B18;color:#8a4e00;border:1px solid #FF9E1B30;display:inline-block;">Opp B</span></div></div>
+        <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #006fa6;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Outreach Follow-up &amp; Closure<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#C60C3018;color:#C60C30;border:1px solid #C60C3030;display:inline-block;">Opp C</span></div></div>
+      </div>
+    </div>
+    <div style="padding:10px 8px;min-height:145px;background:#FAFBFC;display:flex;flex-direction:column;gap:7px;"><div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #1a6b40;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">NPS Case Handling<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#2A8F6018;color:#1a6b3c;border:1px solid #2A8F6030;display:inline-block;">Opp A</span></div></div></div>
+  </div>
+
+  <!-- ROW 3: Inbound CSM Client Adv. -->
+  <div style="display:grid;grid-template-columns:122px 130px 230px 360px 220px;gap:0;border-bottom:1px solid var(--rule);background:var(--white);">
+    <div style="background:#1e3344;padding:14px 8px;font-size:10px;font-weight:800;letter-spacing:.3px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1.4;border-right:1px solid rgba(255,255,255,.08);">
+      <span>Inbound CSM<br>Client Adv.</span>
+      <div style="width:28px;height:1px;background:rgba(255,255,255,.2);margin:5px auto;"></div>
+      <span style="font-size:8px;font-weight:500;opacity:.65;letter-spacing:.2px;">Client Contact Center</span>
+    </div>
+    <div style="border-right:1px solid var(--rule);min-height:150px;background:var(--white);"></div>
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:150px;background:var(--white);display:flex;flex-direction:column;gap:7px;"><div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #1a3649;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Caller Authentication &amp; Verification<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#EDF1F5;color:#A8ACAE;border:1px solid #D0D5D9;display:inline-block;">Opp D</span></div></div><div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #1a3649;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Handle Inbound Client Call<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#EDF1F5;color:#A8ACAE;border:1px solid #D0D5D9;display:inline-block;">Opp D</span></div></div></div>
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:150px;display:flex;align-items:center;justify-content:center;">
+      <div style="display:flex;align-items:center;gap:10px;width:100%;">
+        <div style="width:64px;height:64px;background:#FEF3CD;border:2px solid #DAA520;transform:rotate(45deg);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <div style="transform:rotate(-45deg);font-size:8px;font-weight:700;color:#7a5010;text-align:center;line-height:1.3;width:72px;">Resolved<br>on first<br>call?</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;flex:1;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:9px;font-weight:800;color:#1a6b40;white-space:nowrap;">YES →</span>
+            <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #1a6b40;border-radius:5px;padding:6px 9px;font-size:10px;font-weight:600;color:var(--navy);flex:1;">Coordinate Follow-up Survey<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#EDF1F5;color:#A8ACAE;border:1px solid #D0D5D9;display:inline-block;">Opp D</span></div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:9px;font-weight:800;color:#C60C30;white-space:nowrap;">NO →</span>
+            <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #C60C30;border-radius:5px;padding:6px 9px;font-size:10px;font-weight:600;color:var(--navy);flex:1;">Triage to Specialist Dept.<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#EDF1F5;color:#A8ACAE;border:1px solid #D0D5D9;display:inline-block;">Opp D</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="min-height:150px;background:var(--white);"></div>
+  </div>
+
+  <!-- ROW 4: HR Support Specialist -->
+  <div style="display:grid;grid-template-columns:122px 130px 230px 360px 220px;gap:0;background:#FAFBFC;">
+    <div style="background:#182c3a;padding:14px 8px;font-size:10px;font-weight:800;letter-spacing:.3px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1.4;border-right:1px solid rgba(255,255,255,.08);">
+      <span>HR Support<br>Specialist</span>
+      <div style="width:28px;height:1px;background:rgba(255,255,255,.2);margin:5px auto;"></div>
+      <span style="font-size:8px;font-weight:500;opacity:.65;letter-spacing:.2px;">WSE Call Center</span>
+    </div>
+    <div style="border-right:1px solid var(--rule);min-height:125px;background:#FAFBFC;"></div>
+    <div style="border-right:1px solid var(--rule);min-height:125px;background:#FAFBFC;"></div>
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:125px;background:#FAFBFC;display:grid;grid-template-columns:1fr 1fr;gap:7px;align-content:start;">
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #006fa6;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Resolve Inbound WSE Calls<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#EDF1F5;color:#A8ACAE;border:1px solid #D0D5D9;display:inline-block;">Opp D</span></div></div>
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #006fa6;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Resolve Inbound Chats<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#EDF1F5;color:#A8ACAE;border:1px solid #D0D5D9;display:inline-block;">Opp D</span></div></div>
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #006fa6;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Manage Queue (email)<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#EDF1F5;color:#A8ACAE;border:1px solid #D0D5D9;display:inline-block;">Opp D</span></div></div>
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #006fa6;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Resolve Queue<div style="margin-top:4px;"><span style="font-size:8px;font-weight:800;padding:1px 6px;border-radius:2px;background:#EDF1F5;color:#A8ACAE;border:1px solid #D0D5D9;display:inline-block;">Opp D</span></div></div>
+    </div>
+    <div style="min-height:125px;background:#FAFBFC;"></div>
+  </div>
+
+  </div><!-- /swimlane -->
+  </div><!-- /overflow -->
+
+  <!-- KEY SYSTEMS STRIP -->
+  <div style="margin-top:16px;display:grid;grid-template-columns:122px 130px 230px 360px 220px;gap:0;background:var(--white);border:1px solid var(--rule);border-radius:8px;overflow:hidden;min-width:1040px;">
+    <div style="background:var(--navy);padding:10px 8px;font-size:8px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;text-align:center;">Key<br>Systems</div>
+    <!-- Onboarding -->
+    <div style="padding:8px;border-right:1px solid var(--rule);display:flex;flex-direction:column;gap:4px;">
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#EDF1F5;color:var(--navy);border:1px solid rgba(35,57,74,.2);display:inline-block;">ClientSpace</span>
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#E6F2FC;color:#005a8e;border:1px solid #0088CE40;display:inline-block;">Outlook</span>
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#E6F2FC;color:#005a8e;border:1px solid #0088CE40;display:inline-block;">Teams</span>
+    </div>
+    <!-- Relationship Management -->
+    <div style="padding:8px;border-right:1px solid var(--rule);display:flex;flex-direction:column;gap:4px;">
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#EDF1F5;color:var(--navy);border:1px solid rgba(35,57,74,.2);display:inline-block;">ClientSpacePro</span>
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#E6F2FC;color:#005a8e;border:1px solid #0088CE40;display:inline-block;">Outlook · Teams</span>
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#E6F4EC;color:#1a6b3c;border:1px solid #2A8F6040;display:inline-block;">Excel · SharePoint</span>
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#FEF3E2;color:#8a4e00;border:1px solid #F5A62350;display:inline-block;">WorkSight</span>
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#F0EAF8;color:#4a2fab;border:1px solid #7B4FD640;display:inline-block;">PRISM · TLM · Cornerstone</span>
+    </div>
+    <!-- Service & Support -->
+    <div style="padding:8px;border-right:1px solid var(--rule);display:flex;flex-direction:column;gap:4px;">
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#EDF1F5;color:var(--navy);border:1px solid rgba(35,57,74,.2);display:inline-block;">ClientSpacePro</span>
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#E6F2FC;color:#005a8e;border:1px solid #0088CE40;display:inline-block;">TalkDesk · Teams</span>
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#FEF3E2;color:#8a4e00;border:1px solid #F5A62350;display:inline-block;">Qualtrics · WorkSight</span>
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#E6F2FC;color:#005a8e;border:1px solid #0088CE40;display:inline-block;">Power BI</span>
+    </div>
+    <!-- Retention & Growth -->
+    <div style="padding:8px;display:flex;flex-direction:column;gap:4px;">
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#EDF1F5;color:var(--navy);border:1px solid rgba(35,57,74,.2);display:inline-block;">ClientSpacePro</span>
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#FEF3E2;color:#8a4e00;border:1px solid #F5A62350;display:inline-block;">WorkSight</span>
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#F0EAF8;color:#4a2fab;border:1px solid #7B4FD640;display:inline-block;">PRISM</span>
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#E6F4EC;color:#1a6b3c;border:1px solid #2A8F6040;display:inline-block;">Excel</span>
+    </div>
+  </div>
+
+  <!-- SYSTEM COLOR LEGEND -->
+  <div style="margin-top:10px;display:flex;align-items:center;gap:20px;padding:9px 14px;background:var(--white);border:1px solid var(--rule);border-radius:6px;flex-wrap:wrap;">
+    <span style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--lgrey);">System Legend</span>
+    <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--grey);">
+      <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#EDF1F5;border:1px solid rgba(35,57,74,.25);flex-shrink:0;"></span>Core CRM (ClientSpace)
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--grey);">
+      <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#E6F2FC;border:1px solid #0088CE40;flex-shrink:0;"></span>Communication &amp; Telephony (Outlook · Teams · TalkDesk · Power BI)
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--grey);">
+      <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#E6F4EC;border:1px solid #2A8F6040;flex-shrink:0;"></span>Productivity (Excel · SharePoint)
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--grey);">
+      <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#FEF3E2;border:1px solid #F5A62350;flex-shrink:0;"></span>Client Platforms (WorkSight · Qualtrics)
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--grey);">
+      <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#F0EAF8;border:1px solid #7B4FD640;flex-shrink:0;"></span>Service Data (PRISM · TLM · Cornerstone)
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>G&amp;A Partners · AI Client Success Operations PRD · Confidential</span>
+    <span>Preliminary — Subject to Change · TBD</span>
+  </div>
+</div>
+</div>
+
+<div id="tab-deepdive" class="tab-panel">
+<div class="page">
+  <div class="pg-eye">Initiative Deep Dive</div>
+  <div class="pg-h1">How AI &amp; Automation Can Transform Client Success</div>
+  <div class="pg-sub">Two initiatives across two strategic buckets: cost efficiency (four AI and automation sub-opportunities targeting coverage ratio improvement) and customer retention (an AI churn propensity model targeting $18.2M in controllable revenue at risk). Each initiative maps to documented pain points and a clear target state — this is where winning responses will demonstrate specificity.</div>
+
+  <!-- ─── VALUE STREAM 1: CLIENT SUPPORT EXCELLENCE ─── -->
+  <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--lgrey);padding:4px 0 10px;border-bottom:2px solid var(--rule);margin-bottom:16px;">1 · Cost Efficiency — Coverage Ratio &amp; Operational Improvement</div>
+
+    <!-- INITIATIVE 1 -->
+  <div class="init-card">
+    <div style="padding:18px 20px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+          <div class="init-title">Optimize Coverage Ratio for CSMs and Client Advocates</div>
+          <span class="init-tag blue">AI</span><span class="init-tag">Automation</span>
+        </div>
+        <div class="init-sub">Four AI/automation sub-initiatives targeting the largest time sinks across Client Relationship (19–20%), Escalation Management (25%), Account Management (31%), and Inbound Call Handling — together consuming the majority of all Client Support capacity. Sub-opp A targets cross-system consolidation; B targets escalation routing; C targets AI-assisted documentation; D addresses inbound call handling.</div>
+
+        <!-- SUB-OPP A -->
+        <div class="sub-init" style="margin-top:12px;">
+          <div class="sub-init-header">
+            <div class="sub-num" style="background:var(--red);">A</div>
+            <div class="sub-title">Unified Client 360 Dashboard (Cross-System Consolidation)</div>
+            <span style="font-size:10px;font-weight:700;padding:2px 8px;background:#C60C3022;color:#C60C30;border-radius:3px;border:1px solid #C60C3044;margin-left:auto;">All Tiers · Automation</span>
+            <span style="font-size:9px;font-weight:700;padding:2px 8px;background:#C60C30;color:#fff;border-radius:3px;white-space:nowrap;margin-left:4px;">PRD Priority</span>
+          </div>
+          <div class="sub-cols">
+            <div>
+              <div class="init-col-head cur" style="font-size:8px;">Current State</div>
+              <ul class="tbl-bullets" style="margin-top:4px;">
+                <li>P/G CSMs navigate five systems (ClientSpace, WorkSight, PRISM, TLM, Cornerstone) before every touchpoint — 15–30 min of manual preparation per meeting</li>
+                <li>S/B Advocates manually copy contact lists from ClientSpacePro into Outlook for every outreach email</li>
+                <li>Client health is assessed manually by reviewing cases and reports — no proactive surfacing</li>
+              </ul>
+            </div>
+            <div>
+              <div class="init-col-head chal" style="font-size:8px;">Current Challenges</div>
+              <ul class="tbl-bullets tbl-bullets-pain" style="margin-top:4px;">
+                <li>"Everything is pretty manual between the way that the data flows between them" — Client Relationship (S/B)</li>
+                <li>No single source of truth for services, pricing, and quotes — CSMs cross-reference three systems for every upsell conversation</li>
+                <li>NPS data from Qualtrics dumps into a single text field in ClientSpace — each element extracted manually per case</li>
+              </ul>
+            </div>
+            <div>
+              <div class="init-col-head tgt" style="font-size:8px;">AI / Automation Target</div>
+              <ul class="tbl-bullets tbl-bullets-opp" style="margin-top:4px;">
+                <li>Single ClientSpace screen aggregating: current services (WorkSight, PRISM, TLM, Cornerstone), case history, NPS trend, open escalations, action plan, service team, and AI health score</li>
+                <li>Auto-generated S/B outreach emails drafted from SOP template with contact list pre-populated — advocate reviews and sends</li>
+                <li>Fix Qualtrics→Salesforce→ClientSpace mapping so NPS score, comments, and category populate dedicated fields</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUB-OPP B -->
+        <div class="sub-init">
+          <div class="sub-init-header">
+            <div class="sub-num" style="background:var(--amber);">B</div>
+            <div class="sub-title">Automated Escalation Routing with SLA Enforcement</div>
+            <span style="font-size:10px;font-weight:700;padding:2px 8px;background:#FF9E1B22;color:#7a4800;border-radius:3px;border:1px solid #FF9E1B44;margin-left:auto;">All Tiers · Automation</span>
+          </div>
+          <div class="sub-cols">
+            <div>
+              <div class="init-col-head cur" style="font-size:8px;">Current State</div>
+              <ul class="tbl-bullets" style="margin-top:4px;">
+                <li>Escalated cases require CSMs to manually notify case owners via Teams; non-responses trigger a multi-step manual chase through owner, manager, and department leadership</li>
+                <li>No automated escalation directory exists outside of IT — CSMs manually identify the correct leader in the chain each time</li>
+              </ul>
+            </div>
+            <div>
+              <div class="init-col-head chal" style="font-size:8px;">Current Challenges</div>
+              <ul class="tbl-bullets tbl-bullets-pain" style="margin-top:4px;">
+                <li>"One of the biggest forms of waste is waiting. We wait on other departments far more than we should" — Account Mgmt.</li>
+                <li>IT's dedicated Teams escalation chat works well; payroll, benefits, 401k, and tax lack equivalent channels</li>
+                <li>Platinum priority flags in ClientSpace are routinely ignored by internal departments</li>
+              </ul>
+            </div>
+            <div>
+              <div class="init-col-head tgt" style="font-size:8px;">AI / Automation Target</div>
+              <ul class="tbl-bullets tbl-bullets-opp" style="margin-top:4px;">
+                <li>When tagged as an escalation: system auto-notifies the case owner, starts a response timer, and escalates to manager (24h) then department leadership (48h) — CSM confirmed at each step</li>
+                <li>Replicate IT's Teams escalation chat model for payroll, benefits, 401k, tax, and HR advisory</li>
+                <li>Embed root cause definitions in ClientSpace dropdown, retiring the external Excel reference</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUB-OPP C -->
+        <div class="sub-init">
+          <div class="sub-init-header">
+            <div class="sub-num" style="background:var(--pos);">C</div>
+            <div class="sub-title">AI Assisted Case Updates and Aged Case Alerts</div>
+            <span style="font-size:10px;font-weight:700;padding:2px 8px;background:#2A8F6022;color:var(--pos);border-radius:3px;border:1px solid #2A8F6044;margin-left:auto;">All Tiers · AI</span>
+          </div>
+          <div class="sub-cols">
+            <div>
+              <div class="init-col-head cur" style="font-size:8px;">Current State</div>
+              <ul class="tbl-bullets" style="margin-top:4px;">
+                <li>CSMs review full case note histories twice daily to identify current status and next steps — even when the last entry is stale</li>
+                <li>Documentation after every client call is fully manual — 10–15 min per case from scratch; 15–20 min for escalation entries</li>
+                <li>Aged cases are identified reactively during daily review; no system proactively flags cases sitting idle past acceptable thresholds</li>
+              </ul>
+            </div>
+            <div>
+              <div class="init-col-head chal" style="font-size:8px;">Current Challenges</div>
+              <ul class="tbl-bullets tbl-bullets-pain" style="margin-top:4px;">
+                <li>"The last internal note never gives me clear instruction on what I need to do next" — Account Management interviewee</li>
+                <li>Inconsistent note quality across the team undermines scoring algorithms and outreach effectiveness</li>
+                <li>No automated mechanism flags cases open beyond SLA thresholds — CSMs discover stale cases manually</li>
+              </ul>
+            </div>
+            <div>
+              <div class="init-col-head tgt" style="font-size:8px;">AI / Automation Target</div>
+              <ul class="tbl-bullets tbl-bullets-opp" style="margin-top:4px;">
+                <li>After every client call or Teams meeting, AI generates a structured note: (1) summary, (2) case status, (3) next action and owner — CSM reviews and approves</li>
+                <li>Daily review converts from reading full history to scanning an AI summary</li>
+                <li>Automated alerts surface cases open beyond configurable thresholds (e.g., &gt;2 days for Platinum) directly to the CSM and manager</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUB-OPP D: AI Customer Experience — Inbound & Silver/Bronze -->
+        <div class="sub-init" style="background:#F5F7F9;opacity:0.65;">
+          <div class="sub-init-header">
+            <div class="sub-num" style="background:var(--lgrey);">D</div>
+            <div class="sub-title" style="color:var(--grey);">AI Customer Experience — Inbound &amp; Silver/Bronze</div>
+            <span style="font-size:9px;font-weight:700;padding:2px 7px;background:#EDF1F5;color:var(--lgrey);border-radius:3px;border:1px solid var(--rule);margin-left:auto;">Outside PRD Scope</span>
+          </div>
+          <div class="sub-cols">
+            <div>
+              <div class="init-col-head cur" style="font-size:8px;">Current State</div>
+              <ul class="tbl-bullets" style="margin-top:4px;">
+                <li>Inbound CSM Client Advocates handle high-volume calls with no AI support — caller authentication, case lookup, and case creation are all manual during each call</li>
+                <li>WorkSight's KB search is poor, forcing agents to rely on memory or SharePoint during live calls instead of having answers surfaced in real time</li>
+              </ul>
+            </div>
+            <div>
+              <div class="init-col-head chal" style="font-size:8px;">Current Challenges</div>
+              <ul class="tbl-bullets tbl-bullets-pain" style="margin-top:4px;">
+                <li>TalkDesk-to-ClientSpace auto-population is broken — agents manually search for client identity on every inbound call</li>
+                <li>"The search feature on the knowledge base is not good" — avoidable escalations and longer handle times result</li>
+                <li>High call volume with fully manual case creation is disproportionately costly at 200 accounts per FTE</li>
+              </ul>
+            </div>
+            <div>
+              <div class="init-col-head tgt" style="font-size:8px;">AI / Automation Target</div>
+              <ul class="tbl-bullets tbl-bullets-opp" style="margin-top:4px;">
+                <li>Ciklum rollout: auto case creation on call pickup with client identity and recent history pre-populated from ClientSpace</li>
+                <li>AI-generated call summary posted to ClientSpace within 2 minutes of call end — agents review and approve</li>
+                <li>AI-powered search layer over WorkSight surfaces resolution steps in real time, improving first-call resolution</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout info" style="margin-top:12px;"><strong>Coverage ratio improvement:</strong> Our goal from implementing all opportunities above (A + B + C + D) is to improve the coverage ratios for CSMs and Client Advocates. Today, a CSM supports ~50 Platinum/Gold accounts and ~200 Silver/Bronze accounts on average.</div>
+    </div>
+  </div>
+
+  <!-- ─── VALUE STREAM 2: CUSTOMER RETENTION ─── -->
+  <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--lgrey);padding:4px 0 10px;border-bottom:2px solid var(--rule);margin:28px 0 16px;">2 · Customer Retention &amp; Gross Margin Protection</div>
+
+  <!-- INITIATIVE E -->
+  <div class="init-card">
+    <div style="padding:18px 20px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:#7B4FD6;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;">E</div>
+        <div class="init-title">AI Churn Propensity Model</div>
+        <span class="init-tag" style="background:#7B4FD622;color:#5a35b0;border:1px solid #7B4FD644;">AI</span>
+        <span style="font-size:9px;font-weight:700;padding:2px 8px;background:#C60C30;color:#fff;border-radius:3px;white-space:nowrap;margin-left:4px;">PRD Priority</span>
+      </div>
+      <div class="init-sub">A machine-learning model that aggregates client signals across disconnected systems to generate a continuous churn risk score per account — enabling CSMs and Client Advocates to intervene proactively before churn occurs. In 2025, G&amp;A Partners lost 350 accounts to controllable reasons, representing <strong>$18.2M in total revenue</strong> that a predictive retention model could have targeted for intervention.</div>
+
+      <div class="sub-cols" style="margin-top:16px;">
+        <div>
+          <div class="init-col-head cur" style="font-size:8px;">Current State</div>
+          <ul class="tbl-bullets" style="margin-top:4px;">
+            <li>680 accounts churned in 2025, representing <strong>$30.4M in total lost revenue</strong>. Of these, <strong>350 accounts (51.5%) were lost to controllable reasons</strong>: Customer Service Issues (127 accounts, $6.9M), Price (135 accounts, $6.3M), and Medical Rates Too High (88 accounts, $4.9M) — totalling $18.2M in controllable revenue at risk</li>
+            <li>CSMs have no systematic early warning for at-risk accounts — churn is identified reactively when clients serve notice, typically too late for effective intervention</li>
+            <li>Account health is assessed manually through ad-hoc NPS review and case observation — no model aggregates signals across systems into a unified risk score</li>
+          </ul>
+        </div>
+        <div>
+          <div class="init-col-head chal" style="font-size:8px;">Current Challenges</div>
+          <ul class="tbl-bullets tbl-bullets-pain" style="margin-top:4px;">
+            <li>Churn prediction signals exist across disconnected systems — NPS in Qualtrics, cases and escalations in ClientSpace, service utilization in PRISM/WorkSight — but are never aggregated into a unified view</li>
+            <li>With 50 P/G accounts per CSM, proactively monitoring all accounts for early warning signs is not feasible manually — at-risk accounts surface only after NPS drops or case volume spikes visibly</li>
+            <li>No structured feedback loop exists between churn events and CSM outreach strategy — lost account data is not used to improve future retention actions</li>
+          </ul>
+        </div>
+        <div>
+          <div class="init-col-head tgt" style="font-size:8px;">AI / Automation Target</div>
+          <ul class="tbl-bullets tbl-bullets-opp" style="margin-top:4px;">
+            <li>ML propensity model ingesting NPS trends, case volume and aging, escalation history, service utilization, and account tenure — generating a continuous churn risk score per account</li>
+            <li>Monthly risk scores surfaced in ClientSpace — CSMs and Client Advocates see a ranked view of at-risk accounts for prioritised retention outreach</li>
+            <li>Model trained on 2020–2025 attrition data with ongoing retraining as new churn events occur</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>G&amp;A Partners · AI Client Success Operations PRD · Confidential</span>
+    <span>Preliminary — Subject to Change · TBD</span>
+  </div>
+</div>
+</div>
+
+
+<!-- ══ TAB 5: BUSINESS IMPACT ══ -->
+<div id="tab-impact" class="tab-panel">
+<div class="page">
+  <div class="pg-eye">Business Impact</div>
+  <div class="pg-h1">AI &amp; Automation Business Impact — Cost Efficiency &amp; Gross Margin Retention</div>
+  <div class="pg-sub">Section 1 presents the Client Success operational baseline and maps the AI / automation goals with each process. Section 2 presents G&amp;A's 2025 attrition profile, segments controllable vs. non-controllable churn, and outlines our expectation from the AI Churn Propensity Model for customer retention.</div>
+
+  <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--lgrey);padding:4px 0 10px;border-bottom:2px solid var(--rule);margin-bottom:16px;">1 · Cost Efficiency — Coverage Ratio &amp; Operational Improvement</div>
+
+  <div class="section-title">Current State Baseline</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px;">
+    <div>
+      <div style="font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--navy);margin-bottom:8px;">Platinum / Gold</div>
+      <table class="tbl">
+        <thead><tr><th>Metric</th><th style="text-align:right;">Current</th></tr></thead>
+        <tbody>
+          <tr><td>FTEs (CSMs + Mgrs)</td><td style="text-align:right;font-weight:700;">34</td></tr>
+          <tr><td>Total Accounts</td><td style="text-align:right;font-weight:700;">~1,700</td></tr>
+          <tr><td>Coverage Ratio</td><td style="text-align:right;font-weight:700;">50 accts / FTE</td></tr>
+          <tr><td>Time per Account per Month</td><td style="text-align:right;font-weight:700;">192 min</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <div style="font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--navy);margin-bottom:8px;">Silver / Bronze</div>
+      <table class="tbl">
+        <thead><tr><th>Metric</th><th style="text-align:right;">Current</th></tr></thead>
+        <tbody>
+          <tr><td>FTEs (Advocates + Mgrs)</td><td style="text-align:right;font-weight:700;">16</td></tr>
+          <tr><td>Total Accounts</td><td style="text-align:right;font-weight:700;">~3,200</td></tr>
+          <tr><td>Coverage Ratio</td><td style="text-align:right;font-weight:700;">200 accts / FTE</td></tr>
+          <tr><td>Time per Account per Month</td><td style="text-align:right;font-weight:700;">48 min</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-title">Time Allocation by Process (Current State)</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px;">
+    <div>
+      <div style="font-size:10px;font-weight:700;color:var(--grey);margin-bottom:6px;">Platinum/Gold — 192 min/account/month</div>
+      <table class="tbl">
+        <thead><tr><th>Process</th><th style="text-align:center;">% Allocation</th><th style="text-align:right;">Min/Acct/Mo</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Client Relationship</strong></td><td style="text-align:center;"><span class="pri-high">36%</span></td><td style="text-align:right;">~70 min</td></tr>
+          <tr><td><strong>Escalation Management</strong></td><td style="text-align:center;"><span class="pri-high">25%</span></td><td style="text-align:right;">~49 min</td></tr>
+          <tr><td><strong>Account Management</strong></td><td style="text-align:center;"><span class="pri-med">19%</span></td><td style="text-align:right;">~37 min</td></tr>
+          <tr><td>Other (NPS, Value-Add, Onboarding)</td><td style="text-align:center;"><span class="pri-low">19%</span></td><td style="text-align:right;">~36 min</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <div style="font-size:10px;font-weight:700;color:var(--grey);margin-bottom:6px;">Silver/Bronze — 48 min/account/month</div>
+      <table class="tbl">
+        <thead><tr><th>Process</th><th style="text-align:center;">% Allocation</th><th style="text-align:right;">Min/Acct/Mo</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Escalation Management</strong></td><td style="text-align:center;"><span class="pri-high">25%</span></td><td style="text-align:right;">~12 min</td></tr>
+          <tr><td><strong>Inbound Call Handling</strong></td><td style="text-align:center;"><span class="pri-high">20%</span></td><td style="text-align:right;">~10 min</td></tr>
+          <tr><td><strong>Account Management</strong></td><td style="text-align:center;"><span class="pri-med">20%</span></td><td style="text-align:right;">~10 min</td></tr>
+          <tr><td><strong>Client Relationship</strong></td><td style="text-align:center;"><span class="pri-med">21%</span></td><td style="text-align:right;">~10 min</td></tr>
+          <tr><td>Other (NPS, Value-Add)</td><td style="text-align:center;"><span class="pri-low">14%</span></td><td style="text-align:right;">~6 min</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-title">Automation Opportunities — Cost Efficiency</div>
+  <table class="tbl" style="margin-bottom:22px;">
+    <thead>
+      <tr>
+        <th style="width:22%;">Process</th>
+        <th style="width:12%;text-align:center;">Initiative</th>
+        <th>Automation Goal</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="vertical-align:top;"><strong>Client Relationship</strong><div style="margin-top:5px;"><span style="font-size:9px;font-weight:700;padding:2px 8px;background:#C60C30;color:#fff;border-radius:3px;white-space:nowrap;">PRD Priority</span></div></td>
+        <td style="text-align:center;vertical-align:top;padding-top:12px;"><span style="font-size:9px;font-weight:800;padding:2px 8px;border-radius:3px;background:#C60C3018;color:#C60C30;border:1px solid #C60C3030;display:inline-block;">Opp A</span><div style="font-size:9px;color:var(--grey);margin-top:5px;line-height:1.4;">Unified Client 360 Dashboard</div></td>
+        <td>Unified 360 dashboard aggregates services, case history, NPS trends, open escalations, and AI health score into a single ClientSpace screen — eliminating 5-system navigation before every touchpoint. Auto-drafted outreach emails for S/B advocates reduce manual preparation per interaction.</td>
+      </tr>
+      <tr>
+        <td><strong>Escalation Management</strong></td>
+        <td style="text-align:center;vertical-align:top;padding-top:12px;"><span style="font-size:9px;font-weight:800;padding:2px 8px;border-radius:3px;background:#FF9E1B18;color:#8a4e00;border:1px solid #FF9E1B30;display:inline-block;">Opp B</span><div style="font-size:9px;color:var(--grey);margin-top:5px;line-height:1.4;">Automated Escalation Routing with SLA Enforcement</div></td>
+        <td>Auto-notify case owners on escalation, start response timers, and escalate automatically through the management chain on non-response — eliminating the manual Teams follow-up cycle identified as the single largest time waste across Client Success.</td>
+      </tr>
+      <tr>
+        <td><strong>Account Management</strong></td>
+        <td style="text-align:center;vertical-align:top;padding-top:12px;"><span style="font-size:9px;font-weight:800;padding:2px 8px;border-radius:3px;background:#2A8F6018;color:#1a6b3c;border:1px solid #2A8F6030;display:inline-block;">Opp C</span><div style="font-size:9px;color:var(--grey);margin-top:5px;line-height:1.4;">AI Assisted Case Updates &amp; Aged Case Alerts</div></td>
+        <td>Replace manual case note authoring with AI-generated structured summaries (summary, status, next action) after every client interaction. Daily case review converts from reading full note history to scanning an AI summary. Automated alerts proactively surface cases aged beyond SLA thresholds.</td>
+      </tr>
+      <tr style="opacity:0.55;background:#F5F7F9;">
+        <td><strong style="color:var(--grey);">Inbound Call Handling</strong></td>
+        <td style="text-align:center;vertical-align:top;padding-top:12px;"><span style="font-size:9px;font-weight:800;padding:2px 8px;border-radius:3px;background:#EDF1F5;color:#A8ACAE;border:1px solid #D0D5D9;display:inline-block;">Opp D</span><div style="font-size:9px;color:var(--lgrey);margin-top:5px;line-height:1.4;">AI Customer Experience — Inbound &amp; S/B</div></td>
+        <td style="color:var(--grey);">Auto case creation on call pickup with client identity pre-populated, AI-generated call summaries, and AI-powered search over WorkSight reduce average handle time and documentation burden for the high-volume inbound channel. <span style="font-size:9px;font-weight:700;padding:2px 6px;background:#EDF1F5;color:var(--lgrey);border-radius:3px;border:1px solid var(--rule);">Outside PRD Scope</span></td>
+      </tr>
+
+    </tbody>
+  </table>
+
+
+
+  <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--lgrey);padding:4px 0 10px;border-bottom:2px solid var(--rule);margin:28px 0 16px;">2 · Customer Retention &amp; Revenue Protection</div>
+
+  <div class="section-title">2025 Attrition Baseline</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:22px;">
+    <div style="background:var(--white);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;text-align:center;">
+      <div style="font-size:22px;font-weight:800;color:var(--navy);">680</div>
+      <div style="font-size:10px;font-weight:700;color:var(--grey);margin-top:2px;">Total Accounts Lost</div>
+    </div>
+    <div style="background:var(--white);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;text-align:center;">
+      <div style="font-size:22px;font-weight:800;color:var(--navy);">$30.4M</div>
+      <div style="font-size:10px;font-weight:700;color:var(--grey);margin-top:2px;">Total Revenue Lost</div>
+    </div>
+    <div style="background:var(--white);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;text-align:center;">
+      <div style="font-size:22px;font-weight:800;color:var(--red);">$18.2M</div>
+      <div style="font-size:10px;font-weight:700;color:var(--grey);margin-top:2px;">Controllable Revenue at Risk</div>
+    </div>
+  </div>
+
+  <div class="section-title">Attrition Breakdown by Reason</div>
+  <table class="tbl" style="margin-bottom:22px;">
+    <thead>
+      <tr>
+        <th>Primary Reason</th>
+        <th style="text-align:center;">Category</th>
+        <th style="text-align:center;">Accounts Lost</th>
+        <th style="text-align:center;">Revenue Lost</th>
+        <th style="text-align:center;">% of Total Revenue</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Customer Service Issues</strong></td><td style="text-align:center;"><span class="pri-high">Controllable</span></td><td style="text-align:center;">127</td><td style="text-align:center;font-weight:700;">$6.9M</td><td style="text-align:center;">22.8%</td></tr>
+      <tr><td><strong>Price</strong></td><td style="text-align:center;"><span class="pri-high">Controllable</span></td><td style="text-align:center;">135</td><td style="text-align:center;font-weight:700;">$6.3M</td><td style="text-align:center;">20.7%</td></tr>
+      <tr><td><strong>Medical Rates Too High</strong></td><td style="text-align:center;"><span class="pri-high">Controllable</span></td><td style="text-align:center;">88</td><td style="text-align:center;font-weight:700;">$4.9M</td><td style="text-align:center;">16.2%</td></tr>
+      <tr><td><strong>Business Closed</strong></td><td style="text-align:center;"><span class="pri-low">Non-Controllable</span></td><td style="text-align:center;">172</td><td style="text-align:center;font-weight:700;">$4.7M</td><td style="text-align:center;">15.6%</td></tr>
+      <tr><td><strong>Business Sold</strong></td><td style="text-align:center;"><span class="pri-low">Non-Controllable</span></td><td style="text-align:center;">106</td><td style="text-align:center;font-weight:700;">$6.2M</td><td style="text-align:center;">20.3%</td></tr>
+      <tr><td><strong>Financial Issues</strong></td><td style="text-align:center;"><span class="pri-low">Non-Controllable</span></td><td style="text-align:center;">42</td><td style="text-align:center;font-weight:700;">$1.2M</td><td style="text-align:center;">3.9%</td></tr>
+      <tr><td>Other / G&amp;A Initiated</td><td style="text-align:center;"><span class="pri-low">Non-Controllable</span></td><td style="text-align:center;">10</td><td style="text-align:center;font-weight:700;">$0.1M</td><td style="text-align:center;">0.5%</td></tr>
+      <tr class="total-row"><td><strong>Total</strong></td><td></td><td style="text-align:center;font-weight:700;">680</td><td style="text-align:center;font-weight:700;">$30.4M</td><td style="text-align:center;font-weight:700;">100%</td></tr>
+      <tr class="subhead"><td colspan="5">Controllable Subtotal</td></tr>
+      <tr><td><strong>Total Controllable</strong></td><td style="text-align:center;"><span class="pri-high">Controllable</span></td><td style="text-align:center;font-weight:700;">350 (51.5%)</td><td style="text-align:center;font-weight:700;">$18.2M</td><td style="text-align:center;font-weight:700;">59.7%</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">Automation Opportunities — Gross Margin Retention</div>
+  <table class="tbl" style="margin-bottom:22px;">
+    <thead>
+      <tr>
+        <th style="width:22%;">Process</th>
+        <th style="width:28%;text-align:center;">Initiative</th>
+        <th>Automation Goal</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="vertical-align:top;"><strong>Retention &amp; Churn Prevention</strong><div style="margin-top:5px;"><span style="font-size:9px;font-weight:700;padding:2px 8px;background:#C60C30;color:#fff;border-radius:3px;white-space:nowrap;">PRD Priority</span></div></td>
+        <td style="text-align:center;vertical-align:top;padding-top:12px;"><span style="font-size:9px;font-weight:800;padding:2px 8px;border-radius:3px;background:#7B4FD618;color:#5a35b0;border:1px solid #7B4FD630;display:inline-block;">Opp E</span><div style="font-size:9px;color:var(--grey);margin-top:5px;line-height:1.4;">AI Churn Propensity Model</div></td>
+        <td>ML-based churn propensity model aggregates NPS trends, case volume, escalation history, and service utilization to generate a monthly risk score per account — surfaced in ClientSpace so CSMs and Client Advocates can prioritise retention outreach before churn occurs.</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <div class="foot">
+    <span>G&amp;A Partners · AI Client Success Operations PRD · Confidential</span>
+    <span>Preliminary — Subject to Change · TBD</span>
+  </div>
+</div>
+</div>
+
+
+<!-- ══ TAB 6: SYSTEMS & TECHNICAL ══ -->
+<div id="tab-systems" class="tab-panel">
+<div class="page">
+  <div class="pg-eye">Systems &amp; Technical</div>
+  <div class="pg-h1">System Inventory, Integration Gaps &amp; Technical Constraints</div>
+  <div class="pg-sub">A full inventory of every system that Client Success teams currently use, the gaps between them, and the broken integrations that a partner solution must address or route around. This is the technical foundation for any architecture proposal.</div>
+
+  <div class="callout warn"><strong>Critical constraint:</strong> Client Success operates across 6+ systems with zero native integration. All data transfer between ClientSpacePro, Outlook, Teams, Excel, SharePoint, and TalkDesk is fully manual. Any solution architecture must directly address this fragmentation — either by building integration layers or replacing the manual data movement.</div>
+
+  <div class="section-title">Core Systems in Scope</div>
+  <div class="sys-grid">
+    <div class="sys-card">
+      <div class="sys-name">ClientSpacePro / ClientSpace</div>
+      <div class="sys-role">Primary CRM &amp; Case Management</div>
+      <div class="sys-desc">The core case management and client record system for Client Success. All cases, escalations, account assignments, and NPS cases live here. Dashboards load slowly, adding cumulative delay to every daily review session. The system has a priority flag for Platinum accounts but internal departments do not consistently act on it.</div>
+      <div class="sys-tag-row"><span class="sys-tag st-core">In Scope</span><span class="sys-tag st-gap">Slow Load Performance</span><span class="sys-tag st-gap">Fragmented from Other Systems</span></div>
+    </div>
+    <div class="sys-card">
+      <div class="sys-name">TalkDesk</div>
+      <div class="sys-role">Inbound Call Platform</div>
+      <div class="sys-desc">Phone platform for all inbound calls from clients and WSEs. A previously working integration automatically populated caller identity and case context from ClientSpacePro based on caller phone number — this integration is now broken. All case data entry is currently fully manual, adding time to every call.</div>
+      <div class="sys-tag-row"><span class="sys-tag st-core">In Scope</span><span class="sys-tag st-gap">Broken Integration (Critical)</span><span class="sys-tag st-target">Restore as Priority</span></div>
+    </div>
+    <div class="sys-card">
+      <div class="sys-name">Qualtrics</div>
+      <div class="sys-role">NPS Survey Platform</div>
+      <div class="sys-desc">NPS surveys are sent via Qualtrics during the first two weeks of each month. The Qualtrics→Salesforce→ClientSpace integration dumps all survey data (NPS score, client comments, response category) into a single issue text field rather than mapping to dedicated fields. CSMs must manually extract each data element — creating a bottleneck for every NPS case and blocking Power BI reporting accuracy.</div>
+      <div class="sys-tag-row"><span class="sys-tag st-core">In Scope</span><span class="sys-tag st-gap">Broken Data Mapping (Critical)</span><span class="sys-tag st-target">Fix Mapping as Priority</span></div>
+    </div>
+    <div class="sys-card">
+      <div class="sys-name">WorkSight</div>
+      <div class="sys-role">Client Portal &amp; Knowledge Base</div>
+      <div class="sys-desc">Client-facing portal and knowledge base. WorkSight's search functionality is documented as "poor" — clients cannot efficiently find answers to common questions, driving avoidable inbound call volume. The knowledge base content exists but is not surfaced effectively to end users.</div>
+      <div class="sys-tag-row"><span class="sys-tag st-core">In Scope</span><span class="sys-tag st-gap">Poor Search (High Impact)</span><span class="sys-tag st-target">AI Search Layer Needed</span></div>
+    </div>
+    <div class="sys-card">
+      <div class="sys-name">Microsoft Teams</div>
+      <div class="sys-role">Internal Communication &amp; Escalation</div>
+      <div class="sys-desc">Primary internal communication tool. IT has a dedicated Teams escalation chat that works well — giving CSMs a monitored channel with fast acknowledgment. Payroll, benefits, 401k, tax, and HR advisory departments lack equivalent channels, forcing CSMs to manually chase responses through case notes and individual Teams messages.</div>
+      <div class="sys-tag-row"><span class="sys-tag st-core">In Scope</span><span class="sys-tag st-gap">Missing Dept. Escalation Channels</span><span class="sys-tag st-target">Replicate IT Model</span></div>
+    </div>
+    <div class="sys-card">
+      <div class="sys-name">SharePoint</div>
+      <div class="sys-role">Document Storage &amp; SOPs</div>
+      <div class="sys-desc">Shared Advocacy Library and SOP storage. The library is hard to navigate — finding the proactive outreach SOP requires extensive scrolling through a large document list. SOPs exist but are not embedded in workflow tools, requiring context-switching to reference them during active work.</div>
+      <div class="sys-tag-row"><span class="sys-tag st-core">In Scope</span><span class="sys-tag st-gap">Poor Navigability</span></div>
+    </div>
+    <div class="sys-card">
+      <div class="sys-name">Microsoft Excel / Outlook</div>
+      <div class="sys-role">Scoring, Tracking &amp; Outreach</div>
+      <div class="sys-desc">Excel hosts the Silver/Bronze outreach scoring tool (macro-based; macro security may block execution) and the outreach tracker. Outlook handles all client outreach email composition. Contact lists must be manually copied from ClientSpacePro and pasted into Outlook — no auto-population exists. KPIs including retention rates, upsell revenue, and adoption rates are tracked in Excel, not the CRM.</div>
+      <div class="sys-tag-row"><span class="sys-tag st-core">In Scope</span><span class="sys-tag st-gap">Manual Data Transfer</span><span class="sys-tag st-gap">KPI Silo</span></div>
+    </div>
+    <div class="sys-card">
+      <div class="sys-name">PRISM / TLM / Cornerstone</div>
+      <div class="sys-role">Service Data Systems</div>
+      <div class="sys-desc">Three separate systems holding service utilization, pricing, and client learning data respectively. P/G CSMs must navigate all three alongside ClientSpace before every touchpoint meeting. No consolidated view exists. These are the primary data sources that the Unified Client 360 Dashboard (Opp A) must aggregate.</div>
+      <div class="sys-tag-row"><span class="sys-tag st-core">In Scope</span><span class="sys-tag st-gap">No Consolidated View</span><span class="sys-tag st-target">Source for 360 Dashboard</span></div>
+    </div>
+    <div class="sys-card">
+      <div class="sys-name">Ciklum</div>
+      <div class="sys-role">Target: AI Self-Service Platform</div>
+      <div class="sys-desc">The target vendor for AI Customer Experience automation (Opp D). Ciklum would provide auto case creation on call pickup, AI-generated call documentation, and an AI-powered search layer over WorkSight for inbound agents. This is a new integration — no existing Ciklum deployment exists at G&amp;A Partners today.</div>
+      <div class="sys-tag-row"><span class="sys-tag st-target">AI Self-Service · Opp D</span></div>
+    </div>
+  </div>
+
+  <div class="section-title">Integration Gap Summary</div>
+  <table class="tbl" style="margin-bottom:22px;">
+    <thead><tr><th>Gap</th><th>Systems Affected</th><th>Current Workaround</th><th>Initiative</th><th style="text-align:center;">Priority</th></tr></thead>
+    <tbody>
+      <tr><td><strong>TalkDesk auto-population broken</strong></td><td>TalkDesk → ClientSpacePro</td><td>Manual client search on every inbound call</td><td>#2</td><td style="text-align:center;"><span class="pri-high">High</span></td></tr>
+      <tr><td><strong>Qualtrics data mapping failure</strong></td><td>Qualtrics → Salesforce → ClientSpace</td><td>CSM manually extracts NPS score, comments field-by-field per case</td><td>#1-A</td><td style="text-align:center;"><span class="pri-high">High</span></td></tr>
+      <tr><td><strong>No ClientSpace→Outlook integration</strong></td><td>ClientSpacePro → Outlook</td><td>Manual copy-paste of contact lists per outreach</td><td>#1-A</td><td style="text-align:center;"><span class="pri-high">High</span></td></tr>
+      <tr><td><strong>No ClientSpace→Teams integration</strong></td><td>ClientSpace → Teams</td><td>Manual team member lookup + individual Teams chat initiation</td><td>#1-B</td><td style="text-align:center;"><span class="pri-med">Medium</span></td></tr>
+      <tr><td><strong>No multi-system aggregation layer</strong></td><td>WorkSight, PRISM, TLM, Cornerstone → ClientSpace</td><td>CSM navigates 5 systems manually before each meeting</td><td>#1-A</td><td style="text-align:center;"><span class="pri-med">Medium</span></td></tr>
+      <tr><td><strong>KPI data in Excel, not CRM</strong></td><td>Excel → ClientSpace</td><td>Manual tracking; no real-time pipeline visibility</td><td>#1-A</td><td style="text-align:center;"><span class="pri-low">Low</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout success"><strong>Note to partners:</strong> Partners are not constrained by the current system architecture. If you believe a different toolset, integration platform, or data layer better addresses the requirements, that is a valid and encouraged response. The systems above are documented as context, not as constraints.</div>
+
+  <div class="foot">
+    <span>G&amp;A Partners · AI Client Success Operations PRD · Confidential</span>
+    <span>Preliminary — Subject to Change · TBD</span>
+  </div>
+</div>
+</div>
+
+
+<!-- ══ TAB 7: GLOSSARY ══ -->
+<div id="tab-glossary" class="tab-panel">
+<div class="page">
+  <div class="pg-eye">Glossary</div>
+  <div class="pg-h1">Terms, Definitions &amp; Acronyms</div>
+  <div class="pg-sub">Definitions of all Client Success–specific terms, G&amp;A operational acronyms, tier designations, and system names used throughout this document.</div>
+
+  <div class="section-title">Client Tier Definitions</div>
+  <div class="card">
+    <div class="gloss-item"><div class="gloss-term">Platinum / Gold (P/G)</div><div class="gloss-def">The top two client tiers in G&amp;A's account segmentation framework. Platinum/Gold accounts receive dedicated CSM coverage, monthly touchpoints or QBRs, full lifecycle management, and white-glove escalation handling. Current coverage ratio: ~50 accounts per FTE. Time allocation: ~192 min/account/month.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Silver / Bronze (S/B)</div><div class="gloss-def">The bottom two client tiers. Silver/Bronze accounts are served by a pooled team of Client Advocates through proactive outreach on a weekly cadence (~5 outreaches per advocate per week) rather than dedicated coverage. Current coverage ratio: ~200 accounts per FTE. Time allocation: ~48 min/account/month.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Coverage Ratio</div><div class="gloss-def">The number of accounts served per FTE. The primary operational efficiency metric for Client Success — increasing the coverage ratio (while maintaining retention outcomes) is the core objective of the cost efficiency initiatives (Opps A–C).</div></div>
+    <div class="gloss-item"><div class="gloss-term">Parent Company / Parent Account</div><div class="gloss-def">The top-level organizational unit in ClientSpace. Tier designation and CSM assignment are made at the parent company level, not at the individual worksite level. Coverage ratio modeling (1,700 P/G, 3,200 S/B) uses parent account counts.</div></div>
+  </div>
+
+  <div class="section-title">Roles</div>
+  <div class="card">
+    <div class="gloss-item"><div class="gloss-term">CSM (Client Success Manager)</div><div class="gloss-def">Dedicated relationship manager for Platinum/Gold accounts. Owns the full client lifecycle: onboarding handoff, monthly touchpoints, case oversight, escalation management, renewal, and upsell.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Client Advocate</div><div class="gloss-def">Pooled outreach specialist serving Silver/Bronze accounts. Executes proactive outreach using an Excel-based scoring tool to prioritize which clients to contact each week.</div></div>
+    <div class="gloss-item"><div class="gloss-term">CSM – Broker</div><div class="gloss-def">A specialized CSM role managing the broker relationship channel rather than direct client accounts. Responsible for broker satisfaction, broker-escalated client issues, and premier broker program management.</div></div>
+    <div class="gloss-item"><div class="gloss-term">HR Support Specialist</div><div class="gloss-def">Inbound support role handling WSE (Worksite Employee) calls and chats. Spends 70% of time on call intake and resolution for platform navigation, payroll, benefits, and HR questions.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Inbound CSM Client Advocate</div><div class="gloss-def">Specialized advocate role handling inbound calls from clients (not WSEs). Sits between the HR Support Specialist team and the full CSM team in terms of case complexity.</div></div>
+  </div>
+
+  <div class="section-title">Process &amp; Operational Terms</div>
+  <div class="card">
+    <div class="gloss-item"><div class="gloss-term">AHT (Average Handle Time)</div><div class="gloss-def">Average time to handle an inbound support call from pickup to case closure. Referenced in Opp D (AI Customer Experience) as the metric that automation and AI knowledge base improvements will reduce.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Aging Case</div><div class="gloss-def">A case that has been open beyond a defined SLA threshold — typically 7 days for standard accounts, less for Platinum. Aging cases are reviewed weekly by CSMs and account managers. The lack of automated aging alerts forces manual case-by-case review, contributing to 20–25% of Account Management time.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Client Snapshot</div><div class="gloss-def">G&amp;A's term for the client profile view in ClientSpacePro. The "Client Snapshot" panel contains service agreements, contact records, and basic account data. Currently does not aggregate data from PRISM, TLM, WorkSight, or Cornerstone — this is the gap that Opp A's Unified 360 Dashboard addresses.</div></div>
+    <div class="gloss-item"><div class="gloss-term">CSA (Client Service Agreement)</div><div class="gloss-def">The formal service agreement defining what services a client receives from G&amp;A. Long-tenured and acquired clients often have outdated CSAs that no longer reflect actual service usage, creating uncertainty during upsell conversations and making it impossible to rely on the CSA as a source of truth.</div></div>
+    <div class="gloss-item"><div class="gloss-term">NPS (Net Promoter Score)</div><div class="gloss-def">Client satisfaction metric collected monthly via Qualtrics. Responses classify clients as Promoters (9–10), Passives (7–8), or Detractors (0–6). Detractor cases trigger investigation and CSM engagement. The broken Qualtrics→ClientSpace data mapping (all data dumped to a single field) prevents accurate Power BI reporting on NPS trends.</div></div>
+    <div class="gloss-item"><div class="gloss-term">QBR (Quarterly Business Review)</div><div class="gloss-def">Formal quarterly meeting between a P/G CSM and the client's key contacts to review service performance, open issues, and strategic priorities. Meeting preparation currently requires manual navigation of 5+ systems, taking 15–30 minutes per meeting.</div></div>
+    <div class="gloss-item"><div class="gloss-term">SLA (Service Level Agreement)</div><div class="gloss-def">Defined response time expectations for case handling or escalation acknowledgment. G&amp;A currently lacks formal SLAs for escalation routing to internal departments. Opp B's automated escalation routing introduces SLA enforcement (24h/48h auto-escalation timers) to create accountability.</div></div>
+    <div class="gloss-item"><div class="gloss-term">WSE (Worksite Employee)</div><div class="gloss-def">An employee of a G&amp;A client company. WSEs interact with G&amp;A directly for platform questions, paycheck issues, benefits inquiries, and HR matters. HR Support Specialists handle WSE inbound calls — the population targeted by Opp D (AI Customer Experience).</div></div>
+  </div>
+
+  <div class="section-title">Systems &amp; Technology Terms</div>
+  <div class="card">
+    <div class="gloss-item"><div class="gloss-term">ClientSpacePro</div><div class="gloss-def">The PEO-specific case management CRM used by Client Success as the system of record for all cases, accounts, contacts, and escalations. Has slow dashboard load times that add cumulative delay to daily review sessions. No native integration with Outlook, Teams, PRISM, TLM, or Cornerstone.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Ciklum</div><div class="gloss-def">The target AI/automation platform vendor identified for Opp D (AI Customer Experience — Inbound &amp; Silver/Bronze). Ciklum would provide the AI layer integrated with WorkSight's knowledge base to enable auto case creation, AI-generated documentation, and real-time KB search for inbound agents.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Power BI</div><div class="gloss-def">Microsoft's business intelligence platform used by Client Success leadership for NPS dashboards and reporting. Power BI's NPS reporting is currently broken because the Qualtrics→ClientSpace data mapping dumps all survey data into a single text field rather than mapping NPS scores, comments, and categories to dedicated fields.</div></div>
+    <div class="gloss-item"><div class="gloss-term">TalkDesk</div><div class="gloss-def">The telephony platform handling all inbound client and WSE calls. A previously functional integration auto-populated caller identity and case context from ClientSpacePro based on caller phone number — this integration is no longer functional. All case data entry is now fully manual on every call.</div></div>
+    <div class="gloss-item"><div class="gloss-term">WorkSight</div><div class="gloss-def">G&amp;A's client-facing portal and knowledge base for clients and WSEs. The portal contains documentation for common platform and HR questions, but the search functionality is documented as poor — clients cannot effectively find relevant articles, driving avoidable inbound call volume to the HR Support Specialist team.</div></div>
+  </div>
+
+  <div class="section-title">Retention &amp; Attrition Terms</div>
+  <div class="card">
+    <div class="gloss-item"><div class="gloss-term">Churn Propensity Model</div><div class="gloss-def">An ML-based scoring model (Initiative E) that assigns a continuous churn risk score to each account by aggregating NPS trends, case volume and aging, escalation history, service utilization, and account tenure. Scores are surfaced monthly in ClientSpace to enable proactive CSM and Client Advocate intervention before churn occurs.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Controllable Churn</div><div class="gloss-def">Client attrition attributable to reasons within G&amp;A's ability to influence — primarily Customer Service Issues, Price, and Medical Rates Too High. In 2025, controllable churn accounted for 350 accounts and $18.2M in revenue (59.7% of total revenue lost). The churn propensity model specifically targets this segment.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Non-Controllable Churn</div><div class="gloss-def">Client attrition driven by client-side events outside G&amp;A's ability to influence — Business Closed, Business Sold, Financial Issues, and G&amp;A-initiated terminations. In 2025, non-controllable churn accounted for 330 accounts and $12.2M in revenue. These accounts are excluded from the churn propensity model's intervention targeting.</div></div>
+  </div>
+
+  <div class="foot">
+    <span>G&amp;A Partners · AI Client Success Operations PRD · Confidential</span>
+    <span>Preliminary — Subject to Change · TBD</span>
+  </div>
+</div>
+</div>
+
+
+<!-- ══ TAB 8: SUBMISSION ══ -->
+<div id="tab-submission" class="tab-panel">
+<div class="page">
+  <div class="pg-eye">Submission Guide</div>
+  <div class="pg-h1">What We Need From You</div>
+  <div class="pg-sub">Your response must address all six items below. Responses should focus on the two PRD priority initiatives: Opp A (Unified Client 360 Dashboard) and Opp E (AI Churn Propensity Model). Quality over length — a specific response beats a comprehensive generic one.</div>
+
+  <div class="card" style="margin-bottom:22px;">
+    <div class="submit-item">
+      <div class="submit-num">1</div>
+      <div class="submit-body">
+        <h4>Proposed Approach &amp; Workplan</h4>
+        <p>What is your phasing? Which initiative do you tackle first and why? What does the first 30–60–90 days look like? Be specific about sequencing — how do you phase the Unified 360 Dashboard (Opp A) alongside the AI Churn Propensity Model (Opp E)? Are these parallel build tracks or sequential? What are the critical path dependencies in your plan?</p>
+      </div>
+    </div>
+    <div class="submit-item">
+      <div class="submit-num">2</div>
+      <div class="submit-body">
+        <h4>Architecture &amp; Technical Design</h4>
+        <p>How do you architect the Unified 360 Dashboard against the ClientSpace-centric stack — specifically the five-system aggregation requirement (ClientSpace, WorkSight, PRISM, TLM, Cornerstone) and the Qualtrics data mapping fix needed to correctly surface NPS scores? What AI models, frameworks, and integration patterns? <br><br>For the AI Churn Propensity Model: how do you design the ML pipeline — feature engineering from ClientSpace/Qualtrics, model training on 2020–2025 attrition data, and monthly score delivery back into ClientSpace? Include a system architecture diagram. Address which components require external build vs. native ClientSpace configuration.</p>
+      </div>
+    </div>
+    <div class="submit-item">
+      <div class="submit-num">3</div>
+      <div class="submit-body">
+        <h4>Effort, Timeline &amp; Cost</h4>
+        <p>Build cost by initiative, ongoing infrastructure cost, proposed pricing model. Include G&amp;A-side resource requirements (who needs to be involved, how much of their time). Separate build cost from run cost — a low build / high run structure is not acceptable without justification.</p>
+      </div>
+    </div>
+    <div class="submit-item">
+      <div class="submit-num">4</div>
+      <div class="submit-body">
+        <h4>Data Cost Management &amp; PII Handling</h4>
+        <p>How do you handle PII in LLM and ML processing — client contact records, NPS survey comments, and case content used in the 360 Dashboard? For the Churn Propensity Model: how is client behavioral data stored, processed, and protected? What is your data residency approach? Expected token and compute cost for the 360 Dashboard at steady state.</p>
+      </div>
+    </div>
+    <div class="submit-item">
+      <div class="submit-num">5</div>
+      <div class="submit-body">
+        <h4>Working Demo / POC</h4>
+        <p><strong>(A) Unified Client 360 Dashboard:</strong> Show a mock ClientSpace screen aggregating data from at least three source systems (e.g. case history, NPS score, open escalations, service utilization) into a single client snapshot view — demonstrating how a CSM would prepare for a touchpoint meeting without navigating multiple systems. Include how the AI health score would be surfaced and how the Qualtrics NPS data fix enables the dashboard.<br><br>
+        <strong>(E) AI Churn Propensity Model:</strong> Present a sample model output showing 5–10 accounts with their churn risk scores, the top contributing signals (e.g. NPS trend, escalation frequency, case volume), and the recommended intervention action for each. Show how scores would surface in ClientSpace so CSMs and Client Advocates can prioritise retention outreach. Include a brief description of the training data approach using the 2020–2025 attrition dataset.<br><br>
+        Video recording of a live demo is accepted if a live session is not possible before the deadline.</p>
+      </div>
+    </div>
+    <div class="submit-item">
+      <div class="submit-num">6</div>
+      <div class="submit-body">
+        <h4>Relevant Experience</h4>
+        <p>2–3 specific examples of AI or automation solutions built for client success, CRM, or B2B service environments — ideally including at least one unified dashboard or cross-system aggregation build and one churn or propensity scoring model. For each: problem, solution, systems integrated, and measurable outcome (churn reduction, revenue retained, NPS improvement, or client preparation time saved preferred). Include the team that would work on this engagement and their relevant experience with ClientSpace and Qualtrics specifically.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Evaluation Criteria</div>
+  <table class="tbl" style="margin-bottom:22px;">
+    <thead><tr><th>Criterion</th><th style="width:80px;text-align:center;">Weight</th><th>What We Are Looking For</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Working POC / Demo Quality</strong></td><td style="text-align:center;font-weight:700;color:var(--red);">30%</td><td>Does the Unified 360 Dashboard demo show realistic ClientSpace aggregation across the five source systems with a credible AI health score? Does the churn propensity demo surface risk scores in a way that is actionable for a non-technical CSM or Client Advocate?</td></tr>
+      <tr><td><strong>Architecture Credibility</strong></td><td style="text-align:center;font-weight:700;color:var(--red);">25%</td><td>Is the 360 Dashboard design realistic given the five-system aggregation requirement? Is the Qualtrics data mapping fix credibly addressed as a prerequisite? Is the ML pipeline for the churn model well-designed — feature engineering from ClientSpace/Qualtrics, training on 2020–2025 attrition data, and retraining cadence?</td></tr>
+      <tr><td><strong>Relevant Experience</strong></td><td style="text-align:center;font-weight:700;color:var(--red);">20%</td><td>Have you built unified dashboard or cross-system aggregation solutions for CRM or service environments? Have you built churn or propensity scoring models for B2B service businesses? ClientSpace and Qualtrics experience specifically valued.</td></tr>
+      <tr><td><strong>Cost Realism &amp; PII Strategy</strong></td><td style="text-align:center;font-weight:700;color:var(--red);">15%</td><td>Is build cost credible for the 360 Dashboard (five-system integration) and the churn model (ML build + monthly inference)? Is PII handling for client behavioral data and NPS survey content explicitly addressed? Are Qualtrics integration costs scoped credibly as a prerequisite for Opp A?</td></tr>
+      <tr><td><strong>Speed to Value</strong></td><td style="text-align:center;font-weight:700;color:var(--red);">10%</td><td>What is the fastest path to a working prototype of either Opp A or Opp E? What can be demonstrated or piloted within 60–90 days? How do the two PRD priority initiatives sequence relative to each other?</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout success"><strong>Submit to:</strong> tsagireddy@alixpartners.com &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Deadline:</strong> TBD</div>
+
+  <div class="foot">
+    <span>G&amp;A Partners · AI Client Success Operations PRD · Confidential</span>
+    <span>Preliminary — Subject to Change · TBD</span>
+  </div>
+</div>
+</div>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>

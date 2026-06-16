@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G&A Partners | AI Benefits PRD</title>
+<style>
+:root{--red:#C60C30;--navy:#23394A;--grey:#6B6F70;--lgrey:#A8ACAE;--fog:#F5F7F9;--rule:#E2E8ED;--white:#FFFFFF;--pos:#2A8F60;--c2:#0088CE;--amber:#FF9E1B;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:var(--navy);background:var(--fog);font-size:13px;line-height:1.5;}
+.hdr{background:var(--navy);padding:0 48px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
+.logo-area{padding:12px 0;display:flex;align-items:center;}
+.hdr-right{display:flex;align-items:center;gap:10px;}
+.hdr-badge{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:3px;background:rgba(198,12,48,.3);color:rgba(255,255,255,.8);border:1px solid rgba(198,12,48,.4);}
+.tab-nav{background:var(--navy);display:flex;padding:0 48px;border-bottom:1px solid rgba(255,255,255,.08);overflow-x:auto;}
+.tab-nav::-webkit-scrollbar{height:0;}
+.tab-btn{padding:11px 18px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.4);border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:color .15s;flex-shrink:0;}
+.tab-btn:hover{color:rgba(255,255,255,.75);}
+.tab-btn.active{color:#fff;border-bottom-color:var(--red);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.page{max-width:1060px;margin:0 auto;padding:36px 48px 60px;}
+.pg-eye{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--red);font-weight:700;margin-bottom:5px;}
+.pg-h1{font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.4px;margin-bottom:8px;line-height:1.2;}
+.pg-sub{font-size:12px;color:var(--grey);margin-bottom:24px;max-width:700px;line-height:1.7;}
+.section-title{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--rule);margin-top:28px;}
+.card{background:var(--white);border:1px solid var(--rule);border-radius:8px;padding:18px 20px;margin-bottom:12px;box-shadow:0 1px 4px rgba(35,57,74,.05);}
+.card-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px;}
+.card-sub{font-size:11px;color:var(--grey);line-height:1.65;}
+.card.accent-red{border-left:4px solid var(--red);border-radius:0 8px 8px 0;}
+.card.accent-blue{border-left:4px solid var(--c2);border-radius:0 8px 8px 0;}
+.card.accent-green{border-left:4px solid var(--pos);border-radius:0 8px 8px 0;}
+.card.accent-amber{border-left:4px solid var(--amber);border-radius:0 8px 8px 0;}
+.card.accent-navy{border-left:4px solid var(--navy);border-radius:0 8px 8px 0;}
+.callout{border-radius:0 6px 6px 0;padding:12px 18px;font-size:11px;line-height:1.65;margin-bottom:16px;}
+.callout.info{border-left:4px solid var(--c2);background:#EBF4FB;color:#1a4f72;}
+.callout.warn{border-left:4px solid var(--amber);background:#FEF9EE;color:#5c3c00;}
+.callout.success{border-left:4px solid var(--pos);background:#E9F5EF;color:#1a4a2e;}
+.callout strong{font-weight:700;}
+.tbl{width:100%;border-collapse:collapse;background:var(--white);border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin-bottom:18px;box-shadow:0 1px 5px rgba(35,57,74,.06);}
+.tbl thead th{background:var(--red);color:rgba(255,255,255,.9);padding:9px 14px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-align:left;border-right:1px solid rgba(255,255,255,.1);}
+.tbl thead th:last-child{border-right:none;}
+.tbl tbody td{padding:9px 14px;border-bottom:1px solid var(--rule);font-size:11px;color:var(--navy);vertical-align:top;}
+.tbl tbody tr:last-child td{border-bottom:none;}
+.tbl tbody tr:nth-child(even) td{background:#F8FAFB;}
+.tbl .subhead td{background:#EDF1F5;font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#3a5068;}
+.tbl-bullets{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:5px;}
+.tbl-bullets li{font-size:11px;color:var(--navy);line-height:1.5;padding-left:12px;position:relative;}
+.tbl-bullets li::before{content:"";position:absolute;left:1px;top:6px;width:5px;height:5px;border-radius:50%;background:var(--lgrey);}
+.tbl-bullets-pain li::before{background:var(--red);opacity:.7;}
+.tbl-bullets-opp li{color:#1a5c38;}
+.tbl-bullets-opp li::before{background:var(--pos);}
+.metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px;}
+.metric-tile{background:var(--white);border:1px solid var(--rule);border-radius:6px;padding:14px 16px;border-top:3px solid var(--navy);}
+.metric-tile.c2{border-top-color:var(--c2);}
+.metric-tile.cr{border-top-color:var(--red);}
+.metric-tile.cg{border-top-color:var(--pos);}
+.metric-tile.ca{border-top-color:var(--amber);}
+.metric-val{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-.5px;line-height:1;margin-bottom:4px;}
+.metric-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--lgrey);}
+.index-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:24px;}
+.index-card{background:var(--white);border:1px solid var(--rule);border-radius:10px;padding:20px 22px;display:flex;gap:16px;align-items:flex-start;box-shadow:0 1px 5px rgba(35,57,74,.06);cursor:pointer;transition:box-shadow .15s;}
+.index-card:hover{box-shadow:0 3px 12px rgba(35,57,74,.12);}
+.index-num{width:36px;height:36px;border-radius:50%;background:var(--red);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.index-body h3{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px;}
+.index-body p{font-size:11px;color:var(--grey);line-height:1.6;}
+.gloss-item{display:flex;gap:20px;padding:10px 0;border-bottom:1px solid var(--rule);align-items:flex-start;}
+.gloss-item:last-child{border-bottom:none;}
+.gloss-term{font-size:12px;font-weight:700;color:var(--navy);width:200px;min-width:200px;flex-shrink:0;}
+.gloss-def{font-size:11px;color:var(--grey);line-height:1.6;flex:1;}
+.submit-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--rule);}
+.submit-item:last-child{border-bottom:none;}
+.submit-num{width:28px;height:28px;border-radius:50%;background:var(--red);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.submit-body h4{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:3px;}
+.submit-body p{font-size:11px;color:var(--grey);line-height:1.6;}
+.foot{border-top:1px solid var(--rule);padding-top:14px;display:flex;justify-content:space-between;font-size:10px;color:var(--lgrey);margin-top:36px;}
+.pri-high{display:inline-block;padding:2px 9px;border-radius:99px;font-size:10px;font-weight:700;background:#FDECEA;color:#8a000a;border:1px solid #C60C3044;}
+.init-card{background:var(--white);border:1px solid var(--rule);border-radius:8px;margin-bottom:14px;overflow:hidden;}
+.init-header{display:grid;grid-template-columns:44px 1fr;gap:0;}
+.init-num-col{background:var(--navy);display:flex;align-items:center;justify-content:center;padding:18px 0;}
+.init-num-circle{width:28px;height:28px;border-radius:50%;background:var(--red);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.init-body{padding:16px 20px;}
+.init-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:3px;}
+.init-sub{font-size:11px;color:var(--grey);margin-bottom:12px;}
+.init-cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.init-col-head{font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px;}
+.init-col-head.cur{color:var(--c2);}
+.init-col-head.chal{color:var(--red);}
+.init-col-head.tgt{color:var(--pos);}
+.init-tag{font-size:10px;font-weight:700;padding:2px 8px;background:#C60C3022;color:#C60C30;border-radius:3px;border:1px solid #C60C3044;display:inline-block;margin-right:6px;margin-bottom:3px;}
+.init-tag.blue{background:#0088CE22;color:var(--c2);border-color:#0088CE44;}
+.init-tag.green{background:#2A8F6022;color:var(--pos);border-color:#2A8F6044;}
+.init-tag.amber{background:#FF9E1B22;color:#7a4800;border-color:#FF9E1B44;}
+.sub-init{background:#F8FAFB;border:1px solid var(--rule);border-radius:6px;padding:12px 16px;margin-bottom:10px;}
+.sub-init-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.sub-num{width:22px;height:22px;border-radius:50%;background:var(--c2);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sub-title{font-size:12px;font-weight:700;color:var(--navy);}
+.sub-cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.impact-table{width:100%;border-collapse:collapse;margin-bottom:22px;}
+.impact-table th{background:var(--navy);color:#fff;padding:10px 14px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-align:center;border-right:1px solid rgba(255,255,255,.1);}
+.impact-table th:first-child{text-align:left;}
+.impact-table td{padding:11px 14px;border-bottom:1px solid var(--rule);font-size:11px;text-align:center;vertical-align:middle;}
+.impact-table td:first-child{text-align:left;font-weight:600;}
+.impact-table tr:last-child td{border-bottom:none;}
+.impact-table tr:nth-child(even) td{background:#F8FAFB;}
+.impact-table .total-row td{background:#EDF1F5;font-weight:700;font-size:12px;}
+.badge-sav{display:inline-block;padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;background:#EBF4FB;color:#1a4f72;}
+.sys-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;}
+.sys-card{background:var(--white);border:1px solid var(--rule);border-radius:8px;padding:16px 18px;}
+.sys-name{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:2px;}
+.sys-role{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--lgrey);margin-bottom:6px;}
+.sys-desc{font-size:11px;color:var(--grey);line-height:1.6;}
+.sys-tag-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
+.sys-tag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;}
+.st-core{background:#EDF1F5;color:var(--navy);}
+.st-gap{background:#FDECEA;color:#8a000a;}
+.st-target{background:#E6F4EC;color:#1a5c38;}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="logo-area"><img src="data:image/png;base64,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" alt="G&A Partners" style="height:48px;display:block;"></div>
+  <div class="hdr-right"><span class="hdr-badge">Confidential &middot; Partners Only</span></div>
+</div>
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="showTab('index')">01 &middot; Overview</button>
+  <button class="tab-btn" onclick="showTab('context')">02 &middot; Business Context</button>
+  <button class="tab-btn" onclick="showTab('flow')">03 &middot; Process Map</button>
+  <button class="tab-btn" onclick="showTab('deepdive')">04 &middot; Initiative Deep Dive</button>
+  <button class="tab-btn" onclick="showTab('impact')">05 &middot; Business Impact</button>
+  <button class="tab-btn" onclick="showTab('systems')">06 &middot; Systems &amp; Technical</button>
+  <button class="tab-btn" onclick="showTab('glossary')">07 &middot; Glossary</button>
+  <button class="tab-btn" onclick="showTab('submission')">08 &middot; Submission</button>
+</div>
+
+<!-- TAB 1: OVERVIEW -->
+<div id="tab-index" class="tab-panel active">
+<div class="page">
+  <div class="pg-eye">Partner Evaluation Package &middot; June 2026</div>
+  <div class="pg-h1">AI-Enabled Benefits<br>Product Requirements Document</div>
+  <div class="pg-sub">G&amp;A Partners is evaluating strategic AI development and implementation partners to design and build AI-enabled operations workflows for its Benefits function &mdash; spanning both G&amp;A Beneficial (GAB, pre-implementation) and Benefits Administration (Ben Admin, ongoing operations). This document provides everything a partner needs to understand the opportunity, current state, and what a winning response looks like. Navigate using the tabs above.</div>
+
+  <div class="section-title">What's Inside</div>
+  <div class="index-grid">
+    <div class="index-card" onclick="showTab('index')"><div class="index-num">01</div><div class="index-body"><h3>Overview</h3><p>Key contents, scope, timeline for the partner evaluation, and the point of contact for all questions and submissions.</p></div></div>
+    <div class="index-card" onclick="showTab('context')"><div class="index-num">02</div><div class="index-body"><h3>Business Context</h3><p>What the Benefits team does, its operational processes, team structures, P&amp;L positions, and the margin improvement mandate. Read this first.</p></div></div>
+    <div class="index-card" onclick="showTab('flow')"><div class="index-num">03</div><div class="index-body"><h3>Process Map</h3><p>End-to-end process maps across swimlanes for G&amp;A Beneficial and Benefits Administration, with system touchpoints and initiative tags at each process step.</p></div></div>
+    <div class="index-card" onclick="showTab('deepdive')"><div class="index-num">04</div><div class="index-body"><h3>Initiative Deep Dive</h3><p>Initiative-level breakdowns covering current state, pain points, and what an AI and automation solution must deliver. This is where partners should spend most of their time.</p></div></div>
+    <div class="index-card" onclick="showTab('impact')"><div class="index-num">05</div><div class="index-body"><h3>Business Impact</h3><p>Detailed description of the automation initiative and capability requirements, along with effort estimates and processes affected by the initiative.</p></div></div>
+    <div class="index-card" onclick="showTab('systems')"><div class="index-num">06</div><div class="index-body"><h3>Systems &amp; Technical</h3><p>Full inventory of systems in scope, integration gaps, missing automations, and API considerations across the Benefits technology stack.</p></div></div>
+    <div class="index-card" onclick="showTab('glossary')"><div class="index-num">07</div><div class="index-body"><h3>Glossary</h3><p>Definitions of Benefits-specific terminology, G&amp;A operational acronyms, role definitions, and system names used throughout this document.</p></div></div>
+    <div class="index-card" onclick="showTab('submission')"><div class="index-num">08</div><div class="index-body"><h3>Submission Guide</h3><p>What we need from partners, how we will evaluate responses, and what a winning submission looks like &mdash; including demo specifications for each initiative.</p></div></div>
+  </div>
+
+  <div class="section-title">Scope &amp; Timeline</div>
+  <table class="tbl" style="margin-bottom:22px;">
+    <thead><tr><th>Milestone</th><th>Date</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><strong>PRD Shared</strong></td><td>June 15, 2026</td><td>This document distributed to select partners</td></tr>
+      <tr><td><strong>Partner Response Deadline</strong></td><td>June 25, 2026</td><td>Approach, architecture, cost, demo/POC, and relevant experience required</td></tr>
+      <tr><td><strong>Partner Presentations</strong></td><td>TBD</td><td>Live Q&amp;A and demo walk-through with G&amp;A leadership</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">Point of Contact</div>
+  <div class="card">
+    <div class="card-title">Engagement Lead</div>
+    <div class="card-sub">All questions and submissions should be directed to:<br><br><strong>Tilak Sagireddy</strong><br>tsagireddy@alixpartners.com</div>
+  </div>
+
+  <div class="foot"><span>G&amp;A Partners &middot; AI Benefits Operations PRD &middot; Confidential</span><span>Preliminary &mdash; Subject to Change</span></div>
+</div>
+</div>
+
+<!-- TAB 2: BUSINESS CONTEXT -->
+<div id="tab-context" class="tab-panel">
+<div class="page">
+  <div class="pg-eye">Business Context</div>
+  <div class="pg-h1">G&A Partners Benefits &mdash; Business Overview</div>
+  <div class="pg-sub">G&amp;A's Benefits function has two primary groups. GAB (G&amp;A Beneficial) is a licensed internal brokerage team that sources, quotes, and renews benefits plans for G&amp;A's clients, acting as the strategic and commercial interface between employers, carriers, and brokers. Benefits Administration is an operations team responsible for the day-to-day administration of the benefits plans (managing system setup, carrier enrollment, payroll deductions, reconciliation, WSE/client issue resolution, etc.). Read this before reviewing the process and technical sections.</div>
+
+  <div class="section-title">What the Two Teams Do</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:4px;">
+    <div class="card">
+      <div class="card-title">G&amp;A Beneficial (GAB)</div>
+      <div class="card-sub">GAB owns the client relationship from initial prospect engagement through plan quoting, selection, onboarding, and the annual renewal cycle. The team builds the Client Approved Plans (CAP) document for quoting and renewals, and manages the carrier AOR setup and enrollment launch.<br><br>
+      <strong>Sales Support &amp; Prospecting</strong> &mdash; Requirements gathering and pre-quoting support for Business Advisers.<br><br>
+      <strong>Benefits Underwriting &amp; Quoting</strong> &mdash; Risk scoring via Hero/Gradient, financial comparison building, proposal release, and rate concession negotiation.<br><br>
+      <strong>CAP Build-out &amp; Completion</strong> &mdash; Creation of the Client Approved Plans document defining plan designs, rates, employer contributions, and FSA/HSA parameters for each client.<br><br>
+      <strong>Client Onboarding</strong> &mdash; Kickoff and breakout calls, broker commission verification, DocuSign confirmation, benefits booklet preparation, and enrollment portal build.<br><br>
+      <strong>Benefits Renewal</strong> &mdash; Annual renewal cycle in which existing clients' plans and CAP data are reviewed, updated, and re-entered into the onboarding flow.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Benefits Administration (Ben Admin)</div>
+      <div class="card-sub">Ben Admin owns the full operational lifecycle after client onboarding: system configuration, payroll deduction auditing, carrier enrollment, WSE/client issue resolution, reconciliation, and regulatory compliance for all active Benefits clients.<br><br>
+      <strong>New Client System Setup &amp; Configuration</strong> &mdash; Benefit plans configured in Prism from the CAP; FSA/HSA plans built; carrier enrollment set up for both open-market and master plans.<br><br>
+      <strong>Payroll Reviews &amp; Benefit Deductions</strong> &mdash; Monthly audit of employee payroll deductions against plan rates and employer contribution schedules to ensure accuracy.<br><br>
+      <strong>Carrier / Broker Interaction &amp; Enrollment</strong> &mdash; Processing of employee enrollments with carriers, maintenance of EDI feeds for master plans, and coordination with brokers on open-market plans.<br><br>
+      <strong>WSE &amp; Client Issue Resolution</strong> &mdash; Handling of employee and client inquiries covering ID cards, claims, COBRA events, HSA contributions, and billing questions.<br><br>
+      <strong>Benefits Reconciliation &amp; Payments</strong> &mdash; Monthly reconciliation of payroll deduction data against carrier invoices at the employee level, and processing of carrier payments.<br><br>
+      <strong>Benefits Reporting &amp; Compliance</strong> &mdash; ACA filings, COBRA administration, and annual regulatory filings and plan-level compliance documentation across the client base.</div>
+    </div>
+  </div>
+
+  <div class="section-title">Benefits at a Glance</div>
+  <div class="metric-row">
+    <div class="metric-tile c2"><div class="metric-val">~130K</div><div class="metric-lbl">Total WSEs Supported</div></div>
+    <div class="metric-tile cg"><div class="metric-val">10,426</div><div class="metric-lbl">Annual Quotes (GAB)</div></div>
+    <div class="metric-tile ca"><div class="metric-val">189</div><div class="metric-lbl">Total FTEs<div style="font-size:8px;font-weight:500;color:var(--lgrey);margin-top:2px;">Incl. offshore FTEs</div></div></div>
+    <div class="metric-tile cr"><div class="metric-val">~$17.6M</div><div class="metric-lbl">Combined FLC<div style="font-size:8px;font-weight:500;color:var(--lgrey);margin-top:2px;">Incl. offshore FTEs</div></div></div>
+  </div>
+
+  <div class="section-title">Current Team Structure</div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;">
+    <!-- GAB -->
+    <div style="background:var(--navy);border-radius:8px;padding:14px 18px;">
+      <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:12px;">G&amp;A Beneficial (GAB)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+        <div style="border-right:1px solid rgba(255,255,255,.1);padding:8px 14px 8px 0;">
+          <div style="font-size:8px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px;">Onshore FTEs</div>
+          <div style="font-size:32px;font-weight:800;color:#fff;line-height:1;">62</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.4);margin-top:4px;">$7.9M FLC</div>
+        </div>
+        <div style="padding:8px 0 8px 14px;">
+          <div style="font-size:8px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px;">Offshore FTEs</div>
+          <div style="font-size:32px;font-weight:800;color:#fff;line-height:1;">10</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.4);margin-top:4px;">$0.3M FLC</div>
+        </div>
+      </div>
+    </div>
+    <!-- Ben Admin -->
+    <div style="background:var(--navy);border-radius:8px;padding:14px 18px;">
+      <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:12px;">Benefits Administration</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+        <div style="border-right:1px solid rgba(255,255,255,.1);padding:8px 14px 8px 0;">
+          <div style="font-size:8px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px;">Onshore FTEs</div>
+          <div style="font-size:32px;font-weight:800;color:#fff;line-height:1;">68</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.4);margin-top:4px;">$6.3M FLC</div>
+        </div>
+        <div style="padding:8px 0 8px 14px;">
+          <div style="font-size:8px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px;">Offshore FTEs</div>
+          <div style="font-size:32px;font-weight:800;color:#fff;line-height:1;">30</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.4);margin-top:4px;">$0.8M FLC</div>
+        </div>
+      </div>
+    </div>
+    <!-- Retirement Services (greyed out) -->
+    <div style="background:#6B6F70;border-radius:8px;padding:14px 18px;opacity:0.5;">
+      <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:12px;">Retirement Services</div>
+      <div style="padding:8px 0;">
+        <div style="font-size:8px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:6px;">Onshore FTEs</div>
+        <div style="font-size:32px;font-weight:800;color:#fff;line-height:1;">17</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.5);margin-top:4px;">$1.8M FLC</div>
+      </div>
+    </div>
+    <!-- Leadership & Other (greyed out) -->
+    <div style="background:#6B6F70;border-radius:8px;padding:14px 18px;opacity:0.5;">
+      <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:12px;">Leadership &amp; Other</div>
+      <div style="padding:8px 0;">
+        <div style="font-size:8px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:6px;">Onshore FTEs</div>
+        <div style="font-size:32px;font-weight:800;color:#fff;line-height:1;">2</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--lgrey);padding:4px 0 8px;border-bottom:1px solid var(--rule);margin-bottom:10px;">G&amp;A Beneficial &mdash; Key Roles</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:18px;">
+    <div class="card"><div class="card-title" style="font-size:12px;">AM / AE &mdash; Existing</div><div class="card-sub">Manage G&amp;A's existing client book of business, owning the relationship from plan selection and quoting through onboarding and annual renewal.</div></div>
+    <div class="card"><div class="card-title" style="font-size:12px;">AM / AE &mdash; New</div><div class="card-sub">Manage newly onboarded clients through the initial implementation cycle and early renewal engagements.</div></div>
+    <div class="card"><div class="card-title" style="font-size:12px;">Benefits Coordinator</div><div class="card-sub">Support the quoting and onboarding workflow through CAP batch review, benefits booklet preparation, and enrollment portal build.</div></div>
+  </div>
+
+  <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--lgrey);padding:4px 0 8px;border-bottom:1px solid var(--rule);margin-bottom:10px;">Benefits Administration &mdash; Key Roles</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px;">
+    <div class="card"><div class="card-title" style="font-size:12px;">Benefits Specialist</div><div class="card-sub">Own the full client servicing lifecycle post-onboarding, including carrier enrollments, payroll deduction audits, and WSE and client issue resolution.</div></div>
+    <div class="card"><div class="card-title" style="font-size:12px;">Benefits Reconciliation Specialist</div><div class="card-sub">Reconcile monthly payroll deduction data against carrier invoices at the employee level and process carrier payments.</div></div>
+    <div class="card"><div class="card-title" style="font-size:12px;">Benefits Analyst</div><div class="card-sub">Configure new client benefit plans in Prism, manage system setup and periodic audits, and support acquisition integrations.</div></div>
+    <div class="card"><div class="card-title" style="font-size:12px;">Benefits QC Administrator</div><div class="card-sub">Maintain EDI carrier feeds, manage ACA and regulatory compliance filings, and administer COBRA documentation.</div></div>
+  </div>
+
+  <div class="section-title">What We Are Looking For</div>
+
+  <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--lgrey);padding:4px 0 10px;border-bottom:2px solid var(--rule);margin-bottom:14px;">1 &middot; Core Infrastructure &mdash; CAP &amp; System Modernization</div>
+  <div style="margin-bottom:24px;">
+    <div class="card accent-red">
+      <div class="card-title">A &middot; CAP Migration to Cloud-Based Solution Integrated with Prism &nbsp;<span style="font-size:9px;font-weight:700;padding:2px 7px;background:#FDECEA;color:#8a000a;border-radius:3px;border:1px solid #C60C3044;">Priority</span></div>
+      <div class="card-sub">Replace the entirely manual Excel-based Client Approved Plans document with a cloud-hosted, Prism-integrated solution that auto-populates renewal CAPs from existing configurations and validates new-business CAPs against source data &mdash; eliminating the 2&ndash;4 hour manual build that cascades errors into 8+ downstream processes across both GAB and Ben Admin.</div>
+    </div>
+  </div>
+
+  <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--lgrey);padding:4px 0 10px;border-bottom:2px solid var(--rule);margin-bottom:14px;">2 &middot; G&amp;A Beneficial &mdash; Sales &amp; Underwriting Enablement</div>
+  <div style="margin-bottom:24px;">
+    <div class="card accent-blue">
+      <div class="card-title">B &middot; AI Underwriting Assistant</div>
+      <div class="card-sub">AI document extraction layer that scrubs PDFs, SBCs, and carrier invoices to pre-populate required plan data and flag missing information &mdash; eliminating 20&ndash;30 min per-case manual scrubbing across 10,426 annual quotes and blocking the 80&ndash;90% incomplete submissions from entering the underwriting queue.</div>
+    </div>
+  </div>
+
+  <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--lgrey);padding:4px 0 10px;border-bottom:2px solid var(--rule);margin-bottom:14px;">3 &middot; Benefits Administration &mdash; Service Delivery Automation</div>
+  <div style="margin-bottom:12px;">
+    <div class="card accent-green">
+      <div class="card-title">C &middot; Carrier Portal API/RPA for Open-Market Enrollments</div>
+      <div class="card-sub">API or RPA-based solution to automate field-by-field Prism-to-carrier-portal data entry for all non-EDI (open-market) enrollments &mdash; eliminating 13&ndash;17 min of manual transcription per enrollment with high error risk.</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:22px;">
+    <div class="card" style="background:#F5F7F9;border-color:var(--rule);border-left:4px solid var(--lgrey);border-radius:0 8px 8px 0;opacity:0.6;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+        <div class="card-title" style="color:var(--grey);">D &middot; Ciklum Platform Expansion</div>
+        <span style="font-size:9px;font-weight:700;padding:2px 7px;background:#EDF1F5;color:var(--lgrey);border-radius:3px;border:1px solid var(--rule);white-space:nowrap;">Outside PRD Scope</span>
+      </div>
+      <div class="card-sub" style="color:var(--lgrey);">Expand existing Ciklum platform for automated case creation, self-service deflection, and AI after-call summarization.</div>
+    </div>
+    <div class="card" style="background:#F5F7F9;border-color:var(--rule);border-left:4px solid var(--lgrey);border-radius:0 8px 8px 0;opacity:0.6;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+        <div class="card-title" style="color:var(--grey);">E &middot; Sidekick Platform Expansion</div>
+        <span style="font-size:9px;font-weight:700;padding:2px 7px;background:#EDF1F5;color:var(--lgrey);border-radius:3px;border:1px solid var(--rule);white-space:nowrap;">Outside PRD Scope</span>
+      </div>
+      <div class="card-sub" style="color:var(--lgrey);">Expand existing Sidekick platform to automate payroll deduction comparison and variance flagging against CAP rates.</div>
+    </div>
+    <div class="card" style="background:#F5F7F9;border-color:var(--rule);border-left:4px solid var(--lgrey);border-radius:0 8px 8px 0;opacity:0.6;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+        <div class="card-title" style="color:var(--grey);">F &middot; Benefits Reconciliation Tool Rollout</div>
+        <span style="font-size:9px;font-weight:700;padding:2px 7px;background:#EDF1F5;color:var(--lgrey);border-radius:3px;border:1px solid var(--rule);white-space:nowrap;">Outside PRD Scope</span>
+      </div>
+      <div class="card-sub" style="color:var(--lgrey);">Complete UAT and production stabilization of the Beacon recon platform to automate monthly payroll-to-carrier invoice reconciliation.</div>
+    </div>
+  </div>
+
+  <div class="foot"><span>G&amp;A Partners &middot; AI Benefits Operations PRD &middot; Confidential</span><span>Preliminary &mdash; Subject to Change</span></div>
+</div>
+</div>
+
+<!-- TAB 3: PROCESS MAP -->
+<div id="tab-flow" class="tab-panel">
+<div class="page" style="max-width:100%;padding:28px 32px 60px;">
+  <div class="pg-eye">Process Map &middot; Current State Swimlanes</div>
+  <div class="pg-h1">Benefits Operations &mdash; End-to-End Lifecycle</div>
+  <div class="pg-sub">Two separate process maps reflect the distinct operating models of G&amp;A Beneficial (deal-driven, pre-implementation) and Benefits Administration (event-driven, ongoing operations). Initiative tags (&#9873;) mark where automation targets each process step. Three inter-department handoff points are annotated where the two teams exchange artifacts.</div>
+
+  <!-- GAB MAP LABEL -->
+  <div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:8px;padding:8px 14px;background:var(--white);border:1px solid var(--rule);border-radius:6px;display:inline-flex;align-items:center;gap:8px;">
+    <span style="width:10px;height:10px;border-radius:50%;background:#C60C30;display:inline-block;"></span> Diagram 1: G&amp;A Beneficial (GAB) &mdash; 72 FTEs
+  </div>
+
+  <div style="overflow-x:auto;padding-bottom:16px;margin-bottom:6px;">
+  <div style="min-width:1060px;border:1px solid var(--rule);border-radius:8px;overflow:hidden;box-shadow:0 1px 5px rgba(35,57,74,.06);">
+  <!-- Phase header -->
+  <div style="display:grid;grid-template-columns:120px 230px 260px 185px 220px;gap:0;">
+    <div style="background:var(--white);padding:11px 8px;font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--navy);display:flex;align-items:center;justify-content:center;text-align:center;border-right:1px solid var(--rule);">Role</div>
+    <div style="background:#C60C30;padding:11px 10px;font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#fff;text-align:center;border-right:1px solid rgba(255,255,255,.15);">Prospect &amp; Quote</div>
+    <div style="background:#1a3649;padding:11px 10px;font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#fff;text-align:center;border-right:1px solid rgba(255,255,255,.15);">Client Onboarding</div>
+    <div style="background:#006fa6;padding:11px 10px;font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#fff;text-align:center;border-right:1px solid rgba(255,255,255,.15);">Enrollment &amp; Launch</div>
+    <div style="background:#1a6b40;padding:11px 10px;font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#fff;text-align:center;">Handoff &amp; Retention</div>
+  </div>
+  <!-- Row: Account Manager / Account Executive -->
+  <div style="display:grid;grid-template-columns:120px 230px 260px 185px 220px;gap:0;border-bottom:1px solid var(--rule);background:#FAFBFC;">
+    <div style="background:#23394A;padding:12px 8px;font-size:10px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.4;border-right:1px solid rgba(255,255,255,.08);">Account Manager /<br>Account Executive</div>
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:155px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:#FAFBFC;border:1px solid var(--rule);border-top:3px solid #C60C30;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">Client Requirements Gathering<br><span style="font-size:8px;font-weight:400;color:var(--grey);">Census, plan history, renewal date</span></div>
+      <div style="background:#FAFBFC;border:1px solid #C60C3044;border-top:3px solid #C60C30;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">Submit to Underwriting<br><span style="font-size:8px;font-weight:700;color:#C60C30;">80&ndash;90% submissions incomplete</span></div>
+      <div style="background:#FAFBFC;border:1px solid var(--rule);border-top:3px solid #C60C30;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">Comparison Review &amp; Concessions<br><span style="font-size:8px;font-weight:400;color:var(--grey);">70% of deals need 2&ndash;3 rounds</span></div>
+    </div>
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:155px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:#FAFBFC;border:1px solid var(--rule);border-top:3px solid #1a3649;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">Kickoff &amp; Breakout Call<br><span style="font-size:8px;font-weight:400;color:var(--grey);">Enrollment strategy confirmed</span></div>
+      <div style="background:#FAFBFC;border:1px solid #C60C3044;border-top:3px solid #C60C30;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">CAP Build-out &amp; Completion<br><span style="font-size:8px;font-weight:700;color:#C60C30;">&#9873; Init. A &middot; 2&ndash;4 hrs manually</span></div>
+      <div style="background:#FAFBFC;border:1px solid var(--rule);border-top:3px solid #1a3649;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">Broker Commission Verification<br><span style="font-size:8px;font-weight:400;color:var(--grey);">Open-market &middot; no central repo</span></div>
+    </div>
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:155px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:#FAFBFC;border:1px solid var(--rule);border-top:3px solid #006fa6;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">Enrollment Education Meeting</div>
+      <div style="background:#FAFBFC;border:1px solid var(--rule);border-top:3px solid #006fa6;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">Enrollment Monitoring</div>
+    </div>
+    <div style="padding:10px 8px;min-height:155px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:#FAFBFC;border:1px solid var(--rule);border-top:3px solid #1a6b40;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">Strategic Client Outreach</div>
+      <div style="background:#FAFBFC;border:1px solid var(--rule);border-top:3px solid #1a6b40;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">Welcome Packet Build</div>
+      <div style="background:#FAFBFC;border:1px solid #C60C3044;border-top:3px solid #C60C30;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">Benefits Renewal<br><span style="font-size:8px;font-weight:700;color:#C60C30;">&#9873; Init. A &middot; manual CAP duplication</span></div>
+    </div>
+  </div>
+  <!-- Row: Underwriting -->
+  <div style="display:grid;grid-template-columns:120px 230px 260px 185px 220px;gap:0;border-bottom:1px solid var(--rule);background:var(--white);">
+    <div style="background:#1e3344;padding:12px 8px;font-size:10px;font-weight:800;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1.4;border-right:1px solid rgba(255,255,255,.08);">Underwriting &amp;<br>Comparison</div>
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:130px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:var(--white);border:1px solid #C60C3044;border-top:3px solid #C60C30;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">Underwriting &amp; Quoting<br><span style="font-size:8px;font-weight:700;color:#C60C30;">&#9873; Init. B &middot; 20&ndash;30 min doc scrub</span></div>
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #C60C30;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">Risk Scoring (Hero/Gradient)</div>
+    </div>
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:130px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #1a3649;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">Carrier Setup (AOR / New Group)<br><span style="font-size:8px;font-weight:400;color:var(--grey);">30&ndash;45 day AOR carrier turnaround</span></div>
+    </div>
+    <div style="border-right:1px solid var(--rule);min-height:130px;"></div>
+    <div style="min-height:130px;"></div>
+  </div>
+  <!-- Row: Coordinator/Analyst -->
+  <div style="display:grid;grid-template-columns:120px 230px 260px 185px 220px;gap:0;background:#FAFBFC;">
+    <div style="background:#182c3a;padding:12px 8px;font-size:10px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.4;border-right:1px solid rgba(255,255,255,.08);">Coordinator /<br>Analyst</div>
+    <div style="border-right:1px solid var(--rule);min-height:110px;"></div>
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:110px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:#FAFBFC;border:1px solid #C60C3044;border-top:3px solid #C60C30;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">DocuSign &amp; CAP Batch Review<br><span style="font-size:8px;font-weight:700;color:#C60C30;">&#9873; Init. A &middot; downstream of CAP accuracy</span></div>
+      <div style="background:#FAFBFC;border:1px solid #C60C3044;border-top:3px solid #C60C30;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">Benefits Booklet Preparation<br><span style="font-size:8px;font-weight:700;color:#C60C30;">&#9873; Init. A &middot; auto-generated from CAP</span></div>
+      <div style="background:#FAFBFC;border:1px solid var(--rule);border-top:3px solid #1a3649;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">Portal Build (NextGen/WorkSight)</div>
+    </div>
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:110px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:#FAFBFC;border:1px solid var(--rule);border-top:3px solid #006fa6;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">Portal Testing &amp; QC</div>
+    </div>
+    <div style="padding:10px 8px;min-height:110px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:#FAFBFC;border:1px solid var(--rule);border-top:3px solid #1a6b40;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">New Client Checklist &amp; Handoff to Ben Admin</div>
+    </div>
+  </div>
+  </div></div>
+
+  <!-- GAB Legend -->
+  <div style="margin-top:8px;padding:11px 18px;background:var(--white);border:1px solid var(--rule);border-radius:8px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:28px;">
+    <span style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--lgrey);">GAB Initiative Tags</span>
+    <span style="font-size:10px;color:var(--grey);"><span style="color:var(--red);font-weight:700;">&#9873; A</span> &mdash; CAP Migration to Cloud-Based Solution</span>
+    <span style="font-size:10px;color:var(--grey);"><span style="color:var(--red);font-weight:700;">&#9873; B</span> &mdash; AI Underwriting Assistant</span>
+  </div>
+
+  <!-- BEN ADMIN MAP LABEL -->
+  <div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:8px;padding:8px 14px;background:var(--white);border:1px solid var(--rule);border-radius:6px;display:inline-flex;align-items:center;gap:8px;">
+    <span style="width:10px;height:10px;border-radius:50%;background:#0088CE;display:inline-block;"></span> Diagram 2: Benefits Administration (Ben Admin) &mdash; 98 FTEs
+  </div>
+
+  <div style="overflow-x:auto;padding-bottom:16px;">
+  <div style="min-width:1060px;border:1px solid var(--rule);border-radius:8px;overflow:hidden;box-shadow:0 1px 5px rgba(35,57,74,.06);">
+  <!-- Phase header -->
+  <div style="display:grid;grid-template-columns:120px 250px 285px 200px 205px;gap:0;">
+    <div style="background:var(--white);padding:11px 8px;font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--navy);display:flex;align-items:center;justify-content:center;text-align:center;border-right:1px solid var(--rule);">Role</div>
+    <div style="background:#C60C30;padding:11px 10px;font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#fff;text-align:center;border-right:1px solid rgba(255,255,255,.15);">Client Setup</div>
+    <div style="background:#1a3649;padding:11px 10px;font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#fff;text-align:center;border-right:1px solid rgba(255,255,255,.15);">Ongoing Servicing</div>
+    <div style="background:#006fa6;padding:11px 10px;font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#fff;text-align:center;border-right:1px solid rgba(255,255,255,.15);">Recon &amp; Payments</div>
+    <div style="background:#1a6b40;padding:11px 10px;font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#fff;text-align:center;">Compliance &amp; QC</div>
+  </div>
+  <!-- Row: Benefits Specialist -->
+  <div style="display:grid;grid-template-columns:120px 250px 285px 200px 205px;gap:0;border-bottom:1px solid var(--rule);background:var(--white);">
+    <div style="background:#23394A;padding:12px 8px;font-size:10px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.4;border-right:1px solid rgba(255,255,255,.08);">Benefits<br>Specialist</div>
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:170px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #C60C30;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">New Client Implementation<br><span style="font-size:8px;font-weight:400;color:var(--grey);">Downstream of GAB CAP handoff</span></div>
+      <div style="background:var(--white);border:1px solid #C60C3044;border-top:3px solid #C60C30;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">Carrier Enrollment (Open Market)<br><span style="font-size:8px;font-weight:700;color:#C60C30;">&#9873; Init. C &middot; 13&ndash;17 min/enrollment</span></div>
+    </div>
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:170px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid var(--lgrey);border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">Payroll Reviews &amp; Deduction Audit<br><span style="font-size:8px;font-weight:700;color:var(--lgrey);">&#9873; Init. E &middot; 4+ reports &middot; 20&ndash;60 min/client</span></div>
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid var(--lgrey);border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">WSE Issue Resolution<br><span style="font-size:8px;font-weight:700;color:var(--lgrey);">&#9873; Init. D &middot; 2&ndash;6 ID card req/day</span></div>
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid var(--lgrey);border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">Client Issue Resolution<br><span style="font-size:8px;font-weight:700;color:var(--lgrey);">&#9873; Init. D &middot; billing &amp; coverage inquiries</span></div>
+    </div>
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:170px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #006fa6;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">Exception &amp; Discrepancy<br>Resolution (Recon)</div>
+    </div>
+    <div style="padding:10px 8px;min-height:170px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #1a6b40;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">COBRA / State Continuation<br><span style="font-size:8px;font-weight:400;color:var(--grey);">Via WEX &middot; manual entry</span></div>
+    </div>
+  </div>
+  <!-- Row: Benefits Analyst -->
+  <div style="display:grid;grid-template-columns:120px 250px 285px 200px 205px;gap:0;border-bottom:1px solid var(--rule);background:#FAFBFC;">
+    <div style="background:#1e3344;padding:12px 8px;font-size:10px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.4;border-right:1px solid rgba(255,255,255,.08);">Benefits<br>Analyst</div>
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:130px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:#FAFBFC;border:1px solid #C60C3044;border-top:3px solid #C60C30;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">New Client System Setup &amp; Config<br><span style="font-size:8px;font-weight:700;color:#C60C30;">&#9873; Init. A downstream &middot; 48% of analyst time</span></div>
+      <div style="background:#FAFBFC;border:1px solid var(--rule);border-top:3px solid #C60C30;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">Acquisition Migrations</div>
+    </div>
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:130px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:#FAFBFC;border:1px solid var(--rule);border-top:3px solid #1a3649;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">Periodic Audits &amp; QC</div>
+    </div>
+    <div style="border-right:1px solid var(--rule);min-height:130px;"></div>
+    <div style="padding:10px 8px;min-height:130px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:#FAFBFC;border:1px solid var(--rule);border-top:3px solid #1a6b40;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">ACA Register &amp; Compliance<br><span style="font-size:8px;font-weight:400;color:var(--grey);">~800 clients &middot; Jan&ndash;Mar season</span></div>
+    </div>
+  </div>
+  <!-- Row: Recon Specialist -->
+  <div style="display:grid;grid-template-columns:120px 250px 285px 200px 205px;gap:0;border-bottom:1px solid var(--rule);background:var(--white);">
+    <div style="background:#182c3a;padding:12px 8px;font-size:10px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.4;border-right:1px solid rgba(255,255,255,.08);">Benefits<br>Recon Specialist</div>
+    <div style="border-right:1px solid var(--rule);min-height:100px;"></div>
+    <div style="border-right:1px solid var(--rule);min-height:100px;"></div>
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:100px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid var(--lgrey);border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">Benefits Reconciliation &amp; Payments<br><span style="font-size:8px;font-weight:700;color:var(--lgrey);">&#9873; Init. F &middot; 97% of role &middot; Excel fallback</span></div>
+    </div>
+    <div style="min-height:100px;"></div>
+  </div>
+  <!-- Row: Benefits QC / EDI -->
+  <div style="display:grid;grid-template-columns:120px 250px 285px 200px 205px;gap:0;background:#FAFBFC;">
+    <div style="background:#0f2230;padding:12px 8px;font-size:10px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.4;border-right:1px solid rgba(255,255,255,.08);">Benefits QC /<br>EDI / Compliance</div>
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:100px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:#FAFBFC;border:1px solid var(--rule);border-top:3px solid #C60C30;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">EDI Implementation &amp; Setup</div>
+    </div>
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:100px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:#FAFBFC;border:1px solid var(--rule);border-top:3px solid #1a3649;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">EDI Maintenance &amp; Discrepancy Triage<br><span style="font-size:8px;font-weight:400;color:var(--grey);">Daily validation &middot; manual routing</span></div>
+    </div>
+    <div style="border-right:1px solid var(--rule);min-height:100px;"></div>
+    <div style="padding:10px 8px;min-height:100px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:#FAFBFC;border:1px solid var(--rule);border-top:3px solid #1a6b40;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:var(--navy);">ACA / COBRA / 5500 / RxDC / SOC Docs</div>
+    </div>
+  </div>
+  </div></div>
+
+  <!-- Ben Admin Legend -->
+  <div style="margin-top:8px;padding:11px 18px;background:var(--white);border:1px solid var(--rule);border-radius:8px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+    <span style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--lgrey);">Ben Admin Initiative Tags</span>
+    <span style="font-size:10px;color:var(--grey);"><span style="color:var(--red);font-weight:700;">&#9873; A</span> &mdash; CAP Migration (downstream)</span>
+    <span style="font-size:10px;color:var(--grey);"><span style="color:var(--red);font-weight:700;">&#9873; C</span> &mdash; Carrier Portal API/RPA</span>
+    <span style="font-size:10px;color:var(--grey);"><span style="color:var(--red);font-weight:700;">&#9873; D</span> &mdash; Ciklum Platform Expansion</span>
+    <span style="font-size:10px;color:var(--grey);"><span style="color:var(--red);font-weight:700;">&#9873; E</span> &mdash; Sidekick Platform Expansion</span>
+    <span style="font-size:10px;color:var(--grey);"><span style="color:var(--red);font-weight:700;">&#9873; F</span> &mdash; Benefits Reconciliation Tool</span>
+  </div>
+
+  <!-- Inter-Dept Handoffs -->
+  <div style="margin-top:20px;padding:14px 18px;background:#EDF1F5;border:1px solid var(--rule);border-radius:8px;">
+    <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--lgrey);margin-bottom:10px;">Key Inter-Department Handoff Points</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;">
+      <div><div style="font-size:10px;font-weight:700;color:var(--navy);margin-bottom:3px;">&#8594; CAP + Benefit Batch (GAB to Ben Admin)</div><div style="font-size:10px;color:var(--grey);">Approved CAP and benefit batch in ClientSpace. CAP accuracy is the #1 cross-boundary pain point &mdash; errors in GAB cascade directly into Ben Admin system setup blocking.</div></div>
+      <div><div style="font-size:10px;font-weight:700;color:var(--navy);margin-bottom:3px;">&#8594; Carrier Setup (GAB UW to Ben Admin Specialist/EDI)</div><div style="font-size:10px;color:var(--grey);">Carrier confirmation and portal credentials for open-market plans. Carrier must be set up before effective date; open-market plans require full manual re-entry.</div></div>
+      <div><div style="font-size:10px;font-weight:700;color:var(--navy);margin-bottom:3px;">&#8592; Renewal Cycle (Ben Admin to GAB)</div><div style="font-size:10px;color:var(--grey);">Retention triggers renewal; renewed CAP data is manually duplicated from prior-year, reintroducing the same format changes and transcription errors as new-business.</div></div>
+    </div>
+  </div>
+
+  <div class="foot"><span>G&amp;A Partners &middot; AI Benefits Operations PRD &middot; Confidential</span><span>Preliminary &mdash; Subject to Change</span></div>
+</div>
+</div>
+
+<!-- TAB 4: PROCESS DEEP DIVE -->
+<div id="tab-deepdive" class="tab-panel">
+<div class="page">
+  <div class="pg-eye">Initiative Deep Dive</div>
+  <div class="pg-h1">How AI &amp; Automation Can Transform Benefits</div>
+  <div class="pg-sub">Six automation and AI initiatives (three in scope for this PRD) target the largest manual bottlenecks across the Benefits lifecycle. Each maps to documented process pain points drawn from interviews and the end-to-end process maps, and defines a clear target state. Partners should focus here: this is where the opportunity is defined and where winning responses must demonstrate specificity.</div>
+
+  <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--lgrey);padding:4px 0 10px;border-bottom:2px solid var(--rule);margin-bottom:16px;">1 &middot; Core Infrastructure &mdash; CAP &amp; System Modernization &nbsp;<span style="font-size:9px;font-weight:700;padding:2px 7px;background:#FDECEA;color:#8a000a;border-radius:3px;border:1px solid #C60C3044;text-transform:none;letter-spacing:0;">Priority</span></div>
+
+  <!-- INITIATIVE A -->
+  <div class="init-card">
+    <div class="init-header">
+      <div class="init-num-col"><div class="init-num-circle">A</div></div>
+      <div class="init-body">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+          <div class="init-title">CAP Migration to Cloud-Based Solution Integrated with Prism</div>
+          <span class="init-tag">Automation</span><span class="init-tag green">Integration</span>
+        </div>
+        <div class="init-sub">The Client Approved Plans (CAP) document is referenced in 8+ processes across both GAB and Ben Admin. Built entirely in Excel at 2&ndash;4 hours per client, every downstream process depends on its accuracy. A cloud-hosted, Prism-integrated solution that auto-populates renewal CAPs and validates new-business CAPs against source data would eliminate the bulk of this manual transcription.</div>
+        <div class="init-cols" style="margin-top:14px;">
+          <div>
+            <div class="init-col-head cur" style="font-size:8px;">Current State</div>
+            <ul class="tbl-bullets" style="margin-top:4px;">
+              <li>CAP built entirely in Excel &mdash; plan designs, rates, deductibles, and FSA/HSA parameters entered manually per client</li>
+              <li>New-business CAPs take 2&ndash;4 hours; renewal CAPs require full manual duplication with format changes each cycle</li>
+              <li>Referenced in 8+ downstream processes; ~1,320 new client setups annually amplify the labor cost</li>
+            </ul>
+          </div>
+          <div>
+            <div class="init-col-head chal" style="font-size:8px;">Current Challenges</div>
+            <ul class="tbl-bullets tbl-bullets-pain" style="margin-top:4px;">
+              <li>Excel freezes on large plans; triple-checking required before every release</li>
+              <li>CAP errors are the #1 cause of Ben Admin system setup blocking &mdash; user quote: <em>"Our setup is blocked quite often because we notice issues on the cap."</em></li>
+              <li>AM-Existing spends 35&ndash;45% of time on CAP/renewal data entry, leaving minimal capacity for strategic client outreach</li>
+            </ul>
+          </div>
+          <div>
+            <div class="init-col-head tgt" style="font-size:8px;">AI / Automation Target</div>
+            <ul class="tbl-bullets tbl-bullets-opp" style="margin-top:4px;">
+              <li>Renewal CAPs auto-populated from existing Prism configurations; AM reviews and approves rather than rebuilds</li>
+              <li>New-business CAPs validated in real time against Prism source data; discrepancies flagged before Ben Admin submission</li>
+              <li>Structured CAP data flows directly downstream to Prism setup, deduction audit, and portal build</li>
+              
+            </ul>
+          </div>
+        </div>
+        <div style="margin-top:14px;">
+          <div class="sub-init">
+            <div class="sub-init-header"><div class="sub-num">A1</div><div class="sub-title">GAB Portion &mdash; AM/AE/Coordinator Capacity Recovery</div></div>
+            <div class="sub-cols">
+              <div><div style="font-size:9px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--c2);margin-bottom:5px;">Affected Roles</div><div style="font-size:10px;color:var(--grey);">AE and AM (existing and new), Benefits Coordinator &mdash; 50+ FTEs with 25&ndash;45% time on CAP/Renewal</div></div>
+              <div><div style="font-size:9px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--red);margin-bottom:5px;">Key Pain</div><div style="font-size:10px;color:var(--grey);">Manual renewal CAP duplication; no pre-fill from prior-year Prism data</div></div>
+              <div><div style="font-size:9px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--pos);margin-bottom:5px;">Automation Yield</div><div style="font-size:10px;color:var(--grey);">40&ndash;50% of affected CAP/Renewal labor; freed AM capacity redirected to client outreach.</div></div>
+            </div>
+          </div>
+          <div class="sub-init">
+            <div class="sub-init-header"><div class="sub-num">A2</div><div class="sub-title">Ben Admin Portion &mdash; Benefits Analyst Setup Efficiency</div></div>
+            <div class="sub-cols">
+              <div><div style="font-size:9px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--c2);margin-bottom:5px;">Affected Roles</div><div style="font-size:10px;color:var(--grey);">Benefits Analyst (8 ICs) &mdash; 48% of time on system setup, directly blocked by CAP inaccuracies</div></div>
+              <div><div style="font-size:9px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--red);margin-bottom:5px;">Key Pain</div><div style="font-size:10px;color:var(--grey);">Setup blocked by CAP discrepancies; rework cycles post-setup; seasonal spikes in July and Q4</div></div>
+              <div><div style="font-size:9px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--pos);margin-bottom:5px;">Automation Yield</div><div style="font-size:10px;color:var(--grey);">20&ndash;30% of setup labor (rework cycles eliminated).</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--lgrey);padding:4px 0 10px;border-bottom:2px solid var(--rule);margin-bottom:16px;margin-top:24px;">2 &middot; G&amp;A Beneficial &mdash; Sales &amp; Underwriting Enablement</div>
+
+  <!-- INITIATIVE B -->
+  <div class="init-card">
+    <div class="init-header">
+      <div class="init-num-col"><div class="init-num-circle" style="background:var(--c2);">B</div></div>
+      <div class="init-body">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+          <div class="init-title">AI Underwriting Assistant</div>
+          <span class="init-tag blue">AI</span><span class="init-tag">Automation</span>
+        </div>
+        <div class="init-sub">The underwriting team processes 10,426 annual quotes, with 80&ndash;90% of submissions arriving incomplete. Manual document scrubbing &mdash; extracting plan data from PDFs, SBCs, and invoices &mdash; takes 20&ndash;30 minutes per case. An AI extraction layer would pre-populate comparison fields; a completeness check would block incomplete cases before they enter the queue.</div>
+        <div class="init-cols" style="margin-top:14px;">
+          <div>
+            <div class="init-col-head cur" style="font-size:8px;">Current State</div>
+            <ul class="tbl-bullets" style="margin-top:4px;">
+              <li>10,426 annual quotes; 20&ndash;30 min per case scrubbing PDFs, SBCs, and invoices to extract plan data</li>
+              <li>80&ndash;90% of submissions arrive incomplete &mdash; back-and-forth with sales consumes ~20% of UW team capacity</li>
+              <li>Age-banded rate calculations for larger groups extend scrubbing time further</li>
+            </ul>
+          </div>
+          <div>
+            <div class="init-col-head chal" style="font-size:8px;">Current Challenges</div>
+            <ul class="tbl-bullets tbl-bullets-pain" style="margin-top:4px;">
+              <li>48-hour quoting turnaround driven by scrubbing volume; extends to 3&ndash;5+ days with incomplete submissions</li>
+              <li>No submission completeness gating &mdash; incomplete cases must be returned, doubling handling time</li>
+              <li>Non-underwriting work consumes ~40% of team capacity, compressing quoting bandwidth</li>
+            </ul>
+          </div>
+          <div>
+            <div class="init-col-head tgt" style="font-size:8px;">AI / Automation Target</div>
+            <ul class="tbl-bullets tbl-bullets-opp" style="margin-top:4px;">
+              <li>AI extraction layer auto-populates plan design fields, rates, deductibles, and census data from PDFs and SBCs</li>
+              <li>Pre-submission completeness check blocks incomplete cases with actionable error messages</li>
+              <li>Scrubbing reduced to review-and-confirm; specialists focus on concession strategy and judgment calls</li>
+              
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--lgrey);padding:4px 0 10px;border-bottom:2px solid var(--rule);margin-bottom:16px;margin-top:24px;">3 &middot; Benefits Administration &mdash; Service Delivery Automation</div>
+
+  <!-- INITIATIVE C -->
+  <div class="init-card">
+    <div class="init-header">
+      <div class="init-num-col"><div class="init-num-circle" style="background:var(--pos);">C</div></div>
+      <div class="init-body">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+          <div class="init-title">Carrier Portal API/RPA for Open-Market Enrollments</div>
+          <span class="init-tag">Automation</span><span class="init-tag green">Integration</span>
+        </div>
+        <div class="init-sub">All non-EDI (open-market) carrier enrollments require a Benefits Specialist to log into each carrier portal and enter enrollment data field-by-field from Prism &mdash; 13&ndash;17 minutes per enrollment with high error risk. An API or RPA automation would handle the Prism-to-portal transcription; the specialist retains the audit review step.</div>
+        <div class="init-cols" style="margin-top:14px;">
+          <div>
+            <div class="init-col-head cur" style="font-size:8px;">Current State</div>
+            <ul class="tbl-bullets" style="margin-top:4px;">
+              <li>Every open-market enrollment requires manual field-by-field data entry into carrier portals from Prism</li>
+              <li>13&ndash;17 minutes per enrollment; Benefits Specialists spend 20% of total time on Carrier/Broker Interaction</li>
+              <li>EDI available for master plan carriers only; no API alternative for open-market</li>
+            </ul>
+          </div>
+          <div>
+            <div class="init-col-head chal" style="font-size:8px;">Current Challenges</div>
+            <ul class="tbl-bullets tbl-bullets-pain" style="margin-top:4px;">
+              <li>Transcription errors create coverage gaps &mdash; a directly documented SOX-adjacent risk</li>
+              <li>Enrollment audit review required on every case on top of 13&ndash;17 min manual entry</li>
+              <li>User quote: <em>"If we could have some type of API for all carriers open market... that would eliminate the need for us to go out to each carrier portal."</em></li>
+            </ul>
+          </div>
+          <div>
+            <div class="init-col-head tgt" style="font-size:8px;">AI / Automation Target</div>
+            <ul class="tbl-bullets tbl-bullets-opp" style="margin-top:4px;">
+              <li>API or RPA reads Prism enrollment data and executes carrier portal entry automatically</li>
+              <li>Enrollment confirmation auto-captured and stored in ClientSpace for compliance record</li>
+              <li>Exceptions routed to assigned Benefits Specialist with field-level context; audit review step retained</li>
+              
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INITIATIVE D (Outside PRD Scope) -->
+  <div class="init-card" style="opacity:0.5;margin-top:14px;">
+    <div class="init-header">
+      <div class="init-num-col"><div class="init-num-circle" style="background:var(--amber);">D</div></div>
+      <div class="init-body">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+          <div class="init-title">Ciklum Platform Expansion</div>
+          <span class="init-tag blue">AI</span><span class="init-tag">Automation</span>
+          <span style="font-size:9px;font-weight:700;padding:2px 7px;background:#EDF1F5;color:var(--lgrey);border-radius:3px;border:1px solid var(--rule);white-space:nowrap;">Outside PRD Scope</span>
+        </div>
+        <div class="init-sub">The Benefits Specialist team handles high volumes of low-complexity interactions &mdash; ID card requests, coverage verification, and billing inquiries &mdash; that do not require specialist judgment. Expanding Ciklum for automated case creation, self-service deflection, and AI after-call summarization would redirect capacity to complex cases.</div>
+        <div class="init-cols" style="margin-top:14px;">
+          <div>
+            <div class="init-col-head cur" style="font-size:8px;">Current State</div>
+            <ul class="tbl-bullets" style="margin-top:4px;">
+              <li>Benefits Specialists spend 35% of time on WSE and Client Issue Resolution combined</li>
+              <li>ID card requests average 2&ndash;6 per day; bulk requests of 30&ndash;50 during peak open enrollment</li>
+              <li>All issue intake is manual triage; no automated case creation</li>
+            </ul>
+          </div>
+          <div>
+            <div class="init-col-head chal" style="font-size:8px;">Current Challenges</div>
+            <ul class="tbl-bullets tbl-bullets-pain" style="margin-top:4px;">
+              <li>High-volume low-complexity requests consume capacity reserved for claims, FSA corrections, and COBRA</li>
+              <li>No self-service path &mdash; every inquiry routes to a Specialist regardless of complexity</li>
+              <li>After-call summarization and case documentation are entirely manual</li>
+            </ul>
+          </div>
+          <div>
+            <div class="init-col-head tgt" style="font-size:8px;">AI / Automation Target</div>
+            <ul class="tbl-bullets tbl-bullets-opp" style="margin-top:4px;">
+              <li>Automated case creation from intake channel eliminates manual triage logging</li>
+              <li>Self-service deflection routes ID cards and FAQs to carrier apps with guided prompts</li>
+              <li>AI after-call summarization auto-populates ClientSpace case notes; complex cases remain Specialist-owned</li>
+              
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INITIATIVE E (Outside PRD Scope) -->
+  <div class="init-card" style="opacity:0.5;margin-top:14px;">
+    <div class="init-header">
+      <div class="init-num-col"><div class="init-num-circle" style="background:#4A90D9;">E</div></div>
+      <div class="init-body">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+          <div class="init-title">Sidekick Platform Expansion &mdash; Automated Payroll Deduction Audit</div>
+          <span class="init-tag blue">AI</span><span class="init-tag">Automation</span>
+          <span style="font-size:9px;font-weight:700;padding:2px 7px;background:#EDF1F5;color:var(--lgrey);border-radius:3px;border:1px solid var(--rule);white-space:nowrap;">Outside PRD Scope</span>
+        </div>
+        <div class="init-sub">Monthly payroll deduction reviews consume 23% of the Benefits Specialist team. Each review pulls 4+ Prism reports, manually combines them in Excel, and compares deductions tier-by-tier against the CAP. Expanding Sidekick would replace this workflow with an automated consolidated comparison report.</div>
+        <div class="init-cols" style="margin-top:14px;">
+          <div>
+            <div class="init-col-head cur" style="font-size:8px;">Current State</div>
+            <ul class="tbl-bullets" style="margin-top:4px;">
+              <li>Benefits Specialists spend 23% of time on payroll deduction reviews &mdash; the highest single time allocation in the role</li>
+              <li>Each review: pull 4+ Prism reports &rarr; combine in Excel &rarr; compare against CAP &rarr; reconcile invoice (20&ndash;60 min per client)</li>
+              <li>HSA employer match entered manually per employee with no automated validation</li>
+            </ul>
+          </div>
+          <div>
+            <div class="init-col-head chal" style="font-size:8px;">Current Challenges</div>
+            <ul class="tbl-bullets tbl-bullets-pain" style="margin-top:4px;">
+              <li>4+ disconnected Prism reports required per cycle; VLOOKUP-based comparison is fragile and error-prone</li>
+              <li>No automated variance identification &mdash; discrepancies must be manually spotted and can persist across pay periods</li>
+              <li>User quote: <em>"If we could create some type of report within Prism that included everything that we reviewed versus pulling multiple reports..."</em></li>
+            </ul>
+          </div>
+          <div>
+            <div class="init-col-head tgt" style="font-size:8px;">AI / Automation Target</div>
+            <ul class="tbl-bullets tbl-bullets-opp" style="margin-top:4px;">
+              <li>Sidekick auto-pulls deduction register, CAP rates, and prior pay period data into a consolidated variance report</li>
+              <li>HSA employer match auto-calculated from plan enrollment data and CAP specs</li>
+              <li>Specialists review exception-flagged variances only; routine matches confirmed in bulk</li>
+              
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INITIATIVE F (Outside PRD Scope) -->
+  <div class="init-card" style="opacity:0.5;margin-top:14px;">
+    <div class="init-header">
+      <div class="init-num-col"><div class="init-num-circle" style="background:var(--pos);">F</div></div>
+      <div class="init-body">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+          <div class="init-title">Benefits Reconciliation Tool Rollout</div>
+          <span class="init-tag">Automation</span>
+          <span style="font-size:9px;font-weight:700;padding:2px 7px;background:#EDF1F5;color:var(--lgrey);border-radius:3px;border:1px solid var(--rule);white-space:nowrap;">Outside PRD Scope</span>
+        </div>
+        <div class="init-sub">The Beacon platform is designed to automate monthly payroll-to-carrier invoice reconciliation but is partially deployed and unreliable, forcing a manual Excel fallback. UAT completion and production stabilization &mdash; not new development &mdash; is the key investment required.</div>
+        <div class="init-cols" style="margin-top:14px;">
+          <div>
+            <div class="init-col-head cur" style="font-size:8px;">Current State</div>
+            <ul class="tbl-bullets" style="margin-top:4px;">
+              <li>Recon Specialists spend 97% of time on monthly reconciliation across all active clients</li>
+              <li>Beacon platform partially deployed but unreliable; Excel fallback required when Beacon fails</li>
+              <li>8 different carrier payment methods require manual routing logic</li>
+            </ul>
+          </div>
+          <div>
+            <div class="init-col-head chal" style="font-size:8px;">Current Challenges</div>
+            <ul class="tbl-bullets tbl-bullets-pain" style="margin-top:4px;">
+              <li>Beacon unreliability forces monthly Excel fallback &mdash; platform cannot be depended on without UAT completion</li>
+              <li>Over/under-payment risk from reconciliation errors creates direct financial exposure</li>
+              <li>UAT completion &mdash; not new development &mdash; is the identified key investment</li>
+            </ul>
+          </div>
+          <div>
+            <div class="init-col-head tgt" style="font-size:8px;">AI / Automation Target</div>
+            <ul class="tbl-bullets tbl-bullets-opp" style="margin-top:4px;">
+              <li>Complete Beacon UAT and stabilize production &mdash; enabling reliable auto-pull and employee-level invoice comparison</li>
+              <li>Exception-based workflow: Specialists review flagged discrepancies only; matches confirmed automatically</li>
+              <li>Excel fallback eliminated; payment routing logic automated within Beacon</li>
+              
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot"><span>G&amp;A Partners &middot; AI Benefits Operations PRD &middot; Confidential</span><span>Preliminary &mdash; Subject to Change</span></div>
+</div>
+</div>
+
+<!-- TAB 5: BUSINESS IMPACT -->
+<div id="tab-impact" class="tab-panel">
+<div class="page">
+  <div class="pg-eye">Business Impact</div>
+  <div class="pg-h1">Operational Baseline &amp; Automation Impact</div>
+  <div class="pg-sub">This tab presents two connected views: our automation goal for CAP Migration &mdash; the highest-priority initiative in this PRD &mdash; and how the G&amp;A Beneficial team currently spends time across its core processes, with the three processes targeted by Initiative A highlighted.</div>
+
+  <div class="section-title">Initiative A &mdash; Automation Goal &nbsp;<span style="font-size:9px;font-weight:700;padding:2px 7px;background:#FDECEA;color:#8a000a;border-radius:3px;border:1px solid #C60C3044;text-transform:none;letter-spacing:0;">Priority</span></div>
+  <table class="tbl" style="margin-bottom:22px;">
+    <thead>
+      <tr>
+        <th style="width:30%;">Initiative</th>
+        <th style="width:70%;">Target End State &mdash; What We Are Looking For</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="vertical-align:top;"><strong>A &middot; CAP Migration</strong><br><span style="font-size:10px;font-weight:400;color:var(--grey);">Cloud-Based Solution Integrated with Prism / WorkSight</span></td>
+        <td>
+          <ul class="tbl-bullets" style="gap:10px;">
+            <li><strong>CAP auto-generation from source data:</strong> Solution ingests data from G&amp;A's client repository, benefits plan configurations, and underwriting results to auto-generate the Client Approved Plans document &mdash; covering plan designs, carrier rates, employer contribution schedules, pay period structures, and FSA/HSA parameters &mdash; eliminating the current 2&ndash;4 hour manual Excel build per client.</li>
+            <li><strong>Dynamic template management:</strong> Solution supports real-time updates to the CAP template and associated downstream outputs when base rates change, plans are added or modified, or contribution structures are revised &mdash; ensuring all artifacts remain in sync without requiring a full manual rebuild.</li>
+            <li><strong>Renewal auto-population:</strong> For renewal cycles, the solution auto-populates the CAP from prior-year Prism plan configurations, flagging year-over-year changes for AM review rather than requiring full manual reconstruction. AM-Existing currently spends 35% of their time on renewals alone.</li>
+            <li><strong>Benefits booklet auto-generation:</strong> Solution auto-generates the client-facing benefits booklet directly from approved CAP data during initial enrollment and annual renewal, eliminating the downstream manual coordinator build step.</li>
+            <li><strong>E-signature and contract management:</strong> Integrated e-signature and contract management capabilities to obtain, store, and track client plan sign-off annually &mdash; replacing manual DocuSign coordination outside the system and providing a centralized audit trail of client approvals.</li>
+            <li><strong>Real-time data validation:</strong> CAP data validated in real time against Prism plan configurations and carrier rate tables before submission to Ben Admin; discrepancies flagged at the source, eliminating the downstream setup blocking that currently delays new client go-lives.</li>
+            <li><strong>Prism / WorkSight and ClientSpace integration:</strong> Bi-directional integration with Prism/WorkSight and ClientSpace to serve as a unified repository for benefit plan details, ensuring benefit deductions, carrier enrollment parameters, payroll audit references, and reconciliation inputs are all sourced from a single system of truth.</li>
+          </ul>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+
+
+    <div class="section-title">Activity Baseline &mdash; G&amp;A Beneficial (GAB)</div>
+  <table class="tbl" style="margin-bottom:22px;">
+    <thead>
+      <tr>
+        <th>Process</th>
+        <th style="text-align:center;">AE &mdash; Existing<div style="font-size:8px;font-weight:400;opacity:.7;">(4 FTEs)</div></th>
+        <th style="text-align:center;">AM &mdash; Existing<div style="font-size:8px;font-weight:400;opacity:.7;">(27 FTEs)</div></th>
+        <th style="text-align:center;">AE &mdash; New<div style="font-size:8px;font-weight:400;opacity:.7;">(4 FTEs)</div></th>
+        <th style="text-align:center;">AM &mdash; New<div style="font-size:8px;font-weight:400;opacity:.7;">(10 FTEs)</div></th>
+        <th style="text-align:center;">Ben. Coordinator<div style="font-size:8px;font-weight:400;opacity:.7;">(5 FTEs)</div></th>
+        <th style="text-align:center;">Ben. Underwriter<div style="font-size:8px;font-weight:400;opacity:.7;">(1 FTE)</div></th>
+        <th style="text-align:center;">FTE Equiv.</th>
+        <th style="text-align:center;">Initiative</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="background:#FDECEA;border-top:2px solid #C60C3066;border-left:2px solid #C60C3066;"><strong>CAP Build-out &amp; Completion</strong></td><td style="background:#FDECEA;border-top:2px solid #C60C3066; text-align:center;"><strong>10%</strong></td><td style="background:#FDECEA;border-top:2px solid #C60C3066; text-align:center;"><strong>10%</strong></td><td style="background:#FDECEA;border-top:2px solid #C60C3066; text-align:center;"><strong>20%</strong></td><td style="background:#FDECEA;border-top:2px solid #C60C3066; text-align:center;"><strong>20%</strong></td><td style="background:#FDECEA;border-top:2px solid #C60C3066; text-align:center;"><strong>10%</strong></td><td style="background:#FDECEA;border-top:2px solid #C60C3066; text-align:center;"><strong>&mdash;</strong></td><td style="background:#FDECEA;border-top:2px solid #C60C3066; text-align:center;"><strong>6.4</strong></td><td style="background:#FDECEA;border-top:2px solid #C60C3066;border-right:2px solid #C60C3066; text-align:center;"><span class="pri-high">&#9873; A</span></td></tr>
+      <tr><td style="background:#FDECEA;border-left:2px solid #C60C3066;"><strong>Benefits Booklet Preparation</strong></td><td style="background:#FDECEA; text-align:center;"><strong>5%</strong></td><td style="background:#FDECEA; text-align:center;"><strong>5%</strong></td><td style="background:#FDECEA; text-align:center;"><strong>5%</strong></td><td style="background:#FDECEA; text-align:center;"><strong>5%</strong></td><td style="background:#FDECEA; text-align:center;"><strong>15%</strong></td><td style="background:#FDECEA; text-align:center;"><strong>&mdash;</strong></td><td style="background:#FDECEA; text-align:center;"><strong>3.0</strong></td><td style="background:#FDECEA;border-right:2px solid #C60C3066; text-align:center;"><span class="pri-high">&#9873; A</span></td></tr>
+      <tr><td style="background:#FDECEA;border-bottom:2px solid #C60C3066;border-left:2px solid #C60C3066;"><strong>Benefits Renewal</strong></td><td style="background:#FDECEA;border-bottom:2px solid #C60C3066; text-align:center;"><strong>30%</strong></td><td style="background:#FDECEA;border-bottom:2px solid #C60C3066; text-align:center;"><strong>35%</strong></td><td style="background:#FDECEA;border-bottom:2px solid #C60C3066; text-align:center;"><strong>5%</strong></td><td style="background:#FDECEA;border-bottom:2px solid #C60C3066; text-align:center;"><strong>5%</strong></td><td style="background:#FDECEA;border-bottom:2px solid #C60C3066; text-align:center;"><strong>10%</strong></td><td style="background:#FDECEA;border-bottom:2px solid #C60C3066; text-align:center;"><strong>2%</strong></td><td style="background:#FDECEA;border-bottom:2px solid #C60C3066; text-align:center;"><strong>11.9</strong></td><td style="background:#FDECEA;border-bottom:2px solid #C60C3066;border-right:2px solid #C60C3066; text-align:center;"><span class="pri-high">&#9873; A</span></td></tr>
+      <tr><td>Sales Support &amp; Prospecting</td><td style="text-align:center;">5%</td><td style="text-align:center;">5%</td><td style="text-align:center;">10%</td><td style="text-align:center;">10%</td><td style="text-align:center;">&mdash;</td><td style="text-align:center;">&mdash;</td><td style="text-align:center;">3.0</td><td style="text-align:center;">&mdash;</td></tr>
+      <tr><td>Client Requirements Gathering</td><td style="text-align:center;">10%</td><td style="text-align:center;">10%</td><td style="text-align:center;">20%</td><td style="text-align:center;">20%</td><td style="text-align:center;">10%</td><td style="text-align:center;">10%</td><td style="text-align:center;">6.5</td><td style="text-align:center;">&mdash;</td></tr>
+      <tr><td>Benefits Underwriting &amp; Quoting</td><td style="text-align:center;">5%</td><td style="text-align:center;">5%</td><td style="text-align:center;">10%</td><td style="text-align:center;">10%</td><td style="text-align:center;">30%</td><td style="text-align:center;">75%</td><td style="text-align:center;">5.2</td><td style="text-align:center;"><span style="display:inline-block;padding:2px 9px;border-radius:99px;font-size:10px;font-weight:700;background:#EBF4FB;color:#1a4f72;border:1px solid #0088CE44;">&#9873; B</span></td></tr>
+      <tr><td>Enrollment Education</td><td style="text-align:center;">10%</td><td style="text-align:center;">10%</td><td style="text-align:center;">10%</td><td style="text-align:center;">10%</td><td style="text-align:center;">&mdash;</td><td style="text-align:center;">5%</td><td style="text-align:center;">4.6</td><td style="text-align:center;">&mdash;</td></tr>
+      <tr><td>Welcome Packet Build</td><td style="text-align:center;">&mdash;</td><td style="text-align:center;">&mdash;</td><td style="text-align:center;">5%</td><td style="text-align:center;">5%</td><td style="text-align:center;">10%</td><td style="text-align:center;">&mdash;</td><td style="text-align:center;">1.2</td><td style="text-align:center;">&mdash;</td></tr>
+      <tr><td>Broker Commission Verification</td><td style="text-align:center;">5%</td><td style="text-align:center;">5%</td><td style="text-align:center;">5%</td><td style="text-align:center;">5%</td><td style="text-align:center;">10%</td><td style="text-align:center;">1%</td><td style="text-align:center;">2.8</td><td style="text-align:center;">&mdash;</td></tr>
+      <tr><td>Strategic Client Outreach</td><td style="text-align:center;">15%</td><td style="text-align:center;">10%</td><td style="text-align:center;">5%</td><td style="text-align:center;">5%</td><td style="text-align:center;">&mdash;</td><td style="text-align:center;">5%</td><td style="text-align:center;">4.1</td><td style="text-align:center;">&mdash;</td></tr>
+      <tr><td>QC &amp; Work Audits</td><td style="text-align:center;">5%</td><td style="text-align:center;">5%</td><td style="text-align:center;">5%</td><td style="text-align:center;">5%</td><td style="text-align:center;">5%</td><td style="text-align:center;">2%</td><td style="text-align:center;">2.5</td><td style="text-align:center;">&mdash;</td></tr>
+    </tbody>
+  </table>
+  <div class="callout info">The three highlighted processes represent approximately <strong>21&ndash;22 onshore FTEs</strong> across the GAB team. Beyond this, the CAP Migration &amp; Automation initiative also directly impacts G&amp;A Beneficial&rsquo;s offshore team of <strong>~10 FTEs</strong> who support CAP build-out and renewal processes &mdash; bringing the total addressable capacity to <strong>31&ndash;32 FTEs</strong> across GAB.</div>
+
+  <div class="foot"><span>G&amp;A Partners &middot; AI Benefits Operations PRD &middot; Confidential</span><span>Preliminary &mdash; Subject to Change</span></div>
+</div>
+</div>
+
+<!-- TAB 6: SYSTEMS & TECHNICAL -->
+<div id="tab-systems" class="tab-panel">
+<div class="page">
+  <div class="pg-eye">Systems &amp; Technical</div>
+  <div class="pg-h1">Benefits Technology Stack &amp; Integration Landscape</div>
+  <div class="pg-sub">A complete inventory of systems in scope across G&amp;A Beneficial and Benefits Administration, including current integration gaps and the target state for each initiative. Partners should design solutions within and against this stack &mdash; proposals that ignore documented system constraints will not score well.</div>
+
+  <div class="section-title">Core Systems</div>
+  <div class="sys-grid">
+    <div class="sys-card"><div class="sys-name">PrismHR</div><div class="sys-role">Primary HRIS / Benefits Administration Platform</div><div class="sys-desc">System of record for all plan configurations, employee enrollments, payroll deductions, and benefits data. Every downstream Ben Admin process originates from or validates against Prism. Initiatives A, C, E, and F all require Prism data access as source of truth.</div><div class="sys-tag-row"><span class="sys-tag st-core">Core Platform</span><span class="sys-tag st-core">Source of Record</span></div></div>
+    <div class="sys-card"><div class="sys-name">ClientSpacePRO</div><div class="sys-role">Case Management &amp; Workflow Platform</div><div class="sys-desc">Primary case management system for client and WSE issue resolution, carrier interaction tracking, and process workflow. The CAP Migration (Initiative A) integrates with ClientSpace for case tracking, approval routing, and audit trail documentation.</div><div class="sys-tag-row"><span class="sys-tag st-core">Core Platform</span><span class="sys-tag st-core">Case Management</span></div></div>
+    <div class="sys-card"><div class="sys-name">NextGen / WorkSight</div><div class="sys-role">Employee Benefits Enrollment Portal</div><div class="sys-desc">Benefits enrollment portal used by WSEs during open enrollment. Coordinator/Analyst team builds and tests the portal based on the CAP. Portal accuracy is directly downstream of CAP quality &mdash; CAP errors surface during portal build and block enrollment launch.</div><div class="sys-tag-row"><span class="sys-tag st-core">Core Platform</span><span class="sys-tag st-core">Enrollment Portal</span></div></div>
+    <div class="sys-card"><div class="sys-name">Hero / Gradient</div><div class="sys-role">Underwriting Risk Scoring</div><div class="sys-desc">External risk scoring platforms used during Benefits Underwriting &amp; Quoting. The CAP Migration (Initiative A) indirectly benefits this workflow by providing clean, structured plan data as input to the quoting process.</div><div class="sys-tag-row"><span class="sys-tag st-core">Underwriting</span><span class="sys-tag st-core">External Platform</span></div></div>
+    <div class="sys-card"><div class="sys-name">WEX</div><div class="sys-role">COBRA &amp; FSA/HSA Administration</div><div class="sys-desc">Third-party administrator for COBRA continuation, FSA, and HSA plan administration. COBRA qualifying events must be manually entered one at a time &mdash; a documented pain point. FSA/HSA parameters are part of the CAP and configured in both Prism and WEX during new client setup.</div><div class="sys-tag-row"><span class="sys-tag st-core">COBRA / FSA / HSA</span><span class="sys-tag" style="background:#FDECEA;color:#8a000a;">Manual Entry Required</span></div></div>
+    <div class="sys-card"><div class="sys-name">Beacon Platform</div><div class="sys-role">Benefits Reconciliation Tool (Partial Deployment)</div><div class="sys-desc">Designed to automate monthly payroll-to-carrier invoice reconciliation at the employee level. Currently partially deployed and unreliable &mdash; when functional it significantly reduces recon time; when failing the team falls back to Excel.</div><div class="sys-tag-row"><span class="sys-tag" style="background:#FEF9EE;color:#7a4800;">Partial Deployment</span><span class="sys-tag st-target">Target: Full Production</span></div></div>
+  </div>
+
+  <div class="section-title">Platform Expansion Targets (Initiatives A, D &amp; E)</div>
+  <div class="sys-grid">
+    <div class="sys-card"><div class="sys-name">CAP Cloud Tool (Net-New)</div><div class="sys-role">Initiative A &mdash; CAP System of Record</div><div class="sys-desc">No current system exists. Net-new solution required &mdash; either purpose-built cloud application or configurable platform integrated with Prism. Must support: auto-population from Prism plan configurations, real-time validation, structured data output for downstream flows (Prism setup, WorkSight), and version control for renewal cycles. Build-vs-buy is a key evaluation criterion.</div><div class="sys-tag-row"><span class="sys-tag st-gap">Gap &mdash; No Solution Exists</span><span class="sys-tag st-target">Net-New Required</span></div></div>
+    <div class="sys-card" style="opacity:0.5;"><div class="sys-name">Ciklum Platform</div><div class="sys-role">Initiative D &mdash; Service Automation Expansion</div><div class="sys-desc">Existing vendor relationship. Expansion scope: (1) automated case creation from intake channels, (2) self-service deflection for ID card requests and coverage verification, (3) AI after-call summarization for ClientSpace documentation. Partners should demonstrate specific integration depth with both Ciklum and ClientSpacePRO.</div><div class="sys-tag-row"><span class="sys-tag" style="background:#FEF9EE;color:#7a4800;">Existing Vendor</span><span class="sys-tag st-target">Outside PRD Scope</span></div></div>
+    <div class="sys-card" style="opacity:0.5;"><div class="sys-name">Sidekick Platform</div><div class="sys-role">Initiative E &mdash; Payroll Deduction Audit Automation</div><div class="sys-desc">Existing vendor relationship. Expansion scope: automated comparison and variance flagging against Prism deduction register, CAP rates, and previous pay period data. Requires Prism read integration and CAP data integration. Partners must demonstrate Prism read capability and exception-routing to ClientSpace.</div><div class="sys-tag-row"><span class="sys-tag" style="background:#FEF9EE;color:#7a4800;">Existing Vendor</span><span class="sys-tag st-target">Outside PRD Scope</span></div></div>
+  </div>
+
+  <div class="section-title">Critical Integration Gaps</div>
+  <table class="tbl">
+    <thead><tr><th>Gap</th><th>Initiative</th><th>Current Workaround</th><th>Target State</th></tr></thead>
+    <tbody>
+      <tr><td><strong>CAP Document &mdash; No System Integration</strong></td><td><span class="pri-high">&#9873; A</span></td><td>Excel document manually built and shared; downstream systems re-read CAP manually without validation</td><td>Cloud-hosted CAP tool with Prism write-back; structured data flows downstream without manual re-entry</td></tr>
+      <tr><td><strong>Document Ingestion &mdash; No Extraction Layer</strong></td><td><span class="pri-high">&#9873; B</span></td><td>Underwriter manually reads PDFs, SBCs, and invoices to extract plan data (20&ndash;30 min per case)</td><td>AI extraction pre-populates comparison fields; specialist reviews and confirms</td></tr>
+      <tr><td><strong>Carrier Portals &mdash; No API for Open-Market</strong></td><td><span class="pri-high">&#9873; C</span></td><td>Specialist manually logs into each carrier portal and enters data field-by-field from Prism (13&ndash;17 min per enrollment)</td><td>API or RPA reads Prism enrollment data and executes portal entry automatically; specialist audits output</td></tr>
+      <tr style="opacity:0.45;"><td><strong>Self-Service Channel &mdash; No Deflection Routing</strong></td><td><span style="display:inline-block;padding:2px 9px;border-radius:99px;font-size:10px;font-weight:700;background:#EDF1F5;color:var(--lgrey);border:1px solid var(--rule);">&#9873; D</span></td><td>All WSE and client inquiries route to Benefits Specialists regardless of complexity</td><td>Ciklum self-service routes low-complexity inquiries to carrier apps; complex cases route to Specialists</td></tr>
+      <tr style="opacity:0.45;"><td><strong>Prism Deduction Reports &mdash; No Consolidated View</strong></td><td><span style="display:inline-block;padding:2px 9px;border-radius:99px;font-size:10px;font-weight:700;background:#EDF1F5;color:var(--lgrey);border:1px solid var(--rule);">&#9873; E</span></td><td>4+ separate Prism reports pulled and combined manually in Excel with VLOOKUP formulas each review cycle</td><td>Sidekick pulls and consolidates data automatically; variances pre-flagged before Specialist review</td></tr>
+      <tr style="opacity:0.45;"><td><strong>Beacon Reconciliation &mdash; Partial Deployment</strong></td><td><span style="display:inline-block;padding:2px 9px;border-radius:99px;font-size:10px;font-weight:700;background:#EDF1F5;color:var(--lgrey);border:1px solid var(--rule);">&#9873; F</span></td><td>Beacon used when functional; Excel-based manual reconciliation as fallback when Beacon fails</td><td>Full UAT completion and production stabilization; Excel fallback eliminated</td></tr>
+    </tbody>
+  </table>
+
+  <div class="foot"><span>G&amp;A Partners &middot; AI Benefits Operations PRD &middot; Confidential</span><span>Preliminary &mdash; Subject to Change</span></div>
+</div>
+</div>
+
+<!-- TAB 7: GLOSSARY -->
+<div id="tab-glossary" class="tab-panel">
+<div class="page">
+  <div class="pg-eye">Glossary</div>
+  <div class="pg-h1">Terms, Acronyms &amp; Definitions</div>
+  <div class="pg-sub">Benefits-specific terminology, G&amp;A operational acronyms, role definitions, and system names used throughout this document. Partners unfamiliar with the PEO benefits context should read this before the Initiative Deep Dive.</div>
+
+  <div class="section-title">Organizational &amp; Role Terms</div>
+  <div class="card" style="padding:8px 20px;">
+    <div class="gloss-item"><div class="gloss-term">G&amp;A Beneficial (GAB)</div><div class="gloss-def">G&amp;A's pre-implementation benefits team. Owns the client relationship from prospect engagement through quoting, plan selection, CAP build, enrollment, and the annual renewal cycle. 72 FTEs (62 onshore, 10 offshore).</div></div>
+    <div class="gloss-item"><div class="gloss-term">Benefits Administration (Ben Admin)</div><div class="gloss-def">G&amp;A's post-implementation benefits operations team. Owns system configuration, payroll deduction auditing, carrier enrollment, WSE/client issue resolution, reconciliation, and regulatory compliance for ~130,000 WSEs. 98 FTEs (68 onshore, 30 offshore).</div></div>
+    <div class="gloss-item"><div class="gloss-term">Account Manager (AM)</div><div class="gloss-def">Primary client-facing role in GAB. 27 existing + 10 new AMs. Currently spends 35&ndash;45% of time on CAP and renewal data entry. Largest beneficiary of Initiative A.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Account Executive (AE)</div><div class="gloss-def">Senior client-facing role in GAB. 4 existing + 4 new AEs. Involved in CAP build, renewal, and strategic client engagement.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Benefits Coordinator</div><div class="gloss-def">GAB role supporting underwriting and onboarding workflow &mdash; CAP batch review, booklet preparation, and portal build coordination. 5 ICs.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Benefits Underwriter</div><div class="gloss-def">Specialist role in GAB owning risk scoring via Hero/Gradient, comparison building, and proposal release. 1 IC, supported by unlisted underwriting team of ~5.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Benefits Specialist</div><div class="gloss-def">Primary operational role in Ben Admin. 36 ICs + 8 managers = 44 FTEs. Owns payroll reviews, carrier enrollment, WSE and client issue resolution. The largest single role across both Benefits teams.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Benefits Analyst</div><div class="gloss-def">Technical configuration role in Ben Admin. 8 ICs + 1 manager = 9 FTEs. Owns new client system setup (48% of time), periodic audits, process improvement, and acquisition integration. Directly downstream of CAP accuracy.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Benefits Recon Specialist</div><div class="gloss-def">Role in Ben Admin dedicated to monthly billing reconciliation. 4 ICs + 1 manager = 5 FTEs. Spends 97% of time on reconciliation &mdash; the most concentrated single-process role in the operation.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Benefits QC Admin</div><div class="gloss-def">Quality control and compliance role in Ben Admin. 3 ICs + 1 manager = 4 FTEs. Owns EDI implementation and maintenance, ACA filings, COBRA administration, and compliance documentation.</div></div>
+  </div>
+
+  <div class="section-title">Process &amp; Document Terms</div>
+  <div class="card" style="padding:8px 20px;">
+    <div class="gloss-item"><div class="gloss-term">CAP (Client Approved Plans)</div><div class="gloss-def">The Client Approved Plans document &mdash; a manually built Excel spreadsheet defining plan designs, rates, employer contributions, deductibles, and FSA/HSA parameters for each client. Referenced in 8+ downstream processes. Accuracy is the single most critical upstream quality control point in the benefits function.</div></div>
+    <div class="gloss-item"><div class="gloss-term">CAP Batch</div><div class="gloss-def">Collection of CAP documents submitted at the GAB &rarr; Ben Admin handoff point. CAP batch is the primary input for Ben Admin system setup and the trigger for new client configuration in Prism.</div></div>
+    <div class="gloss-item"><div class="gloss-term">SBC (Summary of Benefits &amp; Coverage)</div><div class="gloss-def">Standardized plan summary document required by ACA regulations. Used as a primary input to the underwriting comparison process and as a source document for carrier rate verification during CAP build-out.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Open-Market Plan</div><div class="gloss-def">A benefits plan arranged through a carrier or broker on the open market, as opposed to a master plan held directly by G&amp;A. Open-market plans require manual carrier portal enrollment (no EDI available), which is a documented pain point in the current Ben Admin workflow.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Master Plan</div><div class="gloss-def">A benefits plan held directly by G&amp;A, available to all PEO clients. Master plans use EDI for enrollment. EDI is maintained by the Benefits QC Admin team.</div></div>
+    <div class="gloss-item"><div class="gloss-term">EDI (Electronic Data Interchange)</div><div class="gloss-def">Automated electronic enrollment file transmission between G&amp;A systems and carrier systems for master plan clients. EDI is available only for master plans &mdash; open-market plans still require manual portal entry, a documented operational pain point for the Benefits Specialist team.</div></div>
+    <div class="gloss-item"><div class="gloss-term">AOR (Agent of Record)</div><div class="gloss-def">Designated broker on a client's open-market insurance plan. AOR setup requires carrier confirmation and takes 30&ndash;45 days for new-business plans &mdash; a documented bottleneck in Client Onboarding.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Benefits Reconciliation</div><div class="gloss-def">Monthly process comparing G&amp;A's payroll deduction data (Prism) against carrier invoices at the employee level to identify over/under-payments. Performed by the Recon Specialist team using Beacon (partial) and Excel fallback.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Payroll Deduction Review</div><div class="gloss-def">Monthly audit conducted by Benefits Specialists comparing Prism deduction registers against CAP rates, tier-by-tier. Largest single time allocation for the Benefits Specialist role (23%).</div></div>
+  </div>
+
+  <div class="section-title">Regulatory &amp; Compliance Terms</div>
+  <div class="card" style="padding:8px 20px;">
+    <div class="gloss-item"><div class="gloss-term">ACA (Affordable Care Act)</div><div class="gloss-def">Federal healthcare law requiring employers to offer qualifying coverage and file annual reports. G&amp;A files ACA reports for ~800 clients annually during a Jan&ndash;Mar filing season &mdash; a labor-intensive seasonal spike for Benefits Analyst and Benefits QC Admin.</div></div>
+    <div class="gloss-item"><div class="gloss-term">COBRA</div><div class="gloss-def">Federal law requiring continued health coverage to employees who lose coverage due to qualifying events. COBRA qualifying event entry in WEX is currently manual, one event at a time &mdash; a documented pain point.</div></div>
+    <div class="gloss-item"><div class="gloss-term">HSA / FSA / HRA</div><div class="gloss-def">Tax-advantaged benefit accounts. HSA employer match amounts are currently entered manually per employee in Prism with no automated validation &mdash; creating recurring audit cycles. FSA/HSA parameters are part of the CAP.</div></div>
+    <div class="gloss-item"><div class="gloss-term">SOX Control</div><div class="gloss-def">Sarbanes-Oxley internal control point requiring dual-person review or documented audit trail. Several Benefits processes carry SOX controls, particularly around carrier enrollment accuracy (coverage gap risk) and payroll deduction accuracy.</div></div>
+  </div>
+
+  <div class="foot"><span>G&amp;A Partners &middot; AI Benefits Operations PRD &middot; Confidential</span><span>Preliminary &mdash; Subject to Change</span></div>
+</div>
+</div>
+
+<!-- TAB 8: SUBMISSION -->
+<div id="tab-submission" class="tab-panel">
+<div class="page">
+  <div class="pg-eye">Submission Guide</div>
+  <div class="pg-h1">What We Need from Partners</div>
+  <div class="pg-sub">G&amp;A Partners and AlixPartners are looking for specificity, not generality. Generic AI/automation platform pitches without demonstrated integration depth against Prism, ClientSpacePRO, and carrier-specific systems will not score well. The sections below define what we need, with demo requirements for Initiative A.</div>
+
+  <div class="section-title">Required Submission Components</div>
+  <div style="padding:12px 0;">
+    <div class="submit-item">
+      <div class="submit-num">1</div>
+      <div class="submit-body">
+        <h4>Proposed Approach &amp; Workplan</h4>
+        <p>What is your recommended approach and workplan for Initiative A (CAP Migration)? Our preliminary view targets Q1&ndash;Q3 for the foundational build. Do you agree with this timeline? What does the first 30&ndash;60&ndash;90 days look like specifically, including discovery, design, and any phased rollout across GAB and Ben Admin?</p>
+      </div>
+    </div>
+    <div class="submit-item">
+      <div class="submit-num">2</div>
+      <div class="submit-body">
+        <h4>Architecture &amp; Technical Design</h4>
+        <p>Build vs. buy &mdash; purpose-built cloud app or configurable platform? How does the solution ingest data from G&amp;A's client repository, benefits plan configurations, and underwriting results? How does it write back to Prism/WorkSight for system setup? How does it validate new-business CAP data against Prism source configurations in real time? How do structured CAP fields flow downstream to Prism, ClientSpace, and the benefits booklet workflow without re-entry? How does the e-signature and contract management layer integrate with the existing DocuSign or similar workflow? Include a system architecture diagram.</p>
+      </div>
+    </div>
+    <div class="submit-item">
+      <div class="submit-num">3</div>
+      <div class="submit-body">
+        <h4>Effort, Timeline &amp; Cost</h4>
+        <p>Build cost by initiative, ongoing infrastructure/licensing cost, and proposed pricing model. Separate build cost from run cost clearly. Include G&amp;A-side resource requirements (who needs to be involved and how much of their time). For Initiative A, include change management scope &mdash; this touches both GAB and Ben Admin workflows and requires adoption across 45+ Account Managers and 8+ Benefits Analysts.</p>
+      </div>
+    </div>
+    <div class="submit-item">
+      <div class="submit-num">4</div>
+      <div class="submit-body">
+        <h4>Data, Compliance &amp; PII Handling</h4>
+        <p>Benefits data includes PHI (health coverage records), PII (SSNs, dependent information), and wage records. The CAP document contains plan-level financial parameters, employer contribution structures, and client-specific rate data. Explain what data governance controls apply, how CAP data is stored and access-controlled within the solution, how data flows securely between the CAP tool and Prism/WorkSight and ClientSpace, and how the solution handles data retention and deletion policies.</p>
+      </div>
+    </div>
+    <div class="submit-item">
+      <div class="submit-num">5</div>
+      <div class="submit-body">
+        <h4>Working Demo / Proof of Concept</h4>
+        <p><strong>CAP Migration Demo:</strong> Using a sample prior-year Prism configuration, demonstrate the following: (1) renewal CAP auto-populated from existing Prism plan data &mdash; AM reviews and approves changes without manual re-entry; (2) new-business CAP validation path where a rate discrepancy or missing field triggers a specific, actionable error before submission to Ben Admin; (3) benefits booklet auto-generated from the approved CAP data; (4) e-signature workflow routing the approved CAP to the client for sign-off; (5) approved CAP data structured and available for downstream Prism/WorkSight system setup without re-entry. Show how the solution handles data flow to ClientSpace for case tracking and audit trail.</p>
+        <p style="margin-top:8px;font-size:11px;color:var(--grey);">Video recording of a live demo is accepted if a live session is not possible before the deadline.</p>
+      </div>
+    </div>
+    <div class="submit-item">
+      <div class="submit-num">6</div>
+      <div class="submit-body">
+        <h4>Relevant Experience</h4>
+        <p>2&ndash;3 specific examples of AI or automation solutions built for benefits administration, HCM, or PEO environments. For each: problem, solution, systems integrated, and measurable outcome (cycle time reduction, error rate improvement, FTE savings preferred). Include the team that would work on this engagement and their relevant experience with PrismHR, ClientSpacePRO, carrier portal integrations, and benefits compliance (PHI/PII data handling). Experience with e-signature platforms, contract management workflows, and document generation in benefits or HCM environments is specifically valued.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Evaluation Criteria</div>
+  <table class="tbl" style="margin-bottom:22px;">
+    <thead><tr><th>Criterion</th><th style="width:80px;text-align:center;">Weight</th><th>What We Are Looking For</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Working POC / Demo Quality</strong></td><td style="text-align:center;font-weight:700;color:var(--red);">30%</td><td>Does the CAP auto-population demo show real Prism read/write integration, or just a UI mockup? Does the benefits booklet auto-generation demonstrate a live output from CAP data? Does the e-signature workflow show an actual routing and sign-off path?</td></tr>
+      <tr><td><strong>Architecture Credibility</strong></td><td style="text-align:center;font-weight:700;color:var(--red);">25%</td><td>Is the CAP cloud tool design realistic given the need to integrate with Prism/WorkSight as source of record, generate the benefits booklet, manage e-signatures, and flow structured data downstream to ClientSpace? Is the build-vs-buy recommendation well-reasoned given G&amp;A's existing stack?</td></tr>
+      <tr><td><strong>Relevant Experience</strong></td><td style="text-align:center;font-weight:700;color:var(--red);">20%</td><td>Have you built benefits administration, HCM, or PEO automation at comparable scale? PrismHR integration experience is specifically valued. Experience with benefits plan document generation, e-signature workflows, and PrismHR integrations is specifically valued.</td></tr>
+      <tr><td><strong>Cost Realism &amp; Change Management</strong></td><td style="text-align:center;font-weight:700;color:var(--red);">15%</td><td>Is build cost credible given integration scope (Prism/WorkSight, ClientSpacePRO, e-signature platform)? Is change management for Initiative A scoped as a first-class deliverable, covering both GAB and Ben Admin adoption?</td></tr>
+      <tr><td><strong>Speed to Value</strong></td><td style="text-align:center;font-weight:700;color:var(--red);">10%</td><td>What is the realistic timeline to deliver a working CAP auto-population capability by Q3? Can the benefits booklet auto-generation and e-signature workflow be delivered in parallel or must they sequence after the core CAP build?</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout success"><strong>Submit to:</strong> tsagireddy@alixpartners.com &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Deadline:</strong> June 25, 2026</div>
+
+  <div class="foot"><span>G&amp;A Partners &middot; AI Benefits Operations PRD &middot; Confidential</span><span>Preliminary &mdash; Subject to Change</span></div>
+</div>
+</div>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>

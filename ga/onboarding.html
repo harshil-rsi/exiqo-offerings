@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G&A Partners | AI Onboarding PRD</title>
+<style>
+:root{--red:#C60C30;--navy:#23394A;--grey:#6B6F70;--lgrey:#A8ACAE;--fog:#F5F7F9;--rule:#E2E8ED;--white:#FFFFFF;--pos:#2A8F60;--c2:#0088CE;--amber:#FF9E1B;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:var(--navy);background:var(--fog);font-size:13px;line-height:1.5;}
+.hdr{background:var(--navy);padding:0 48px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
+.logo-area{padding:12px 0;display:flex;align-items:center;}
+.hdr-right{display:flex;align-items:center;gap:10px;}
+.hdr-badge{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:3px;background:rgba(198,12,48,.3);color:rgba(255,255,255,.8);border:1px solid rgba(198,12,48,.4);}
+.tab-nav{background:var(--navy);display:flex;padding:0 48px;border-bottom:1px solid rgba(255,255,255,.08);overflow-x:auto;}
+.tab-nav::-webkit-scrollbar{height:0;}
+.tab-btn{padding:11px 18px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.4);border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:color .15s;flex-shrink:0;}
+.tab-btn:hover{color:rgba(255,255,255,.75);}
+.tab-btn.active{color:#fff;border-bottom-color:var(--red);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.page{max-width:1060px;margin:0 auto;padding:36px 48px 60px;}
+.pg-eye{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--red);font-weight:700;margin-bottom:5px;}
+.pg-h1{font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.4px;margin-bottom:8px;line-height:1.2;}
+.pg-sub{font-size:12px;color:var(--grey);margin-bottom:24px;max-width:700px;line-height:1.7;}
+.section-title{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--rule);margin-top:28px;}
+.divider{border:none;border-top:1px solid var(--rule);margin:24px 0;}
+.card{background:var(--white);border:1px solid var(--rule);border-radius:8px;padding:18px 20px;margin-bottom:12px;box-shadow:0 1px 4px rgba(35,57,74,.05);}
+.card-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px;}
+.card-sub{font-size:11px;color:var(--grey);line-height:1.65;}
+.card.accent-red{border-left:4px solid var(--red);border-radius:0 8px 8px 0;}
+.card.accent-blue{border-left:4px solid var(--c2);border-radius:0 8px 8px 0;}
+.card.accent-green{border-left:4px solid var(--pos);border-radius:0 8px 8px 0;}
+.card.accent-amber{border-left:4px solid var(--amber);border-radius:0 8px 8px 0;}
+.card.accent-navy{border-left:4px solid var(--navy);border-radius:0 8px 8px 0;}
+.callout{border-radius:0 6px 6px 0;padding:12px 18px;font-size:11px;line-height:1.65;margin-bottom:16px;}
+.callout.info{border-left:4px solid var(--c2);background:#EBF4FB;color:#1a4f72;}
+.callout.warn{border-left:4px solid var(--amber);background:#FEF9EE;color:#5c3c00;}
+.callout.success{border-left:4px solid var(--pos);background:#E9F5EF;color:#1a4a2e;}
+.callout strong{font-weight:700;}
+.tbl{width:100%;border-collapse:collapse;background:var(--white);border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin-bottom:18px;box-shadow:0 1px 5px rgba(35,57,74,.06);}
+.tbl thead th{background:var(--red);color:rgba(255,255,255,.9);padding:9px 14px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-align:left;border-right:1px solid rgba(255,255,255,.1);}
+.tbl thead th:last-child{border-right:none;}
+.tbl tbody td{padding:9px 14px;border-bottom:1px solid var(--rule);font-size:11px;color:var(--navy);vertical-align:top;}
+.tbl tbody tr:last-child td{border-bottom:none;}
+.tbl tbody tr:nth-child(even) td{background:#F8FAFB;}
+.tbl .subhead td{background:#EDF1F5;font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#3a5068;}
+.tbl-bullets{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:5px;}
+.tbl-bullets li{font-size:11px;color:var(--navy);line-height:1.5;padding-left:12px;position:relative;}
+.tbl-bullets li::before{content:"";position:absolute;left:1px;top:6px;width:5px;height:5px;border-radius:50%;background:var(--lgrey);}
+.tbl-bullets-pain li::before{background:var(--red);opacity:.7;}
+.tbl-bullets-opp li{color:#1a5c38;}
+.tbl-bullets-opp li::before{background:var(--pos);}
+.metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px;}
+.metric-tile{background:var(--white);border:1px solid var(--rule);border-radius:6px;padding:14px 16px;border-top:3px solid var(--navy);}
+.metric-tile.c2{border-top-color:var(--c2);}
+.metric-tile.cr{border-top-color:var(--red);}
+.metric-tile.cg{border-top-color:var(--pos);}
+.metric-tile.ca{border-top-color:var(--amber);}
+.metric-val{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-.5px;line-height:1;margin-bottom:4px;}
+.metric-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--lgrey);}
+.index-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:24px;}
+.index-card{background:var(--white);border:1px solid var(--rule);border-radius:10px;padding:20px 22px;display:flex;gap:16px;align-items:flex-start;box-shadow:0 1px 5px rgba(35,57,74,.06);cursor:pointer;transition:box-shadow .15s;}
+.index-card:hover{box-shadow:0 3px 12px rgba(35,57,74,.12);}
+.index-num{width:36px;height:36px;border-radius:50%;background:var(--red);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.index-body h3{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px;}
+.index-body p{font-size:11px;color:var(--grey);line-height:1.6;}
+.gloss-item{display:flex;gap:20px;padding:10px 0;border-bottom:1px solid var(--rule);align-items:flex-start;}
+.gloss-item:last-child{border-bottom:none;}
+.gloss-term{font-size:12px;font-weight:700;color:var(--navy);width:190px;min-width:190px;flex-shrink:0;}
+.gloss-def{font-size:11px;color:var(--grey);line-height:1.6;flex:1;}
+.submit-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--rule);}
+.submit-item:last-child{border-bottom:none;}
+.submit-num{width:28px;height:28px;border-radius:50%;background:var(--red);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.submit-body h4{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:3px;}
+.submit-body p{font-size:11px;color:var(--grey);line-height:1.6;}
+.foot{border-top:1px solid var(--rule);padding-top:14px;display:flex;justify-content:space-between;font-size:10px;color:var(--lgrey);margin-top:36px;}
+.pri-high{display:inline-block;padding:2px 9px;border-radius:99px;font-size:10px;font-weight:700;background:#FDECEA;color:#8a000a;border:1px solid #C60C3044;}
+.pri-med{display:inline-block;padding:2px 9px;border-radius:99px;font-size:10px;font-weight:700;background:#EBF4FB;color:#1a4f72;border:1px solid #0088CE44;}
+.pri-low{display:inline-block;padding:2px 9px;border-radius:99px;font-size:10px;font-weight:700;background:#E6F4EC;color:#1a5c38;border:1px solid #2A8F6044;}
+.sys-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;}
+.sys-card{background:var(--white);border:1px solid var(--rule);border-radius:8px;padding:16px 18px;}
+.sys-name{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:2px;}
+.sys-role{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--lgrey);margin-bottom:6px;}
+.sys-desc{font-size:11px;color:var(--grey);line-height:1.6;}
+.sys-tag-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
+.sys-tag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;}
+.st-core{background:#EDF1F5;color:var(--navy);}
+.st-gap{background:#FDECEA;color:#8a000a;}
+.st-target{background:#E6F4EC;color:#1a5c38;}
+.init-card{background:var(--white);border:1px solid var(--rule);border-radius:8px;margin-bottom:14px;overflow:hidden;}
+.init-header{display:grid;grid-template-columns:44px 1fr;gap:0;}
+.init-num-col{background:var(--navy);display:flex;align-items:center;justify-content:center;padding:18px 0;}
+.init-num-circle{width:28px;height:28px;border-radius:50%;background:var(--red);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.init-body{padding:16px 20px;}
+.init-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:3px;}
+.init-sub{font-size:11px;color:var(--grey);margin-bottom:12px;}
+.init-cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.init-col-head{font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px;}
+.init-col-head.cur{color:var(--c2);}
+.init-col-head.chal{color:var(--red);}
+.init-col-head.tgt{color:var(--pos);}
+.init-tag{font-size:10px;font-weight:700;padding:2px 8px;background:#C60C3022;color:#C60C30;border-radius:3px;border:1px solid #C60C3044;display:inline-block;margin-right:6px;margin-bottom:3px;}
+.init-tag.blue{background:#0088CE22;color:var(--c2);border-color:#0088CE44;}
+.init-tag.green{background:#2A8F6022;color:var(--pos);border-color:#2A8F6044;}
+.init-tag.amber{background:#FF9E1B22;color:#7a4800;border-color:#FF9E1B44;}
+.sub-init{background:#F8FAFB;border:1px solid var(--rule);border-radius:6px;padding:12px 16px;margin-bottom:10px;}
+.sub-init-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.sub-num{width:22px;height:22px;border-radius:50%;background:var(--c2);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sub-title{font-size:12px;font-weight:700;color:var(--navy);}
+.sub-cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.impact-table{width:100%;border-collapse:collapse;margin-bottom:22px;}
+.impact-table th{background:var(--navy);color:#fff;padding:10px 14px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-align:center;border-right:1px solid rgba(255,255,255,.1);}
+.impact-table th:first-child{text-align:left;}
+.impact-table td{padding:11px 14px;border-bottom:1px solid var(--rule);font-size:11px;text-align:center;vertical-align:middle;}
+.impact-table td:first-child{text-align:left;font-weight:600;}
+.impact-table tr:last-child td{border-bottom:none;}
+.impact-table tr:nth-child(even) td{background:#F8FAFB;}
+.impact-table .total-row td{background:#EDF1F5;font-weight:700;font-size:12px;}
+.badge-now{display:inline-block;padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;background:#FEF3E2;color:#7a4800;}
+.badge-tgt{display:inline-block;padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;background:#E6F4EC;color:#1a5c38;}
+.badge-sav{display:inline-block;padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;background:#EBF4FB;color:#1a4f72;}
+.arrow-up{color:var(--pos);font-size:16px;font-weight:800;}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="logo-area">
+    <img src="data:image/png;base64,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" alt="G&A Partners" style="height:48px;display:block;">
+  </div>
+  <div class="hdr-right">
+    <span class="hdr-badge">Confidential · Partners Only</span>
+  </div>
+</div>
+
+<!-- TAB NAV -->
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="showTab('index')">01 · Overview</button>
+  <button class="tab-btn" onclick="showTab('context')">02 · Business Context</button>
+  <button class="tab-btn" onclick="showTab('flow')">03 · Process Map</button>
+  <button class="tab-btn" onclick="showTab('deepdive')">04 · Initiative Deep Dive</button>
+  <button class="tab-btn" onclick="showTab('impact')">05 · Business Impact</button>
+  <button class="tab-btn" onclick="showTab('systems')">06 · Systems &amp; Technical</button>
+  <button class="tab-btn" onclick="showTab('glossary')">07 · Glossary</button>
+  <button class="tab-btn" onclick="showTab('submission')">08 · Submission</button>
+</div>
+
+
+<!-- ══ TAB 1: OVERVIEW ══ -->
+<div id="tab-index" class="tab-panel active">
+<div class="page">
+  <div class="pg-eye">Partner Evaluation Package · June 2026</div>
+  <div class="pg-h1">AI-Enabled Onboarding<br>Product Requirements Document</div>
+  <div class="pg-sub">G&A Partners is evaluating strategic AI development and implementation partners to design and build an AI-enabled operations workflow for its Client Onboarding division. This document provides everything a partner needs to understand the opportunity, current state, and what a winning response looks like. Navigate using the tabs above.</div>
+
+  <div class="section-title">What's Inside</div>
+  <div class="index-grid">
+    <div class="index-card" onclick="showTab('index')">
+      <div class="index-num">01</div>
+      <div class="index-body"><h3>Overview</h3><p>Key contents, scope, timeline for the partner evaluation, and the point of contact for all questions and submissions.</p></div>
+    </div>
+    <div class="index-card" onclick="showTab('context')">
+      <div class="index-num">02</div>
+      <div class="index-body"><h3>Business Context</h3><p>What the Onboarding division does, its team structure, role split between Project Managers and Payroll Analysts, P&L position, and the margin improvement mandate.</p></div>
+    </div>
+    <div class="index-card" onclick="showTab('flow')">
+      <div class="index-num">03</div>
+      <div class="index-body"><h3>Process Map</h3><p>Onboarding lifecycle across swim lanes showing PM and PA activities by phase with key systems and documented pain points.</p></div>
+    </div>
+    <div class="index-card" onclick="showTab('deepdive')">
+      <div class="index-num">04</div>
+      <div class="index-body"><h3>Initiative Deep Dive</h3><p>Initiative-level breakdowns covering current state, pain points, and what an AI and automation solution must deliver across identified initiatives.</p></div>
+    </div>
+    <div class="index-card" onclick="showTab('impact')">
+      <div class="index-num">05</div>
+      <div class="index-body"><h3>Business Impact</h3><p>Onboarding activity baseline showing PM and PA time allocation across all process areas with automation goals, alongside onboarding cycle compression context by phase.</p></div>
+    </div>
+    <div class="index-card" onclick="showTab('systems')">
+      <div class="index-num">06</div>
+      <div class="index-body"><h3>Systems &amp; Technical</h3><p>Full inventory of the 10+ systems in scope, integration gaps, and the GuideCX-to-WorkSight migration context. For the partner's technical team.</p></div>
+    </div>
+    <div class="index-card" onclick="showTab('glossary')">
+      <div class="index-num">07</div>
+      <div class="index-body"><h3>Glossary</h3><p>Definitions of Onboarding terminology, G&A-specific acronyms, role titles (PM, PA, BA), system names, and onboarding phase labels used throughout this document.</p></div>
+    </div>
+    <div class="index-card" onclick="showTab('submission')">
+      <div class="index-num">08</div>
+      <div class="index-body"><h3>Submission Guide</h3><p>What we need from partners, how we will evaluate responses, and what a winning submission looks like.</p></div>
+    </div>
+  </div>
+
+  <div class="section-title">Scope &amp; Timeline</div>
+  <table class="tbl" style="margin-bottom:22px;">
+    <thead><tr><th>Milestone</th><th>Date</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><strong>PRD Shared</strong></td><td>June 15, 2026</td><td>This document distributed to select partners</td></tr>
+      <tr><td><strong>Partner Response Deadline</strong></td><td>June 25, 2026</td><td>Approach, architecture, cost, demo/POC, and relevant experience required</td></tr>
+      <tr><td><strong>Partner Presentations</strong></td><td>TBD</td><td>Live Q&A and demo walk-through with G&A Onboarding leadership</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">Point of Contact</div>
+  <div class="card">
+    <div class="card-title">Engagement Lead</div>
+    <div class="card-sub">All questions and submissions should be directed to:<br><br><strong>Tilak Sagireddy</strong><br>tsagireddy@alixpartners.com</div>
+  </div>
+
+  <div class="foot">
+    <span>G&A Partners · AI Onboarding PRD · Confidential</span>
+    <span>Preliminary — Subject to Change · TBD</span>
+  </div>
+</div>
+</div>
+
+
+<!-- ══ TAB 2: BUSINESS CONTEXT ══ -->
+<div id="tab-context" class="tab-panel">
+<div class="page">
+  <div class="pg-eye">Business Context</div>
+  <div class="pg-h1">G&A Partners Onboarding — Business Overview</div>
+  <div class="pg-sub">A concise summary of the Onboarding division's business model, team structure, role split, performance context, and the two strategic mandates that define what success looks like. Read this before reviewing the process and technical sections.</div>
+
+  <div class="section-title">What the Onboarding Division Does</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:4px;">
+    <div class="card">
+      <div class="card-title">The Business</div>
+      <div class="card-sub">G&A Partners' Onboarding division manages the end-to-end process of transitioning a newly signed client from CSA execution through the first 90 to 150 days. The team is the operational bridge between Sales and ongoing payroll operations — every client that enters G&A's book of business must pass through Onboarding before generating recurring revenue. At 704 clients onboarded in 2025, the team runs a high-volume, time-critical production operation where cycle time directly correlates to revenue recognition speed.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Operational Phases</div>
+      <div class="card-sub">
+        <strong>Deal Initiation &amp; Assignment</strong> — Contract validation to confirm scope, services, and billing details before onboarding work begins.<br><br>
+        <strong>Sales Handoff</strong> — Structured knowledge transfer from Sales to the onboarding team to ensure full alignment on what was sold and committed.<br><br>
+        <strong>Client Kickoff &amp; Data Collection</strong> — Establishing the client relationship and gathering all required documentation, employee data, and payroll inputs needed to begin configuration.<br><br>
+        <strong>System Configuration</strong> — Building the client's full payroll and HR infrastructure across PrismHR and WorkSight based on the collected data and agreed service terms.<br><br>
+        <strong>Payroll Testing &amp; Training</strong> — Mock payroll, error resolution, Benefits/401k review, client admin training.<br><br>
+        <strong>First Payroll &amp; Transition</strong> — First payroll processing, dual PM/PA readiness check, PS assignment, knowledge transfer.
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Onboarding Business at a Glance</div>
+  <div class="metric-row">
+    <div class="metric-tile c2"><div class="metric-val">704</div><div class="metric-lbl">Clients Onboarded (2025)</div></div>
+    <div class="metric-tile cg"><div class="metric-val">35</div><div class="metric-lbl">Total Onboarding FTEs</div></div>
+    <div class="metric-tile ca"><div class="metric-val">$4.5M</div><div class="metric-lbl">Total Onboarding FLC</div></div>
+    <div class="metric-tile cr"><div class="metric-val">~40–60 days</div><div class="metric-lbl">Avg. Onboarding Cycle Time</div></div>
+  </div>
+
+  <div class="section-title">Current Team Structure</div>
+  <div style="background:var(--navy);border-radius:8px;padding:10px 18px;margin-bottom:4px;">
+    <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:10px;">ONBOARDING TEAM — 35 FTEs</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;">
+      <div style="border-right:1px solid rgba(255,255,255,.1);padding:8px 14px 8px 0;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px;">Onboarding Project Managers</div>
+        <div style="font-size:28px;font-weight:800;color:#fff;line-height:1;">15</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:4px;">Total FLC $2.0M</div>
+      </div>
+      <div style="border-right:1px solid rgba(255,255,255,.1);padding:8px 14px;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px;">Onboarding Payroll Analysts</div>
+        <div style="font-size:28px;font-weight:800;color:#fff;line-height:1;">16</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:4px;">Total FLC $1.7M</div>
+      </div>
+      <div style="padding:8px 14px;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px;">Leadership &amp; Management</div>
+        <div style="font-size:28px;font-weight:800;color:#fff;line-height:1;">4</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:4px;">Total FLC $0.8M</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;margin-bottom:22px;">
+    <div class="card">
+      <div class="card-title" style="font-size:12px;">Onboarding Project Managers (OBPM)</div>
+      <div class="card-sub">Own the client-facing onboarding relationship from sales handoff through transition. Responsible for coordinating the client kickoff, managing data collection, building the client's environment in PrismHR and WorkSight, training the client on the portal, and ensuring a clean handoff to the ongoing Payroll Specialist.</div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="font-size:12px;">Onboarding Payroll Analysts (OBPA)</div>
+      <div class="card-sub">Own all payroll-specific setup and testing for new clients. Responsible for translating client requirements into a fully configured payroll environment in PrismHR, validating the setup through mock payroll, coordinating compliance reviews, training the client admin on payroll submission, and processing the first live payrolls before transitioning the account.</div>
+    </div>
+  </div>
+
+  <div class="section-title">What We Are Looking For</div>
+
+  <!-- Bucket 1: GM Capture -->
+  <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--lgrey);padding:4px 0 10px;border-bottom:2px solid var(--rule);margin-bottom:14px;">1 · Gross Margin Capture — Onboarding Cycle Compression</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px;">
+    <div class="card" style="border-left:4px solid #1a8c5a;border-radius:0 8px 8px 0;">
+      <div class="card-title">A · Onboarding Cycle Compression (Time-to-First-Payroll Acceleration)</div>
+      <div class="card-sub">G&A currently takes 40–60 days to onboard a new client vs. an industry standard of ~3 weeks. Compressing the cycle by 10–14 calendar days means new clients begin generating billable payroll cycles earlier, directly accelerating gross margin recognition. Target: reduce time-to-first-payroll from the CSA sign date. Most time compression is achievable without fundamental process redesign through a combination of process changes and automation investments.</div>
+    </div>
+    <div class="card" style="background:#F5F7F9;border-color:var(--rule);">
+      <div class="card-title" style="color:var(--grey);">Where the 10–14 Days Come From</div>
+      <div class="card-sub" style="color:var(--grey);">
+        <span style="color:var(--lgrey);"><strong style="color:var(--lgrey);">1.</strong> Enforcing a 24-hour SLA for PM/PA assignment and a 48-hour SLA for other specialist assignments eliminates downstream delays &nbsp;<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;background:#EDF1F5;color:var(--lgrey);border:1px solid var(--rule);display:inline-block;">Process Improvement</span></span><br><br>
+        <strong style="color:var(--navy);">2.</strong> AI-assisted CSA review and checklist-style validation from sales replaces four independent manual reviews, triggering automated document requests immediately after deal close &nbsp;<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;background:#EBF4FB;color:#1a4f72;border:1px solid #0088CE44;display:inline-block;">AI</span><br><br>
+        <span style="color:var(--lgrey);"><strong style="color:var(--lgrey);">3.</strong> Combining client kickoff and payroll breakout into one meeting eliminates the 5-business-day scheduling gap that currently sits between two sessions that can run back-to-back &nbsp;<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;background:#EDF1F5;color:var(--lgrey);border:1px solid var(--rule);display:inline-block;">Process Improvement</span></span><br><br>
+        <strong style="color:var(--navy);">4.</strong> Enforcing hard data collection deadlines with automated daily reminders and escalation triggers can compress client data collection delays &nbsp;<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;background:#E6F4EC;color:#1a5c38;border:1px solid #2A8F6044;display:inline-block;">Automation</span><br><br>
+        <span style="color:var(--lgrey);"><strong style="color:var(--lgrey);">5.</strong> Parallelizing PM and PA system configuration — combined with pre-approving standard SUTA rates during sales — removes the serial setup dependency and the executive approval queue from the critical path &nbsp;<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;background:#EDF1F5;color:var(--lgrey);border:1px solid var(--rule);display:inline-block;">Process Improvement</span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bucket 2: Cost Efficiency -->
+  <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--lgrey);padding:4px 0 10px;border-bottom:2px solid var(--rule);margin-bottom:14px;">2 · Cost Efficiency — FTE Capacity &amp; Operational Improvement</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;">
+    <div class="card accent-red">
+      <div class="card-title">B · Automated Project Management Workflows</div>
+      <div class="card-sub">Workflow automation that auto-syncs case status across ClientSpace, PrismHR, and the Master Client List on phase events, auto-generates OB PM Tool task progress notes, and triggers multi-departmental follow-up sequences — eliminating the manual coordination overhead that dominates both PM and PA time. &nbsp;<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;background:#E6F4EC;color:#1a5c38;border:1px solid #2A8F6044;display:inline-block;">Automation</span></div>
+    </div>
+    <div class="card accent-amber">
+      <div class="card-title">C · AI-Powered Client Communication &amp; Status Compilation</div>
+      <div class="card-sub">An AI layer that auto-drafts responses to common client inquiries, auto-routes non-payroll questions to the correct department, and compiles weekly implementation status directly from live system data for PM/PA review and send. &nbsp;<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;background:#EBF4FB;color:#1a4f72;border:1px solid #0088CE44;display:inline-block;">AI</span></div>
+    </div>
+    <div class="card accent-green">
+      <div class="card-title">D · AI-Assisted CSA Extraction &amp; Cross-Validation <span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:3px;background:#C60C30;color:#ffffff;display:inline-block;margin-left:6px;">PRD Priority</span></div>
+      <div class="card-sub">Document AI that extracts structured fields from CSA PDFs on upload — fee structure, services, SUTA coverage, billing exceptions — and auto-flags discrepancies against ClientSpace handoff data, replacing four independent manual reviews with a single validation step and triggering automated document requests immediately after deal close. &nbsp;<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;background:#EBF4FB;color:#1a4f72;border:1px solid #0088CE44;display:inline-block;">AI</span></div>
+    </div>
+    <div class="card accent-navy">
+      <div class="card-title">E · ClientSpace-WorkSight Integration &amp; GuideCX Migration</div>
+      <div class="card-sub">A WorkSight-ClientSpace integrated data collection workflow with webhook-based document routing and automated escalating reminders on overdue tasks — eliminating the GuideCX manual cycle and enforcing the hard data deadlines that compress the primary onboarding bottleneck. &nbsp;<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;background:#FEF9EE;color:#5c3c00;border:1px solid #FF9E1B44;display:inline-block;">Integration</span></div>
+    </div>
+    <div class="card" style="border-left:4px solid #7B4FD6;border-radius:0 8px 8px 0;">
+      <div class="card-title">F · Mock Payroll Pre-Flight Validation <span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:3px;background:#C60C30;color:#ffffff;display:inline-block;margin-left:6px;">PRD Priority</span></div>
+      <div class="card-sub">A pre-flight validation engine that checks PrismHR configuration completeness before initialization — WC codes, SUTA rates, billing rules, pay group alignment — and outputs a pass/fail report with specific remediation steps, replacing the iterative calculate-fail-fix cycle before the first mock payroll run. &nbsp;<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;background:#E6F4EC;color:#1a5c38;border:1px solid #2A8F6044;display:inline-block;">Automation</span></div>
+    </div>
+  </div>
+
+
+
+  <div class="foot">
+    <span>G&A Partners · AI Onboarding PRD · Confidential</span>
+    <span>Preliminary — Subject to Change · TBD</span>
+  </div>
+</div>
+</div>
+
+
+<!-- ══ TAB 3: PROCESS MAP ══ -->
+<div id="tab-flow" class="tab-panel">
+<div class="page" style="max-width:100%;padding:28px 32px 60px;">
+  <div class="pg-eye">Process Map · Current State Swimlane</div>
+  <div class="pg-h1">Onboarding Customer Journey Map</div>
+  <div class="pg-sub">Two roles across six lifecycle phases. Column colors indicate the onboarding phase; row labels identify the role responsible. Estimated phase durations reflect CSA signing to first payroll processed.</div>
+
+  <div style="overflow-x:auto;padding-bottom:16px;">
+  <div style="min-width:1100px;border:1px solid var(--rule);border-radius:8px;overflow:hidden;box-shadow:0 1px 5px rgba(35,57,74,.06);">
+
+  <!-- PHASE HEADER -->
+  <div style="display:grid;grid-template-columns:110px repeat(6,1fr);gap:0;">
+    <div style="background:var(--white);padding:11px 8px;font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--navy);display:flex;align-items:center;justify-content:center;text-align:center;border-right:1px solid var(--rule);">Role</div>
+    <div style="background:#C60C30;padding:11px 10px;font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#fff;text-align:center;border-right:1px solid rgba(255,255,255,.15);">Deal Initiation</div>
+    <div style="background:#1a3649;padding:11px 10px;font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#fff;text-align:center;border-right:1px solid rgba(255,255,255,.15);">Sales Handoff</div>
+    <div style="background:#006fa6;padding:11px 10px;font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#fff;text-align:center;border-right:1px solid rgba(255,255,255,.15);">Kickoff &amp; Data Collection</div>
+    <div style="background:#2A6099;padding:11px 10px;font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#fff;text-align:center;border-right:1px solid rgba(255,255,255,.15);">System Configuration</div>
+    <div style="background:#2A8F60;padding:11px 10px;font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#fff;text-align:center;border-right:1px solid rgba(255,255,255,.15);">Testing &amp; Training</div>
+    <div style="background:#6B6F70;padding:11px 10px;font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#fff;text-align:center;">First Payroll</div>
+  </div>
+
+  <!-- ROW 1: Project Manager -->
+  <div style="display:grid;grid-template-columns:110px repeat(6,1fr);gap:0;border-bottom:1px solid var(--rule);background:var(--white);">
+    <div style="background:#2a3f52;padding:14px 8px;font-size:10px;font-weight:800;letter-spacing:.3px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1.4;border-right:1px solid rgba(255,255,255,.08);">
+      <span>Project Manager</span>
+      <div style="width:28px;height:1px;background:rgba(255,255,255,.2);margin:5px auto;"></div>
+      <span style="font-size:8px;font-weight:500;opacity:.65;letter-spacing:.2px;">OBPM</span>
+    </div>
+    <!-- Phase A -->
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:190px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #C60C30;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">CSA Review &amp; Cross-Validation</div>
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #C60C30;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">PM Assignment (48-hr SLA)</div>
+    </div>
+    <!-- Phase B -->
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:190px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #1a3649;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Schedule &amp; Conduct Sales Handoff</div>
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #1a3649;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Update ClientSpace Handoff Page</div>
+      <div style="background:#FDECEA;border:1px solid #C60C3022;border-radius:5px;padding:6px 10px;font-size:9px;color:#8a000a;margin-top:2px;">⚠ BA calendar availability stretches this to 4–7 days</div>
+    </div>
+    <!-- Phase C-D -->
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:190px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #006fa6;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Client Kickoff Meeting</div>
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #006fa6;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Set Up GuideCX Project</div>
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #006fa6;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Data Collection &amp; Follow-ups</div>
+      <div style="background:#FDECEA;border:1px solid #C60C3022;border-radius:5px;padding:6px 10px;font-size:9px;color:#8a000a;margin-top:2px;">⚠ No enforced SLA — primary bottleneck; 10–20 days of wait</div>
+    </div>
+    <!-- Phase E -->
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:190px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #2A6099;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Build PrismHR Shell</div>
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #2A6099;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">WorkSight Account &amp; Locations Setup</div>
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #2A6099;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Employee Import (WorkSight Bulk)</div>
+      <div style="background:#FDECEA;border:1px solid #C60C3022;border-radius:5px;padding:6px 10px;font-size:9px;color:#8a000a;margin-top:2px;">⚠ PA cannot start billing config until PM shell complete</div>
+    </div>
+    <!-- Phase F -->
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:190px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #2A8F60;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">WorkSight Client Training (45–60 min)</div>
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #2A8F60;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Ongoing Project Management</div>
+    </div>
+    <!-- Phase G -->
+    <div style="padding:10px 8px;min-height:190px;display:flex;flex-direction:column;gap:6px;">
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #6B6F70;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Dual PM/PA Readiness Gate</div>
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #6B6F70;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Transition Sheet &amp; PS Assignment</div>
+    </div>
+  </div>
+
+  <!-- ROW 2: Payroll Analyst -->
+  <div style="display:grid;grid-template-columns:110px repeat(6,1fr);gap:0;background:#FAFBFC;">
+    <div style="background:#23394A;padding:14px 8px;font-size:10px;font-weight:800;letter-spacing:.3px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1.4;border-right:1px solid rgba(255,255,255,.08);">
+      <span>Payroll Analyst</span>
+      <div style="width:28px;height:1px;background:rgba(255,255,255,.2);margin:5px auto;"></div>
+      <span style="font-size:8px;font-weight:500;opacity:.65;letter-spacing:.2px;">OBPA</span>
+    </div>
+    <!-- Phase A -->
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:170px;display:flex;flex-direction:column;gap:6px;background:#FAFBFC;">
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #C60C30;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">CSA Review (PA Manager)</div>
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #C60C30;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">PA Assignment (48-hr SLA)</div>
+    </div>
+    <!-- Phase B -->
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:170px;display:flex;flex-direction:column;gap:6px;background:#FAFBFC;">
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #1a3649;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">CSA Discrepancy Review</div>
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #1a3649;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Attend Sales Handoff (optional)</div>
+    </div>
+    <!-- Phase C-D -->
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:170px;display:flex;flex-direction:column;gap:6px;background:#FAFBFC;">
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #006fa6;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Payroll Breakout Meeting</div>
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #006fa6;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Request Additional Payroll Data</div>
+      <div style="background:#FDECEA;border:1px solid #C60C3022;border-radius:5px;padding:6px 10px;font-size:9px;color:#8a000a;margin-top:2px;">⚠ Payroll breakout scheduled 5 days after kickoff — pure scheduling gap</div>
+    </div>
+    <!-- Phase E -->
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:170px;display:flex;flex-direction:column;gap:6px;background:#FAFBFC;">
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #2A6099;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">PrismHR Billing Rules &amp; SUTA Config</div>
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #2A6099;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Deduction Codes &amp; Pay Groups</div>
+      <div style="background:#FDECEA;border:1px solid #C60C3022;border-radius:5px;padding:6px 10px;font-size:9px;color:#8a000a;margin-top:2px;">⚠ SUTA executive review can add 3–5 days to critical path</div>
+    </div>
+    <!-- Phase F -->
+    <div style="padding:10px 8px;border-right:1px solid var(--rule);min-height:170px;display:flex;flex-direction:column;gap:6px;background:#FAFBFC;">
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #2A8F60;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Mock Payroll (iterative error fix)</div>
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #2A8F60;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Benefits / 401k Review</div>
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #2A8F60;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Client Admin Payroll Training</div>
+      <div style="background:#FDECEA;border:1px solid #C60C3022;border-radius:5px;padding:6px 10px;font-size:9px;color:#8a000a;margin-top:2px;">⚠ WC/SUTA setup errors are a "pretty consistent" recurring delay</div>
+    </div>
+    <!-- Phase G -->
+    <div style="padding:10px 8px;min-height:170px;display:flex;flex-direction:column;gap:6px;background:#FAFBFC;">
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #6B6F70;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">First Payroll Processing</div>
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #6B6F70;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Client Approval Cycle</div>
+      <div style="background:var(--white);border:1px solid var(--rule);border-top:3px solid #6B6F70;border-radius:5px;padding:8px 10px;font-size:10px;font-weight:600;color:var(--navy);">Knowledge Transfer &amp; Handoff</div>
+    </div>
+  </div>
+
+  </div><!-- /swimlane -->
+  </div><!-- /overflow -->
+
+  <!-- SYSTEMS STRIP -->
+  <div style="margin-top:16px;display:grid;grid-template-columns:110px repeat(6,1fr);gap:0;background:var(--white);border:1px solid var(--rule);border-radius:8px;overflow:hidden;min-width:1100px;">
+    <div style="background:var(--navy);padding:10px 8px;font-size:8px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;text-align:center;">Key<br>Systems</div>
+    <div style="padding:8px;border-right:1px solid var(--rule);display:flex;flex-direction:column;gap:4px;">
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#EDF1F5;color:var(--navy);border:1px solid rgba(35,57,74,.2);display:inline-block;">ClientSpace</span>
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#E6F4EC;color:#1a6b3c;border:1px solid #2A8F6040;display:inline-block;">Excel (Master List)</span>
+    </div>
+    <div style="padding:8px;border-right:1px solid var(--rule);display:flex;flex-direction:column;gap:4px;">
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#EDF1F5;color:var(--navy);border:1px solid rgba(35,57,74,.2);display:inline-block;">ClientSpace</span>
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#E6F2FC;color:#005a8e;border:1px solid #0088CE40;display:inline-block;">Outlook · Teams</span>
+    </div>
+    <div style="padding:8px;border-right:1px solid var(--rule);display:flex;flex-direction:column;gap:4px;">
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#EDF1F5;color:var(--navy);border:1px solid rgba(35,57,74,.2);display:inline-block;">GuideCX</span>
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#E6F2FC;color:#005a8e;border:1px solid #0088CE40;display:inline-block;">ClientSpace</span>
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#E6F4EC;color:#1a6b3c;border:1px solid #2A8F6040;display:inline-block;">Google Drive</span>
+    </div>
+    <div style="padding:8px;border-right:1px solid var(--rule);display:flex;flex-direction:column;gap:4px;">
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#EDF1F5;color:var(--navy);border:1px solid rgba(35,57,74,.2);display:inline-block;">PrismHR</span>
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#FEF3E2;color:#8a4e00;border:1px solid #F5A62350;display:inline-block;">WorkSight · Click Boarding</span>
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#E6F4EC;color:#1a6b3c;border:1px solid #2A8F6040;display:inline-block;">Informer</span>
+    </div>
+    <div style="padding:8px;border-right:1px solid var(--rule);display:flex;flex-direction:column;gap:4px;">
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#EDF1F5;color:var(--navy);border:1px solid rgba(35,57,74,.2);display:inline-block;">PrismHR</span>
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#FEF3E2;color:#8a4e00;border:1px solid #F5A62350;display:inline-block;">HRWorkCycles</span>
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#E6F2FC;color:#005a8e;border:1px solid #0088CE40;display:inline-block;">WorkSight</span>
+    </div>
+    <div style="padding:8px;display:flex;flex-direction:column;gap:4px;">
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#EDF1F5;color:var(--navy);border:1px solid rgba(35,57,74,.2);display:inline-block;">PrismHR</span>
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#E6F2FC;color:#005a8e;border:1px solid #0088CE40;display:inline-block;">ClientSpace</span>
+      <span style="font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;background:#E6F4EC;color:#1a6b3c;border:1px solid #2A8F6040;display:inline-block;">Excel</span>
+    </div>
+  </div>
+
+  <!-- LEGEND -->
+  <div style="margin-top:10px;display:flex;align-items:center;gap:20px;padding:9px 14px;background:var(--white);border:1px solid var(--rule);border-radius:6px;flex-wrap:wrap;">
+    <span style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--lgrey);">System Legend</span>
+    <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--grey);">
+      <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#EDF1F5;border:1px solid rgba(35,57,74,.25);flex-shrink:0;"></span>Core Systems (ClientSpace, PrismHR)
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--grey);">
+      <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#E6F2FC;border:1px solid #0088CE40;flex-shrink:0;"></span>Communication (Outlook · Teams · Gmail)
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--grey);">
+      <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#E6F4EC;border:1px solid #2A8F6040;flex-shrink:0;"></span>Productivity (Excel · Google Drive · SharePoint)
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--grey);">
+      <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#FEF3E2;border:1px solid #F5A62350;flex-shrink:0;"></span>Client &amp; HR Platforms (WorkSight · HRWorkCycles · GuideCX)
+    </div>
+  </div>
+
+  <div class="foot" style="min-width:1100px;">
+    <span>G&A Partners · AI Onboarding PRD · Confidential</span>
+    <span>Preliminary — Subject to Change · TBD</span>
+  </div>
+</div>
+</div>
+
+
+<!-- ══ TAB 4: PROCESS DEEP DIVE ══ -->
+<div id="tab-deepdive" class="tab-panel">
+<div class="page">
+  <div class="pg-eye">Initiative Deep Dive</div>
+  <div class="pg-h1">Initiative Deep Dive</div>
+  <div class="pg-sub">Initiatives across two strategic buckets: gross margin capture (onboarding cycle compression to accelerate revenue recognition) and cost efficiency (AI and automation initiatives targeting FTE capacity improvement for both Project Managers and Payroll Analysts). Each initiative maps to documented pain points and a clear target state.</div>
+
+  <!-- ─── BUCKET 1: GM CAPTURE ─── -->
+  <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--lgrey);padding:4px 0 10px;border-bottom:2px solid var(--rule);margin-bottom:16px;">1 · Gross Margin Capture — Onboarding Cycle Compression</div>
+
+  <div class="init-card">
+    <div style="padding:18px 20px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <div class="init-title">A · Onboarding Cycle Compression: Time-to-First-Payroll Acceleration</div>
+      </div>
+
+      <!-- SUB: Automated Data Collection -->
+      <div class="sub-init" style="margin-top:12px;">
+        <div class="sub-init-header">
+          <div class="sub-num" style="background:var(--amber);">1</div>
+          <div class="sub-title">Automated Data Collection Deadlines &amp; Escalation</div>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;background:#E6F4EC;color:#1a5c38;border-radius:3px;border:1px solid #2A8F6044;display:inline-block;margin-left:auto;">Automation</span>
+        </div>
+        <div class="sub-cols">
+          <div>
+            <div class="init-col-head cur" style="font-size:8px;">Current State</div>
+            <ul class="tbl-bullets" style="margin-top:4px;">
+              <li>The PM creates a GuideCX data collection project after kickoff, then waits for the client to upload required documents — employee census, company codes, payroll reports, reverse wire authorization, handbook, and WTPA forms</li>
+              <li>No downstream work can begin until the employee census and company codes arrive — PM cannot create PrismHR locations and positions, PA cannot configure billing rules or run mock payroll</li>
+              <li>The PM monitors overdue tasks and sends manual follow-up emails with no enforced deadline or escalation SLA beyond "timely manner" in the SOP</li>
+            </ul>
+          </div>
+          <div>
+            <div class="init-col-head chal" style="font-size:8px;">Current Challenges</div>
+            <ul class="tbl-bullets tbl-bullets-pain" style="margin-top:4px;">
+              <li>Client data collection is the primary bottleneck and the single most variable phase in the onboarding cycle — the absence of any automated enforcement means overdue items can sit unactioned for days</li>
+              <li>The PM distributes overdue item follow-ups manually to internal teams, creating parallel chasing overhead across Benefits, HR, and Payroll departments</li>
+              <li>BAs frequently enter placeholder data in required ClientSpace fields at deal close, creating discrepancies that surface during onboarding and require correction before configuration can begin</li>
+            </ul>
+          </div>
+          <div>
+            <div class="init-col-head tgt" style="font-size:8px;">Automation Target</div>
+            <ul class="tbl-bullets tbl-bullets-opp" style="margin-top:4px;">
+              <li>Implement automated escalating follow-up sequences in GuideCX/WorkSight: alternate-day automated reminder, day-5 manager escalation, day-10 escalation to BA and department head, etc.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB: AI CSA Review (cross-reference) -->
+      <div class="sub-init">
+        <div class="sub-init-header">
+          <div class="sub-num" style="background:var(--c2);">2</div>
+          <div class="sub-title">AI-Assisted CSA Extraction &amp; Automated Document Triggers</div>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;background:#EBF4FB;color:#1a4f72;border-radius:3px;border:1px solid #0088CE44;margin-left:auto;">AI</span><span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:3px;background:#C60C30;color:#ffffff;display:inline-block;margin-left:6px;">PRD Priority</span>
+        </div>
+        <div style="font-size:11px;color:var(--grey);line-height:1.65;padding:4px 0;">
+          <span style="font-size:10px;font-weight:700;color:var(--c2);">→ Full initiative breakdown provided in the Cost Efficiency section under Initiative D.</span>
+        </div>
+      </div>
+
+      <!-- SUB: Mock Payroll Pre-Flight Validation (cross-reference) -->
+      <div class="sub-init">
+        <div class="sub-init-header">
+          <div class="sub-num" style="background:#2A8F60;">3</div>
+          <div class="sub-title">Mock Payroll Pre-Flight Validation</div>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;background:#E6F4EC;color:#1a5c38;border-radius:3px;border:1px solid #2A8F6044;display:inline-block;margin-left:auto;">Automation</span><span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:3px;background:#C60C30;color:#ffffff;display:inline-block;margin-left:6px;">PRD Priority</span>
+        </div>
+        <div style="font-size:11px;color:var(--grey);line-height:1.65;padding:4px 0;">
+          <span style="font-size:10px;font-weight:700;color:var(--c2);">→ Full initiative breakdown provided in the Cost Efficiency section under Initiative F.</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  
+
+  <!-- ─── BUCKET 2: COST EFFICIENCY ─── -->
+  <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--lgrey);padding:4px 0 10px;border-bottom:2px solid var(--rule);margin-bottom:16px;margin-top:28px;">2 · Cost Efficiency — FTE Capacity &amp; Operational Improvement</div>
+
+  <div class="init-card">
+    <div style="padding:18px 20px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <div class="init-title">Optimize Capacity for Project Managers and Payroll Analysts</div>
+      </div>
+
+      <!-- SUB-OPP A -->
+      <div class="sub-init" style="margin-top:12px;">
+        <div class="sub-init-header">
+          <div class="sub-num" style="background:var(--red);">B</div>
+          <div class="sub-title">Automated Project Management Workflows</div>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;background:#EDF1F5;color:var(--navy);border-radius:3px;border:1px solid rgba(35,57,74,.2);display:inline-block;margin-right:4px;">PM + PA</span><span style="font-size:10px;font-weight:700;padding:2px 8px;background:#E6F4EC;color:#1a5c38;border-radius:3px;border:1px solid #2A8F6044;display:inline-block;margin-left:auto;">Automation</span>
+        </div>
+        <div class="sub-cols">
+          <div>
+            <div class="init-col-head cur" style="font-size:8px;">Current State</div>
+            <ul class="tbl-bullets" style="margin-top:4px;">
+              <li>PMs manually update ClientSpace cases, PrismHR records, and the Master Client List as each onboarding phase progresses — triple-entering the same status information across three systems</li>
+              <li>OB PM Tool task updates and progress notes are manually written by PMs after each phase milestone; Teams group chat membership is manually updated per client</li>
+              <li>Multi-departmental follow-up tracking (Benefits, 401k, Tax, Risk) is done via email chains with no automated escalation or central visibility</li>
+            </ul>
+          </div>
+          <div>
+            <div class="init-col-head chal" style="font-size:8px;">Current Challenges</div>
+            <ul class="tbl-bullets tbl-bullets-pain" style="margin-top:4px;">
+              <li>Project management is the #1 time consumer for PMs (37%) and #2 for PAs (19%) — dominated by status tracking and record-keeping that does not require human judgment</li>
+              <li>Context-switching overhead across ClientSpace, PrismHR, Excel, and Teams for ~16 concurrent clients compounds into significant daily waste</li>
+              <li>Missed status updates create downstream confusion for Payroll Specialists during handoff, requiring rework</li>
+            </ul>
+          </div>
+          <div>
+            <div class="init-col-head tgt" style="font-size:8px;">AI / Automation Target</div>
+            <ul class="tbl-bullets tbl-bullets-opp" style="margin-top:4px;">
+              <li>Auto-create and update ClientSpace cases from PrismHR and WorkSight system events; auto-sync status to the Master Client List without manual re-entry</li>
+              <li>Auto-generate OB PM Tool task progress notes from system data; auto-update Teams group chat membership on phase transitions</li>
+              <li>Automated departmental follow-up sequences with escalation triggers; PM/PA reviews exceptions rather than initiating every touchpoint</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB-OPP B -->
+      <div class="sub-init">
+        <div class="sub-init-header">
+          <div class="sub-num" style="background:var(--amber);">C</div>
+          <div class="sub-title">AI-Powered Client Communication &amp; Status Compilation</div>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;background:#EDF1F5;color:var(--navy);border-radius:3px;border:1px solid rgba(35,57,74,.2);display:inline-block;margin-right:4px;">PM + PA</span><span style="font-size:10px;font-weight:700;padding:2px 8px;background:#EBF4FB;color:#1a4f72;border-radius:3px;border:1px solid #0088CE44;display:inline-block;margin-left:auto;">AI</span>
+        </div>
+        <div class="sub-cols">
+          <div>
+            <div class="init-col-head cur" style="font-size:8px;">Current State</div>
+            <ul class="tbl-bullets" style="margin-top:4px;">
+              <li>Both PM and PA serve as single points of contact for all client questions during onboarding — triaging payroll vs. non-payroll inquiries, researching answers across multiple systems, and composing responses individually</li>
+              <li>Weekly status updates are manually compiled by gathering implementation progress from each internal department and formatting into a client-facing summary</li>
+            </ul>
+          </div>
+          <div>
+            <div class="init-col-head chal" style="font-size:8px;">Current Challenges</div>
+            <ul class="tbl-bullets tbl-bullets-pain" style="margin-top:4px;">
+              <li>Client Communication consumes 15% of PM time and 10% of PA time — a significant burden for what is largely routine inquiry handling and status reporting</li>
+              <li>Non-payroll inquiries (benefits, HR advisory, risk) are routed manually, creating delays and PM/PA distraction on topics outside their expertise</li>
+              <li>Status compilation requires PMs to contact 6–8 internal departments before every weekly update</li>
+            </ul>
+          </div>
+          <div>
+            <div class="init-col-head tgt" style="font-size:8px;">AI / Automation Target</div>
+            <ul class="tbl-bullets tbl-bullets-opp" style="margin-top:4px;">
+              <li>AI assistant auto-compiles weekly client status from GuideCX task completion and ClientSpace cases — PM/PA reviews and sends rather than assembles from scratch</li>
+              <li>AI-drafted response templates for common inquiries (document status, payroll training schedule, timeline questions) with PM/PA review-and-approve workflow</li>
+              <li>Auto-routing of non-payroll questions to the correct department based on keyword classification, eliminating manual triage</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB-OPP C -->
+      <div class="sub-init">
+        <div class="sub-init-header">
+          <div class="sub-num" style="background:var(--pos);">D</div>
+          <div class="sub-title">AI-Assisted CSA Extraction &amp; Cross-Validation</div>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;background:#EDF1F5;color:var(--navy);border-radius:3px;border:1px solid rgba(35,57,74,.2);display:inline-block;margin-right:4px;">PM + PA</span><span style="font-size:10px;font-weight:700;padding:2px 8px;background:#EBF4FB;color:#1a4f72;border-radius:3px;border:1px solid #0088CE44;display:inline-block;margin-left:auto;">AI</span><span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:3px;background:#C60C30;color:#ffffff;display:inline-block;margin-left:6px;">PRD Priority</span>
+        </div>
+        <div class="sub-cols">
+          <div>
+            <div class="init-col-head cur" style="font-size:8px;">Current State</div>
+            <ul class="tbl-bullets" style="margin-top:4px;">
+              <li>The CSA PDF is independently reviewed four times: by the PM Manager (CSA Review), the PM (Sales Handoff), the PA Manager (CSA Review), and the PA — each manually sifting through the multi-page legal document for fee structure, term, included vs. optional services, billing exceptions, SUTA coverage, and tax classification</li>
+              <li>Each reviewer also cross-validates the CSA against the ClientSpace handoff page fields, repeating the same comparison logic four times with no shared structured output</li>
+            </ul>
+          </div>
+          <div>
+            <div class="init-col-head chal" style="font-size:8px;">Current Challenges</div>
+            <ul class="tbl-bullets tbl-bullets-pain" style="margin-top:4px;">
+              <li>Four independent reviews of the same PDF is the clearest documented redundancy in the onboarding process — the PM Manager alone spends 30–40 minutes per deal on this task</li>
+              <li>BAs enter placeholder data in required fields, creating discrepancies that surface during onboarding meetings rather than pre-empted at deal close</li>
+              <li>No Salesforce-to-ClientSpace integration means BAs manually re-enter data from Salesforce, increasing error risk</li>
+            </ul>
+          </div>
+          <div>
+            <div class="init-col-head tgt" style="font-size:8px;">AI / Automation Target</div>
+            <ul class="tbl-bullets tbl-bullets-opp" style="margin-top:4px;">
+              <li>Document AI model extracts structured fields from the CSA PDF on upload — fee structure, term, included/optional services, pricing, tax classification, ownership, cyber policy — and populates a structured ClientSpace summary record</li>
+              <li>Auto-flags discrepancies between extracted CSA fields and handoff page data; all four reviewers validate pre-populated structured data rather than independently sifting the PDF</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB-OPP D -->
+      <div class="sub-init">
+        <div class="sub-init-header">
+          <div class="sub-num" style="background:var(--navy);">E</div>
+          <div class="sub-title">ClientSpace-WorkSight Integration &amp; GuideCX Migration</div>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;background:#EDF1F5;color:var(--navy);border-radius:3px;border:1px solid rgba(35,57,74,.2);display:inline-block;margin-right:4px;">PM</span><span style="font-size:10px;font-weight:700;padding:2px 8px;background:#FEF9EE;color:#5c3c00;border-radius:3px;border:1px solid #FF9E1B44;display:inline-block;margin-left:auto;">Integration</span>
+        </div>
+        <div class="sub-cols">
+          <div>
+            <div class="init-col-head cur" style="font-size:8px;">Current State</div>
+            <ul class="tbl-bullets" style="margin-top:4px;">
+              <li>The PM manually creates a GuideCX project within 2 business days of kickoff — naming it, selecting the template, adding team members, attaching kickoff documents, configuring task applicability, and updating due dates</li>
+              <li>Client-uploaded documents are manually downloaded from GuideCX by the PM, saved to G: Drive, and attached to ClientSpace with documentation notes — a download-upload-note cycle repeated for every document submission</li>
+              <li>Overdue task follow-ups are sent manually by email; no automated escalation logic exists beyond "timely manner" language in the SOP</li>
+            </ul>
+          </div>
+          <div>
+            <div class="init-col-head chal" style="font-size:8px;">Current Challenges</div>
+            <ul class="tbl-bullets tbl-bullets-pain" style="margin-top:4px;">
+              <li>GuideCX exists as a separate system that PMs must manage in parallel with ClientSpace — creating redundant data entry and context-switching overhead throughout the engagement</li>
+              <li>Client data collection is the primary bottleneck (10–20 days), and the absence of automated escalation means overdue items can sit unactioned for days</li>
+              <li>Security access setup for client admins in WorkSight requires a manual case — 3-day turnaround — blocking training scheduling</li>
+            </ul>
+          </div>
+          <div>
+            <div class="init-col-head tgt" style="font-size:8px;">AI / Automation Target</div>
+            <ul class="tbl-bullets tbl-bullets-opp" style="margin-top:4px;">
+              <li>Migrate GuideCX to WorkSight and integrate with ClientSpace — auto-create data collection projects from ClientSpace kickoff-completion triggers using client metadata (service type, state, tier)</li>
+              <li>Webhook-based auto-distribution of client-uploaded documents from WorkSight to G: Drive and ClientSpace, eliminating the manual download-upload-note cycle</li>
+              <li>Automated escalating follow-up sequences for overdue tasks: day-5 reminder → day-10 BA/executive sponsor escalation → day-15 client CEO/decision-maker escalation</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB-OPP E -->
+      <div class="sub-init">
+        <div class="sub-init-header">
+          <div class="sub-num" style="background:#7B4FD6;">F</div>
+          <div class="sub-title">Mock Payroll Pre-Flight Validation</div>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;background:#EDF1F5;color:var(--navy);border-radius:3px;border:1px solid rgba(35,57,74,.2);display:inline-block;margin-right:4px;">PA</span><span style="font-size:10px;font-weight:700;padding:2px 8px;background:#E6F4EC;color:#1a5c38;border-radius:3px;border:1px solid #2A8F6044;display:inline-block;margin-left:auto;">Automation</span><span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:3px;background:#C60C30;color:#ffffff;display:inline-block;margin-left:6px;">PRD Priority</span>
+        </div>
+        <div class="sub-cols">
+          <div>
+            <div class="init-col-head cur" style="font-size:8px;">Current State</div>
+            <ul class="tbl-bullets" style="margin-top:4px;">
+              <li>The PA runs mock payroll in PrismHR, encounters system calculation errors (WC codes, SUTA rates, setup mismatches, pay group/schedule misalignment), manually resolves each error, re-initializes payroll, and iterates until the run is clean</li>
+              <li>The SOP explicitly calls out this step in uppercase as a recurring delay: "DELAYS OCCUR HERE DUE TO W/C, SUTA ERRORS &amp; OTHER SYSTEM GENERATED ERRORS DUE TO SETUP"</li>
+              <li>Similar errors resurface during the first live payroll if setup corrections in mock were incomplete, creating a second error-resolution cycle</li>
+            </ul>
+          </div>
+          <div>
+            <div class="init-col-head chal" style="font-size:8px;">Current Challenges</div>
+            <ul class="tbl-bullets tbl-bullets-pain" style="margin-top:4px;">
+              <li>Payroll Consultation &amp; Planning (11%) and Payroll Processing (14%) together represent 25% of PA time — the largest combined block — and both are heavily impacted by this iterative error-resolution cycle</li>
+              <li>SUTA Bill Rate Review requires specific executive approval, with policy requiring setup to be complete at least 1 week before first payroll. Any delay in the executive review queue cascades directly into payroll processing delays</li>
+              <li>The calculate-fail-fix-recalculate loop is unpredictable in duration, making it impossible to commit to a first-payroll date early in the onboarding cycle</li>
+            </ul>
+          </div>
+          <div>
+            <div class="init-col-head tgt" style="font-size:8px;">AI / Automation Target</div>
+            <ul class="tbl-bullets tbl-bullets-opp" style="margin-top:4px;">
+              <li>Pre-flight validation report that runs before payroll initialization: (a) all employees have valid WC codes matching CSA Schedule 2; (b) SUTA rates entered for every state with active employees; (c) all billing rules complete; (d) pay group-schedule alignment correct; (e) deduction codes reference valid accounts</li>
+              <li>Output: pass/fail report with specific remediation steps, eliminating the blind trial-and-error cycle and surfacing errors before they surface as calculation failures</li>
+              <li>Pre-approve standard SUTA rates during the sales process for known states — only escalate non-standard rates to executive review, removing the approval queue from the critical path for the majority of deals</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+
+
+
+<div class="foot">
+    <span>G&A Partners · AI Onboarding PRD · Confidential</span>
+    <span>Preliminary — Subject to Change · TBD</span>
+  </div>
+</div>
+</div>
+
+
+
+
+<!-- ══ TAB 5: BUSINESS IMPACT ══ -->
+<div id="tab-impact" class="tab-panel">
+<div class="page">
+  <div class="pg-eye">Business Impact</div>
+  <div class="pg-h1">Operational Baseline &amp; Automation Impact</div>
+  <div class="pg-sub">Activity baseline and automation opportunity mapping derived from process interviews and time allocation data.</div>
+
+
+  <div class="section-title">Onboarding Cycle Compression — Gross Margin Capture</div>
+  <table class="tbl" style="margin-bottom:22px;">
+    <thead><tr><th>Phase</th><th>Current Duration</th><th>Initiative Driver</th></tr></thead>
+    <tbody>
+      <tr style="opacity:0.45;background:#F5F7F9;color:var(--grey);"><td><strong>A. Deal Initiation &amp; Assignment</strong></td><td><span class="badge-now">2–3 days</span></td><td>24-hr SLA enforcement for PM/PA assignment and 48-hr SLA for other specialist assignments</td></tr>
+      <tr><td><strong>B. Sales Handoff</strong><span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;background:#C60C30;color:#ffffff;display:inline-block;margin-left:6px;">PRD Priority</span></td><td><span class="badge-now">4–6 days</span></td><td><span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;background:#EBF4FB;color:#1a4f72;border:1px solid #0088CE44;display:inline-block;margin-right:6px;">Initiative D</span>AI-Assisted CSA Extraction &amp; Automated Document Triggers</td></tr>
+      <tr style="opacity:0.45;background:#F5F7F9;color:var(--grey);"><td><strong>C. Client Kickoff</strong></td><td><span class="badge-now">4–6 days</span></td><td></td></tr>
+      <tr><td><strong>D. Data Collection</strong> ⚠ Primary Bottleneck</td><td><span class="badge-now">15–20 days</span></td><td><span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;background:#E6F4EC;color:#1a5c38;border:1px solid #2A8F6044;display:inline-block;margin-right:6px;">Initiative A · 1</span>Automated Data Collection Deadlines &amp; Escalation</td></tr>
+      <tr style="opacity:0.45;background:#F5F7F9;color:var(--grey);"><td><strong>E. System Configuration</strong></td><td><span class="badge-now">8–12 days</span></td><td>Parallelize PM/PA system configuration + pre-approve standard SUTA rates during sales</td></tr>
+      <tr><td><strong>F. Payroll Testing &amp; Training</strong><span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;background:#C60C30;color:#ffffff;display:inline-block;margin-left:6px;">PRD Priority</span></td><td><span class="badge-now">5–7 days</span></td><td><span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;background:#E6F4EC;color:#1a5c38;border:1px solid #2A8F6044;display:inline-block;margin-right:6px;">Initiative F</span>Mock Payroll Pre-Flight Validation</td></tr>
+      <tr style="opacity:0.45;background:#F5F7F9;color:var(--grey);"><td><strong>G. First Payroll Processing</strong></td><td><span class="badge-now">3–5 days</span></td><td></td></tr>
+      <tr class="total-row"><td><strong>Total</strong></td><td><span class="badge-now">41–59 days</span></td><td></td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">Onboarding Activity Baseline</div>
+  <table class="impact-table" style="margin-bottom:22px;">
+    <thead>
+      <tr>
+        <th style="text-align:left;">Process Area</th>
+        <th style="text-align:center;">PM Time Allocation<br><span style="font-size:9px;font-weight:400;opacity:.8;">15 FTEs</span></th>
+        <th style="text-align:center;">PA Time Allocation<br><span style="font-size:9px;font-weight:400;opacity:.8;">16 FTEs</span></th>
+        <th style="text-align:center;">Total FTE Equivalent</th>
+        <th style="text-align:left;">Automation Goal</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>CSA Review</strong><span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;background:#EBF4FB;color:#1a4f72;border:1px solid #0088CE44;display:inline-block;margin-left:5px;">Initiative D</span></td>
+        <td style="text-align:center;">2%<br><span style="font-size:10px;color:var(--grey);">0.3 FTEs</span></td>
+        <td style="text-align:center;">1%<br><span style="font-size:10px;color:var(--grey);">0.2 FTEs</span></td>
+        <td style="text-align:center;font-weight:600;">0.5 FTEs</td>
+        <td rowspan="3" style="vertical-align:top;text-align:left;font-size:11px;line-height:1.6;"><span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;background:#C60C30;color:#ffffff;display:inline-block;margin-bottom:8px;">PRD Priority</span><br><span style="font-size:11px;font-weight:600;color:var(--navy);line-height:1.6;">Eliminate multiple contract review cycles and ensure validated, accurate client data is available to the reviewers from the moment a deal closes, reducing the time PMs, PAs, and managers spend manually cross-referencing the document.</span><br><br><span style="font-size:11px;color:var(--grey);line-height:1.6;">Extract structured fields from CSA PDFs upon upload to create a checklist-style validation document and auto-create a case for Sales flagging discrepancies / missing information; trigger automated standard document collection sequences at deal close.</span></td>
+      </tr>
+      <tr>
+        <td><strong>Sales Handoff</strong><span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;background:#EBF4FB;color:#1a4f72;border:1px solid #0088CE44;display:inline-block;margin-left:5px;">Initiative D</span></td>
+        <td style="text-align:center;">5%<br><span style="font-size:10px;color:var(--grey);">0.8 FTEs</span></td>
+        <td style="text-align:center;">2%<br><span style="font-size:10px;color:var(--grey);">0.3 FTEs</span></td>
+        <td style="text-align:center;font-weight:600;">1.1 FTEs</td>
+      </tr>
+      <tr>
+        <td><strong>Client Kickoff</strong></td>
+        <td style="text-align:center;">15%<br><span style="font-size:10px;color:var(--grey);">2.3 FTEs</span></td>
+        <td style="text-align:center;">13%<br><span style="font-size:10px;color:var(--grey);">2.1 FTEs</span></td>
+        <td style="text-align:center;font-weight:600;">4.3 FTEs</td>
+      </tr>
+      <tr>
+        <td><strong>Client Data Collection</strong><span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;background:#E6F4EC;color:#1a5c38;border:1px solid #2A8F6044;display:inline-block;margin-left:5px;">Initiative A · 1</span></td>
+        <td style="text-align:center;">5%<br><span style="font-size:10px;color:var(--grey);">0.8 FTEs</span></td>
+        <td style="text-align:center;">1%<br><span style="font-size:10px;color:var(--grey);">0.2 FTEs</span></td>
+        <td style="text-align:center;font-weight:600;">0.9 FTEs</td>
+        <td style="text-align:left;font-size:11px;line-height:1.6;"><span style="font-size:11px;font-weight:600;color:var(--navy);line-height:1.6;">Compress the longest uncontrolled wait period in the onboarding cycle by reducing client document submission lag — directly accelerating time-to-first-payroll.</span><br><br><span style="font-size:11px;color:var(--grey);line-height:1.6;">Automated escalation system with internal and external SLAs for data collection, deadlines, reminders, and alerts.</span></td>
+      </tr>
+      <tr>
+        <td><strong>Project Management</strong><span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;background:#E6F4EC;color:#1a5c38;border:1px solid #2A8F6044;display:inline-block;margin-left:5px;">Initiative B</span><span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;background:#FEF9EE;color:#5c3c00;border:1px solid #FF9E1B44;display:inline-block;margin-left:5px;">Initiative E</span></td>
+        <td style="text-align:center;">37%<br><span style="font-size:10px;color:var(--grey);">5.6 FTEs</span></td>
+        <td style="text-align:center;">19%<br><span style="font-size:10px;color:var(--grey);">3.0 FTEs</span></td>
+        <td style="text-align:center;font-weight:600;">8.6 FTEs</td>
+        <td style="text-align:left;font-size:11px;line-height:1.6;"><span style="font-size:11px;font-weight:600;color:var(--navy);line-height:1.6;">Reduce the administrative coordination overhead that consumes the single largest share of both PM and PA time — freeing capacity to carry a larger concurrent client book without proportional headcount growth.</span><br><br><span style="font-size:11px;color:var(--grey);line-height:1.6;">Auto-sync case status across ClientSpace, PrismHR, and Master Client List on phase events; auto-route documents from GuideCX / WorkSight to G: Drive and ClientSpace, eliminating the manual download-upload cycle; trigger departmental follow-up sequences without manual intervention.</span></td>
+      </tr>
+      <tr>
+        <td><strong>Client Communication &amp; Customer Service</strong><span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;background:#EBF4FB;color:#1a4f72;border:1px solid #0088CE44;display:inline-block;margin-left:5px;">Initiative C</span></td>
+        <td style="text-align:center;">15%<br><span style="font-size:10px;color:var(--grey);">2.3 FTEs</span></td>
+        <td style="text-align:center;">10%<br><span style="font-size:10px;color:var(--grey);">1.6 FTEs</span></td>
+        <td style="text-align:center;font-weight:600;">3.9 FTEs</td>
+        <td style="text-align:left;font-size:11px;line-height:1.6;"><span style="font-size:11px;font-weight:600;color:var(--navy);line-height:1.6;">Reduce the time PMs and PAs spend triaging, researching, and responding to routine client inquiries — allowing them to focus on high-value onboarding activities while improving client response times.</span><br><br><span style="font-size:11px;color:var(--grey);line-height:1.6;">AI-draft responses to common client inquiries and auto-route non-payroll questions to the correct department; auto-compile weekly implementation status from live system data for PM/PA review and send.</span></td>
+      </tr>
+      <tr>
+        <td><strong>System Configuration</strong></td>
+        <td style="text-align:center;">5%<br><span style="font-size:10px;color:var(--grey);">0.8 FTEs</span></td>
+        <td style="text-align:center;">5%<br><span style="font-size:10px;color:var(--grey);">0.8 FTEs</span></td>
+        <td style="text-align:center;font-weight:600;">1.6 FTEs</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><strong>Payroll Consultation &amp; Planning</strong><span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;background:#E6F4EC;color:#1a5c38;border:1px solid #2A8F6044;display:inline-block;margin-left:5px;">Initiative F</span></td>
+        <td style="text-align:center;">—</td>
+        <td style="text-align:center;">11%<br><span style="font-size:10px;color:var(--grey);">1.8 FTEs</span></td>
+        <td style="text-align:center;font-weight:600;">1.8 FTEs</td>
+        <td rowspan="2" style="vertical-align:top;text-align:left;font-size:11px;line-height:1.6;"><span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;background:#C60C30;color:#ffffff;display:inline-block;margin-bottom:8px;">PRD Priority</span><br><span style="font-size:11px;font-weight:600;color:var(--navy);line-height:1.6;">Eliminate recurring payroll configuration errors that create rework cycles and delay first payroll processing — reducing variability in the time-to-first-payroll timeline and freeing PA capacity from iterative error resolution.</span><br><br><span style="font-size:11px;color:var(--grey);line-height:1.6;">Run automated pre-flight configuration checks against PrismHR before payroll initialization — validating WC codes, SUTA rates, billing rules, and pay group alignment — replacing the iterative calculate-fail-fix cycle with a single remediation pass.</span></td>
+      </tr>
+      <tr>
+        <td><strong>Payroll Processing (Initial)</strong><span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;background:#E6F4EC;color:#1a5c38;border:1px solid #2A8F6044;display:inline-block;margin-left:5px;">Initiative F</span></td>
+        <td style="text-align:center;">—</td>
+        <td style="text-align:center;">14%<br><span style="font-size:10px;color:var(--grey);">2.2 FTEs</span></td>
+        <td style="text-align:center;font-weight:600;">2.2 FTEs</td>
+      </tr>
+      <tr>
+        <td><strong>Client Training</strong></td>
+        <td style="text-align:center;">7%<br><span style="font-size:10px;color:var(--grey);">1.1 FTEs</span></td>
+        <td style="text-align:center;">9%<br><span style="font-size:10px;color:var(--grey);">1.4 FTEs</span></td>
+        <td style="text-align:center;font-weight:600;">2.5 FTEs</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><strong>Client Transition</strong></td>
+        <td style="text-align:center;">9%<br><span style="font-size:10px;color:var(--grey);">1.4 FTEs</span></td>
+        <td style="text-align:center;">15%<br><span style="font-size:10px;color:var(--grey);">2.4 FTEs</span></td>
+        <td style="text-align:center;font-weight:600;">3.8 FTEs</td>
+        <td></td>
+      </tr>
+      <tr class="total-row">
+        <td><strong>Total</strong></td>
+        <td style="text-align:center;"><strong>100%</strong><br><span style="font-size:10px;">15.0 FTEs</span></td>
+        <td style="text-align:center;"><strong>100%</strong><br><span style="font-size:10px;">16.0 FTEs</span></td>
+        <td style="text-align:center;"><strong>31.0 FTEs</strong></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+    <div class="foot">
+    <span>G&A Partners · AI Onboarding PRD · Confidential</span>
+    <span>Preliminary — Subject to Change · TBD</span>
+  </div>
+  </div>
+</div>
+
+
+<div id="tab-systems" class="tab-panel">
+<div class="page">
+  <div class="pg-eye">Systems &amp; Technical</div>
+  <div class="pg-h1">Onboarding Systems Landscape</div>
+  <div class="pg-sub">The Onboarding team currently operates across 10+ systems — the most fragmented stack in G&A's operations. The reliance on Excel for assignment tracking and transition management, alongside manual cross-referencing of CSA PDFs and document routing between GuideCX, G: Drive, and ClientSpace, represents the most significant opportunities for system consolidation. Partners must address the integration architecture for this specific stack.</div>
+
+  <div class="section-title">Core Systems Inventory</div>
+  <div class="sys-grid">
+    <div class="sys-card">
+      <div class="sys-name">ClientSpace</div>
+      <div class="sys-role">Core CRM &amp; Case Management</div>
+      <div class="sys-desc">Primary CRM for client record management, handoff pages, case tracking, and the OB PM Tool. The system of record for all onboarding activities. Most automation workflows should trigger from and write back to ClientSpace. Houses the structured handoff page fields that CSA validation must cross-reference.</div>
+      <div class="sys-tag-row"><span class="sys-tag st-core">Core</span><span class="sys-tag st-target">Automation Hub</span></div>
+    </div>
+    <div class="sys-card">
+      <div class="sys-name">PrismHR</div>
+      <div class="sys-role">Payroll System of Record</div>
+      <div class="sys-desc">The HRIS for payroll processing. PM creates the client shell (locations, positions, departments, divisions); PA configures billing rules, SUTA rates, deduction codes, pay groups, and runs mock and initial payrolls. The serial PM→PA dependency originates here. Pre-flight validation must run against PrismHR configuration data.</div>
+      <div class="sys-tag-row"><span class="sys-tag st-core">Core</span><span class="sys-tag st-gap">Serial Dependency</span></div>
+    </div>
+    <div class="sys-card">
+      <div class="sys-name">WorkSight / Click Boarding</div>
+      <div class="sys-role">Employee Onboarding &amp; Client Admin Portal</div>
+      <div class="sys-desc">Employee electronic onboarding (I-9, paperwork) and the client admin portal. PM creates the WorkSight account from PrismHR IDs and trains the client admin on submission. Security access setup currently requires a manual case with a 3-day turnaround — a documented automation candidate. Target destination for GuideCX migration (Initiative E).</div>
+      <div class="sys-tag-row"><span class="sys-tag st-core">Core</span><span class="sys-tag st-target">Migration Target</span></div>
+    </div>
+    <div class="sys-card">
+      <div class="sys-name">GuideCX</div>
+      <div class="sys-role">Client Data Collection Portal (Current)</div>
+      <div class="sys-desc">Client-facing project portal used to request and collect onboarding documents (employee census, company codes, payroll reports, handbook, WTPA forms). PM manually creates the project, configures tasks, and manages the document collection cycle. The manual download-upload-note cycle between GuideCX and G: Drive is a primary target for elimination. Migration to WorkSight-ClientSpace is scoped in Initiative E.</div>
+      <div class="sys-tag-row"><span class="sys-tag st-gap">Migration Candidate</span></div>
+    </div>
+    <div class="sys-card">
+      <div class="sys-name">HRWorkCycles</div>
+      <div class="sys-role">I-9 Verification Workflow</div>
+      <div class="sys-desc">I-9 verification workflow tool. HRWorkCycles I-9 errors are described as "a pretty consistent error causing decent delay fairly regularly." One-at-a-time onboarding invite resends are required for employees who haven't started — cited as a significant time drain for large clients. Bulk invite resend functionality would directly address this pain point.</div>
+      <div class="sys-tag-row"><span class="sys-tag st-gap">Known Errors</span><span class="sys-tag st-target">Bulk Invite Needed</span></div>
+    </div>
+    <div class="sys-card">
+      <div class="sys-name">Informer</div>
+      <div class="sys-role">SUTA Bill Rate Reporting</div>
+      <div class="sys-desc">Reporting tool used for SUTA bill rate review and state-level compliance reporting. The SUTA Bill Rate Review requires executive approval before first payroll — Informer surfaces the data for this review. Pre-approving standard SUTA rates for known states is a key cycle compression lever under Initiative A, removing the executive approval queue from the critical path for standard multi-state clients.</div>
+      <div class="sys-tag-row"><span class="sys-tag st-core">Reporting</span></div>
+    </div>
+    <div class="sys-card">
+      <div class="sys-name">Excel (Master Client List)</div>
+      <div class="sys-role">Assignment Tracking &amp; Workload Balancing</div>
+      <div class="sys-desc">Used for PM and PA assignment tracking, workload balancing, and the Payroll Transition Spreadsheet. Both PM and PA assignment processes rely on manual judgment using Excel pivot tables with no BI dashboard or automated workload balancing. The process data explicitly notes a ClientSpace-based BI report would be "ideal." A primary candidate for elimination via ClientSpace integration.</div>
+      <div class="sys-tag-row"><span class="sys-tag st-gap">Manual Dependency</span><span class="sys-tag st-target">Eliminate via CS Integration</span></div>
+    </div>
+    <div class="sys-card">
+      <div class="sys-name">Google Drive / G: Drive</div>
+      <div class="sys-role">Client Folder Structure &amp; Document Storage</div>
+      <div class="sys-desc">Client-specific folder structure for storing all onboarding documents received from GuideCX. Documents are manually downloaded from GuideCX and saved here before being attached to ClientSpace. The GuideCX-to-G: Drive-to-ClientSpace pipeline is the primary document routing bottleneck targeted by Initiative E.</div>
+      <div class="sys-tag-row"><span class="sys-tag st-gap">Manual Routing</span></div>
+    </div>
+    <div class="sys-card">
+      <div class="sys-name">Outlook / Gmail / Teams</div>
+      <div class="sys-role">Communication &amp; Coordination</div>
+      <div class="sys-desc">Outlook and Gmail for client communication and assignment notifications. Teams for internal group chats (per-client channels), knowledge transfer, and multi-departmental coordination. Teams group chat membership is manually updated by PMs per client. Multi-department follow-ups are conducted via email with no automated escalation.</div>
+      <div class="sys-tag-row"><span class="sys-tag st-gap">Manual Follow-up</span><span class="sys-tag st-target">Auto-routing Target</span></div>
+    </div>
+  </div>
+
+  <div class="section-title">Key Integration Gaps &amp; Technical Risks</div>
+  <table class="tbl">
+    <thead><tr><th>Gap</th><th>Impact</th><th>Initiative Dependency</th></tr></thead>
+    <tbody>
+      <tr><td><strong>No Salesforce → ClientSpace integration</strong></td><td>BAs manually re-enter data from Salesforce into ClientSpace handoff pages, introducing error risk and placeholder data that creates downstream onboarding rework</td><td>Initiative D (CSA Extraction) — pre-populating handoff fields from CSA data is a partial mitigation until a direct Salesforce-ClientSpace feed is built</td></tr>
+      <tr><td><strong>GuideCX to ClientSpace/G: Drive: manual routing</strong></td><td>Every client document upload requires PM manual download → G: Drive save → ClientSpace attachment. At 704 clients/year with 8–12 documents each, this is 5,600–8,400 manual routing actions per year</td><td>Initiative E (ClientSpace-WorkSight Integration) — webhook-based auto-distribution eliminates this cycle entirely</td></tr>
+      <tr><td><strong>PrismHR shell → PA config: hard serial dependency</strong></td><td>PA cannot begin billing rules and SUTA configuration until the PM completes the PrismHR shell, creating 3–5 days of idle PA time on the critical path</td><td>Initiative B (Automated PM Workflows) + Cycle Compression (Initiative A) — splitting shell creation into billing-independent and billing-dependent fields enables parallel PA start</td></tr>
+      <tr><td><strong>WorkSight security access: 3-day manual case</strong></td><td>Client admin security access requires a manual case → team member pickup → 3-day processing. Blocks training scheduling. Explicitly flagged as "be nice to have automated" by users</td><td>Initiative E — role-based auto-provisioning upon Client Security Form submission eliminates the manual case workflow</td></tr>
+      <tr><td><strong>PrismHR pre-flight: no validation before initialization</strong></td><td>WC codes, SUTA rates, and billing rule errors are only discovered when mock payroll fails, triggering an iterative error-resolution cycle documented in the SOP as a recurring delay</td><td>Initiative F (Pre-Flight Validation) — configuration checks before initialization surface errors before they surface as calculation failures</td></tr>
+      <tr><td><strong>Excel workload balancing: no BI integration</strong></td><td>PM and PA assignment decisions rely on Excel pivot tables — no real-time visibility into concurrent client load by team member. Uneven geographic distribution of clients across time zones makes this particularly acute</td><td>Initiative B (Automated PM Workflows) — a ClientSpace-based BI report replaces Excel as the assignment decision surface</td></tr>
+    </tbody>
+  </table>
+
+  <div class="foot">
+    <span>G&A Partners · AI Onboarding PRD · Confidential</span>
+    <span>Preliminary — Subject to Change · TBD</span>
+  </div>
+</div>
+</div>
+
+
+<!-- ══ TAB 7: GLOSSARY ══ -->
+<div id="tab-glossary" class="tab-panel">
+<div class="page">
+  <div class="pg-eye">Glossary</div>
+  <div class="pg-h1">Onboarding Terms &amp; Acronyms</div>
+  <div class="pg-sub">Definitions of G&A-specific terminology, role titles, system names, and onboarding phase labels used throughout this document. Understand these before responding.</div>
+
+  <div class="section-title">Role Definitions</div>
+  <div class="gloss-item"><div class="gloss-term">OBPM / Project Manager</div><div class="gloss-def">Onboarding Project Manager. Owns the client-facing onboarding relationship from sales handoff through transition to the Payroll Specialist. Coordinates all internal departments and manages the GuideCX data collection project. 15 PMs on the current team.</div></div>
+  <div class="gloss-item"><div class="gloss-term">OBPA / Payroll Analyst</div><div class="gloss-def">Onboarding Payroll Analyst. Handles all payroll-specific configuration, testing, and initial processing. Configures PrismHR billing rules, SUTA, deductions, and pay groups; runs mock and first-live payrolls; trains the client admin on payroll submission. 16 PAs on the current team.</div></div>
+  <div class="gloss-item"><div class="gloss-term">BA / Business Advisor</div><div class="gloss-def">Business Advisor (Sales). The G&A salesperson who closes the deal and conducts the sales handoff meeting with the PM. BA enters client data into ClientSpace and is the source of handoff page information. Frequently enters placeholder data in required fields.</div></div>
+  <div class="gloss-item"><div class="gloss-term">PS / Payroll Specialist</div><div class="gloss-def">Payroll Specialist. The ongoing payroll operations role that receives the client after Onboarding completes the first two payrolls. The client exits the Onboarding process once the PS handoff and knowledge transfer is complete.</div></div>
+  <div class="gloss-item"><div class="gloss-term">PM Manager / PA Manager</div><div class="gloss-def">Managers who supervise the PM and PA teams respectively. Both independently review the CSA at the Deal Initiation phase — contributing to the four-way redundant review that Initiative D targets.</div></div>
+
+  <div class="section-title">Process &amp; Document Terms</div>
+  <div class="gloss-item"><div class="gloss-term">CSA</div><div class="gloss-def">Client Service Agreement. The binding contract signed at deal close. Contains fee structure, term, included vs. optional services, billing exceptions, SUTA state coverage, IRS tax classification, and ownership information. Currently reviewed four times independently by PM Manager, PM, PA Manager, and PA.</div></div>
+  <div class="gloss-item"><div class="gloss-term">OB PM Tool</div><div class="gloss-def">Onboarding Project Management Tool — the ClientSpace-based task tracking module used by PMs to manage onboarding milestones, phase progress, and internal departmental assignments. Currently requires manual task updates and progress notes.</div></div>
+  <div class="gloss-item"><div class="gloss-term">Master Client List</div><div class="gloss-def">Excel-based spreadsheet used to track PM and PA assignment workload across the current concurrent client portfolio. Currently the primary workload balancing tool — no automated BI integration with ClientSpace.</div></div>
+  <div class="gloss-item"><div class="gloss-term">SUTA</div><div class="gloss-def">State Unemployment Tax Act. State-specific unemployment tax rates that must be configured in PrismHR per state where the client has active employees. SUTA Bill Rate Review requires executive approval — a bottleneck on the critical path for multi-state clients.</div></div>
+  <div class="gloss-item"><div class="gloss-term">WC Code</div><div class="gloss-def">Workers' Compensation code. State and job-specific classification codes required for payroll tax calculation. WC code configuration errors are the most commonly documented source of mock payroll failures.</div></div>
+  <div class="gloss-item"><div class="gloss-term">WTPA</div><div class="gloss-def">Wage Theft Prevention Act. State-specific notice requirement. WTPA forms are among the kickoff documents clients must upload via GuideCX before system configuration can begin.</div></div>
+  <div class="gloss-item"><div class="gloss-term">Mock Payroll</div><div class="gloss-def">A test payroll run in PrismHR conducted by the PA before the first live payroll. Identifies setup errors (WC codes, SUTA rates, billing rules, pay group alignment). Currently an iterative trial-and-error process; Initiative F targets this with pre-flight validation.</div></div>
+  <div class="gloss-item"><div class="gloss-term">Payroll Breakout</div><div class="gloss-def">A payroll-specific client meeting conducted by the PA, typically scheduled within 5 business days of the general kickoff meeting. Currently a separate scheduling cycle — combining the kickoff and payroll breakout into a single meeting is one of the five cycle compression levers under Initiative A.</div></div>
+  <div class="gloss-item"><div class="gloss-term">Handoff Page</div><div class="gloss-def">The ClientSpace record completed by the BA at deal close. Contains the structured data fields that PMs and PAs use to set up the client in PrismHR and WorkSight. Frequently has incomplete or placeholder data, requiring correction during onboarding meetings.</div></div>
+
+  <div class="section-title">System Acronyms</div>
+  <div class="gloss-item"><div class="gloss-term">ClientSpace / CS</div><div class="gloss-def">The core CRM and case management system. Functions as the hub for all onboarding record-keeping, task tracking, and status documentation. Also referred to as ClientSpacePRO for the Pro version used by certain service teams.</div></div>
+  <div class="gloss-item"><div class="gloss-term">PrismHR</div><div class="gloss-def">G&A's primary HRIS and payroll processing platform. The system in which clients are configured (shell, billing, SUTA, pay groups) and in which all payrolls are run. The PM builds the shell; the PA configures the payroll rules and runs payroll.</div></div>
+  <div class="gloss-item"><div class="gloss-term">GuideCX</div><div class="gloss-def">Third-party client onboarding portal used to create data collection projects, request documents from clients, and track submission status. Currently the primary channel for receiving onboarding documents. Target of the WorkSight/ClientSpace migration initiative.</div></div>
+  <div class="gloss-item"><div class="gloss-term">WorkSight / Click Boarding</div><div class="gloss-def">Employee electronic onboarding platform and client admin portal. Employees complete I-9 and paperwork here. Also the target destination for GuideCX migration — Initiative E proposes making WorkSight the integrated data collection and client portal layer.</div></div>
+  <div class="gloss-item"><div class="gloss-term">HRWorkCycles</div><div class="gloss-def">I-9 verification workflow system. Known for recurring I-9 errors and one-at-a-time invite resend limitations — both flagged as automation candidates by end users.</div></div>
+  <div class="gloss-item"><div class="gloss-term">Informer</div><div class="gloss-def">Reporting and analytics tool used for SUTA bill rate reporting and state compliance data. Primary data source for the SUTA Bill Rate Review executive approval process.</div></div>
+
+  <div class="foot">
+    <span>G&A Partners · AI Onboarding PRD · Confidential</span>
+    <span>Preliminary — Subject to Change · TBD</span>
+  </div>
+</div>
+</div>
+
+
+<!-- ══ TAB 8: SUBMISSION ══ -->
+<div id="tab-submission" class="tab-panel">
+<div class="page">
+  <div class="pg-eye">Submission Guide</div>
+  <div class="pg-h1">What We Need From Partners</div>
+  <div class="pg-sub">This submission is scoped to the two PRD Priority initiatives: <strong>Initiative D — AI-Assisted CSA Extraction &amp; Cross-Validation</strong> and <strong>Initiative F — Mock Payroll Pre-Flight Validation</strong>. Your response must address all six items below. Quality over length — a specific response beats a comprehensive generic one. A working demo or POC is strongly preferred over slide descriptions. Submit to the engagement lead listed in the Overview tab.</div>
+
+  <div class="card" style="margin-bottom:22px;">
+    <div class="submit-item">
+      <div class="submit-num">1</div>
+      <div class="submit-body">
+        <h4>Proposed Approach &amp; Workplan</h4>
+        <p>How do you sequence Initiative D and Initiative F? Can both be piloted independently of broader system integration work? What does the first 30–60–90 days look like for each? What are the key dependencies — for Initiative D, what does your approach require from ClientSpace and the CSA upload workflow? For Initiative F, what level of PrismHR API access or data export is required before build can begin? What G&A-side resources are needed and how much of their time?</p>
+      </div>
+    </div>
+    <div class="submit-item">
+      <div class="submit-num">2</div>
+      <div class="submit-body">
+        <h4>Architecture &amp; Technical Design</h4>
+        <p><strong>(D) AI-Assisted CSA Extraction:</strong> Which document intelligence platform do you propose for multi-page legal documents with variable structure? How do you extract and structure fields — fee structure, included/optional services, SUTA state coverage, billing exceptions, IRS classification — from a CSA PDF on upload? How do you auto-flag discrepancies between extracted fields and ClientSpace handoff page data? How do you auto-create a case for Sales with flagged discrepancies? What is the integration point with ClientSpace for populating the structured summary record?<br><br>
+        <strong>(F) Mock Payroll Pre-Flight Validation:</strong> Is this a PrismHR API integration, a custom Informer report, or an RPA layer — and why? How do you validate WC codes against CSA Schedule 2, SUTA rate completeness across all active employee states, billing rule completeness, pay group-schedule alignment, and deduction code validity? What does the pass/fail output look like and how are remediation steps surfaced to the PA? How do you handle the SUTA executive pre-approval logic for standard vs. non-standard states?<br><br>
+        Include a system architecture diagram for each initiative.</p>
+      </div>
+    </div>
+    <div class="submit-item">
+      <div class="submit-num">3</div>
+      <div class="submit-body">
+        <h4>Effort, Timeline &amp; Cost</h4>
+        <p>Build cost for Initiative D and Initiative F separately, ongoing infrastructure cost, and proposed pricing model. Include G&A-side resource requirements by role (ClientSpace admins, PrismHR access, PA/PM involvement for testing). Separate build cost from run cost. Provide a realistic time-to-production estimate for each initiative independently — the goal is to understand whether both can be live within a single quarter or whether they require sequential delivery.</p>
+      </div>
+    </div>
+    <div class="submit-item">
+      <div class="submit-num">4</div>
+      <div class="submit-body">
+        <h4>Data &amp; PII Handling</h4>
+        <p>Both priority initiatives handle highly sensitive data. For <strong>Initiative D</strong>: the CSA is a signed legal document containing ownership information, EIN, fee structure, and IRS tax classification — how do you handle PII and confidential commercial terms in LLM calls? What is your data residency approach? For <strong>Initiative F</strong>: the pre-flight validation reads full PrismHR payroll configuration data including billing rates, WC codes, SUTA rates, and employee-level tax data — how do you ensure this complies with G&A's data obligations? Expected token cost per client onboarded for Initiative D's AI-assisted extraction component.</p>
+      </div>
+    </div>
+    <div class="submit-item">
+      <div class="submit-num">5</div>
+      <div class="submit-body">
+        <h4>Working Demo / POC</h4>
+        <p><strong>(D) AI-Assisted CSA Extraction:</strong> Upload a sample multi-page CSA PDF (we will provide a redacted example) and demonstrate structured field extraction — fee structure, included services, SUTA state coverage, billing exceptions, IRS classification — populating a ClientSpace summary record. Show the auto-flagging of at least one discrepancy between an extracted CSA field and a ClientSpace handoff page field. Show the auto-created Sales case with the flagged discrepancy.<br><br>
+        <strong>(F) Pre-Flight Validation:</strong> Show a simulated pre-flight report against a PrismHR configuration with a seeded WC code error and a missing SUTA rate — demonstrating the pass/fail output with specific remediation steps before mock payroll initialization. Show how a PA would action the remediation steps from the report output.<br><br>
+        Video recording is accepted if a live session is not possible before the deadline.</p>
+      </div>
+    </div>
+    <div class="submit-item">
+      <div class="submit-num">6</div>
+      <div class="submit-body">
+        <h4>Relevant Experience</h4>
+        <p>2–3 specific examples of document AI or payroll automation solutions built for PEO, HRIS, payroll operations, or analogous environments. For each: problem, solution, systems integrated, and measurable outcome (error rate reduction, cycle time reduction, or FTE savings preferred). Specifically call out any prior experience with: PrismHR API integration, ClientSpace workflow configuration, document intelligence applied to legal or contract documents, and payroll configuration validation automation. Include the team members who would work on this engagement and their direct experience with these systems.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Evaluation Criteria</div>
+  <table class="tbl" style="margin-bottom:22px;">
+    <thead><tr><th>Criterion</th><th style="width:80px;text-align:center;">Weight</th><th>What We Are Looking For</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Working POC / Demo Quality</strong></td><td style="text-align:center;font-weight:700;color:var(--red);">30%</td><td>Does the CSA extraction output look like something a PM or PA Manager would validate rather than re-enter from scratch? Does the discrepancy flagging and auto-created Sales case work end-to-end? Does the pre-flight validation report surface errors in a format that enables immediate PA remediation — not a generic error dump?</td></tr>
+      <tr><td><strong>Architecture Credibility</strong></td><td style="text-align:center;font-weight:700;color:var(--red);">25%</td><td>Is the Initiative D design realistic given the ClientSpace integration requirement and the variable structure of CSA PDFs? Is the Initiative F approach technically credible for the PrismHR stack — API, Informer report, or RPA — with a clear rationale for the chosen approach? Are both initiatives scoped as standalone pilots without requiring broader system migrations?</td></tr>
+      <tr><td><strong>Relevant Experience</strong></td><td style="text-align:center;font-weight:700;color:var(--red);">20%</td><td>Prior experience with PrismHR API or payroll configuration validation. Document intelligence solutions applied to legal or contract documents. ClientSpace or analogous CRM integration experience. PEO or HR outsourcing operational context is a strong differentiator.</td></tr>
+      <tr><td><strong>Cost Realism &amp; PII Strategy</strong></td><td style="text-align:center;font-weight:700;color:var(--red);">15%</td><td>Is build cost credible for the scope of each initiative independently? Is PII handling in LLM calls explicitly addressed for both CSA data (D) and PrismHR configuration data (F)? Is per-client token cost estimated for Initiative D?</td></tr>
+      <tr><td><strong>Speed to Value</strong></td><td style="text-align:center;font-weight:700;color:var(--red);">10%</td><td>Can Initiative D and Initiative F each be live and in production within 60–90 days independently? What is the minimum viable version of each that could be piloted with a subset of new client onboardings before full rollout?</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout success"><strong>Submit to:</strong> tsagireddy@alixpartners.com &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Deadline:</strong> June 25, 2026</div>
+
+  <div class="foot">
+    <span>G&amp;A Partners · AI Onboarding PRD · Confidential</span>
+    <span>Preliminary — Subject to Change · TBD</span>
+  </div>
+</div>
+</div>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
