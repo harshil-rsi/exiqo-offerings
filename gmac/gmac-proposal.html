@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GMAC × Velotio · AI Metadata Tagging — Proposal</title>
+<style>
+:root{
+  --g:#27A27D; --g-d:#055143; --g-d2:#033a30; --g-l:#5cc0a1;
+  --mint:#eef7f3; --mint2:#f6fbf9; --mintline:#d4ebe2;
+  --ink:#0f2620; --muted:#5d716b; --line:#dfe8e4; --card:#ffffff;
+  --gold:#d9a441; --coral:#e07856; --slate:#34433e;
+  --shadow:0 4px 18px rgba(5,81,67,.08); --shadow-lg:0 18px 50px rgba(5,81,67,.18);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  color:var(--ink);background:#0c211b;-webkit-font-smoothing:antialiased}
+/* deck shell */
+.deck{position:relative;height:100vh;overflow:hidden}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;background:var(--mint2);
+  padding:46px 64px 78px;overflow:auto;animation:in .45s cubic-bezier(.2,.7,.2,1)}
+.slide.active{display:flex}
+@keyframes in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.slide.dark{background:radial-gradient(120% 120% at 80% -10%,#0c6b56 0%,var(--g-d) 45%,var(--g-d2) 100%);color:#eafff8}
+.kicker{font-size:12px;font-weight:800;letter-spacing:2.4px;text-transform:uppercase;color:var(--g);margin-bottom:14px;
+  display:flex;align-items:center;gap:10px}
+.kicker::before{content:"";width:26px;height:2px;background:var(--g)}
+.dark .kicker{color:var(--g-l)} .dark .kicker::before{background:var(--g-l)}
+h1{font-size:46px;line-height:1.08;margin:0 0 18px;font-weight:800;letter-spacing:-.5px}
+h2.sh{font-size:32px;line-height:1.12;margin:0 0 8px;font-weight:800;letter-spacing:-.4px}
+.lead{font-size:18px;line-height:1.5;color:var(--muted);max-width:820px;margin:0 0 8px}
+.dark .lead{color:#bfe9dc}
+.fill{flex:1}
+/* chrome: progress + nav */
+.topbar{position:fixed;top:0;left:0;right:0;height:5px;background:rgba(5,81,67,.12);z-index:60}
+.topbar .fillbar{height:100%;background:linear-gradient(90deg,var(--g),var(--g-l));transition:width .4s}
+.brandmark{position:fixed;top:20px;right:30px;z-index:61;display:flex;align-items:center;gap:9px;font-weight:800;
+  letter-spacing:.5px;color:var(--g-d);font-size:15px}
+.dark .brandmark{color:#eafff8}
+.brandmark .gm{font-size:21px;font-weight:800;color:var(--g);letter-spacing:-1px}
+.brandmark .x{opacity:.5;font-weight:500}
+.nav{position:fixed;bottom:18px;left:0;right:0;z-index:61;display:flex;align-items:center;justify-content:center;gap:16px}
+.nav button{border:none;background:var(--g-d);color:#fff;width:40px;height:40px;border-radius:50%;font-size:17px;cursor:pointer;
+  box-shadow:var(--shadow);transition:.15s;display:flex;align-items:center;justify-content:center}
+.nav button:hover{background:var(--g)} .nav button:disabled{opacity:.3;cursor:default}
+.dots{display:flex;gap:7px;align-items:center}
+.dots i{width:8px;height:8px;border-radius:50%;background:rgba(5,81,67,.22);cursor:pointer;transition:.2s}
+.dots i.on{background:var(--g);width:22px;border-radius:5px}
+.counter{position:fixed;bottom:24px;right:30px;z-index:61;font-size:12px;color:var(--muted);font-weight:700}
+.hint{position:fixed;bottom:24px;left:30px;z-index:61;font-size:11px;color:var(--muted)}
+/* building blocks */
+.grid{display:grid;gap:18px}
+.c2{grid-template-columns:1fr 1fr}.c3{grid-template-columns:repeat(3,1fr)}.c4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:22px}
+.dark .card{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.14);box-shadow:none;backdrop-filter:blur(4px)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:30px;font-size:12px;font-weight:800;
+  background:var(--mint);color:var(--g-d);border:1px solid var(--mintline)}
+.dark .pill{background:rgba(255,255,255,.12);color:#eafff8;border-color:rgba(255,255,255,.2)}
+.big-num{font-size:44px;font-weight:800;color:var(--g-d);line-height:1;letter-spacing:-1px}
+.dark .big-num{color:#fff}
+.label{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:800;margin-top:7px}
+.dark .label{color:#9fd3c4}
+.icon{width:46px;height:46px;border-radius:13px;background:var(--mint);color:var(--g-d);display:flex;align-items:center;
+  justify-content:center;font-size:22px;font-weight:800;margin-bottom:14px;border:1px solid var(--mintline)}
+.card h3{margin:0 0 7px;font-size:18px}
+.card p{margin:0;color:var(--muted);font-size:14px;line-height:1.55}
+ul.clean{margin:8px 0 0;padding-left:0;list-style:none}
+ul.clean li{position:relative;padding-left:24px;margin:9px 0;color:var(--slate);font-size:14.5px;line-height:1.5}
+ul.clean li::before{content:"";position:absolute;left:2px;top:8px;width:8px;height:8px;border-radius:2px;background:var(--g)}
+.dark ul.clean li{color:#cdeee4}
+.tag-chip{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:var(--mint);color:var(--g-d);
+  padding:2px 8px;border-radius:6px;border:1px solid var(--mintline)}
+.emph{color:var(--g-d);font-weight:700}
+.dark .emph{color:#8fe6cd}
+/* principle index numbers */
+.pidx{font-size:13px;font-weight:800;color:var(--g);letter-spacing:1px}
+/* flow chain */
+.flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
+.flow .node{flex:1;min-width:120px;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px;text-align:center;box-shadow:var(--shadow)}
+.flow .node .t{font-weight:800;font-size:13.5px;color:var(--g-d)}
+.flow .node .d{font-size:11.5px;color:var(--muted);margin-top:4px}
+.flow .arr{display:flex;align-items:center;color:var(--g-l);font-size:20px;padding:0 6px}
+/* screenshot frame */
+.shot{border-radius:12px;overflow:hidden;box-shadow:var(--shadow-lg);border:1px solid var(--line);background:#fff}
+.shot .bar{background:#e9efec;display:flex;align-items:center;gap:7px;padding:9px 13px;border-bottom:1px solid var(--line)}
+.shot .bar i{width:11px;height:11px;border-radius:50%}
+.shot .bar .u{margin-left:12px;background:#fff;border:1px solid var(--line);border-radius:7px;padding:3px 12px;font-size:11px;
+  color:var(--muted);flex:1;max-width:420px}
+.shot .body{background:#f4f7f6}
+.cap{font-size:12.5px;color:var(--muted);margin-top:10px;display:flex;align-items:center;gap:8px}
+.cap b{color:var(--g-d)}
+/* mini-ui (reused prototype components, compact) */
+.ui{font-size:12px;color:#16302a}
+.ui .hd{background:linear-gradient(120deg,var(--g-d),#0c6b56);color:#fff;padding:9px 14px;display:flex;align-items:center;gap:9px;font-weight:700;font-size:12.5px}
+.ui .hd .lg{width:22px;height:22px;border-radius:6px;background:var(--g);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px}
+.ui .tabs{display:flex;gap:2px;background:var(--g-d);padding:0 12px}
+.ui .tabs span{color:#bfe9dc;font-size:11px;font-weight:700;padding:8px 11px;border-bottom:2px solid transparent}
+.ui .tabs span.on{color:#fff;border-color:var(--g-l)}
+.ui .pane{padding:14px}
+.ui .row2{display:grid;grid-template-columns:150px 1fr;gap:12px}
+.ilist .it{padding:8px 9px;border-radius:7px;margin-bottom:4px;border:1px solid transparent}
+.ilist .it.sel{background:#e7f4ee;border-color:#bfe3d3}
+.ilist .it .id{font-weight:800;font-size:11px;color:var(--g-d)}
+.ilist .it .s{color:var(--muted);font-size:10.5px;margin-top:2px;line-height:1.3}
+.chip{display:inline-block;padding:1px 7px;border-radius:20px;font-size:9.5px;font-weight:800}
+.chip.q{background:#e6f6f1;color:var(--g-d)}.chip.v{background:#efeaff;color:#6d5dd3}.chip.d{background:#fdf1e3;color:#b9772a}
+.chip.ok{background:#e7f6ee;color:#1aa251}.chip.ai{background:#eef2f3;color:#5d716b}.chip.ed{background:#fdf1e3;color:#b9772a}
+.detail .stem{background:#f6faf8;border-left:3px solid var(--g);border-radius:7px;padding:9px 11px;font-size:11.5px;margin-bottom:10px}
+.cat{font-size:9.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--g-d);font-weight:800;border-bottom:1px solid var(--line);padding-bottom:4px;margin:10px 0 7px}
+.tg{display:grid;grid-template-columns:96px 1fr 56px;gap:8px;align-items:center;padding:4px 2px;font-size:11px}
+.tg .lb{color:var(--muted);font-weight:600}
+.tg .vl{font-weight:700}
+.tg .cd{font-family:ui-monospace,Menlo,monospace;font-size:9.5px;background:#eef2f3;padding:0 5px;border-radius:4px;color:#5d716b}
+.tg select{font-size:10.5px;border:1px solid var(--g);border-radius:6px;padding:2px 4px;background:#f3fbf8;color:var(--g-d);font-weight:700}
+.cbar{height:5px;border-radius:3px;background:#e6ebe9;overflow:hidden}.cbar i{display:block;height:100%}
+.acts{display:flex;gap:7px;margin-top:11px;border-top:1px solid var(--line);padding-top:10px}
+.bt{border:none;border-radius:7px;padding:6px 11px;font-size:10.5px;font-weight:800;cursor:default}
+.bt.p{background:var(--g);color:#fff}.bt.g{background:#eef2f3;color:#41506a}.bt.r{background:#fbe9e8;color:#d9534f}.bt.k{background:var(--g-d);color:#fff;margin-left:auto}
+.qti{background:#08231d;color:#bfe9dc;border-radius:9px;padding:12px;font-family:ui-monospace,Menlo,monospace;font-size:10.5px;line-height:1.6;white-space:pre;overflow:auto}
+.qti .t{color:#7fd6c2}.qti .a{color:#e0a23b}.qti .v{color:#9ec5fe}
+.gate{padding:11px 15px;border-radius:10px;font-weight:800;display:flex;align-items:center;gap:11px;background:#e7f6ee;color:#0f7a3d;border:1px solid #b8e6cb;font-size:12px;margin-bottom:12px}
+.gate .b{font-size:22px}
+.fb{display:grid;grid-template-columns:120px 1fr 42px;gap:10px;align-items:center;padding:5px 2px;font-size:11px}
+.fb .bar{height:7px;border-radius:4px;background:#e6ebe9;overflow:hidden}.fb .bar i{display:block;height:100%}
+.fb .n{text-align:right;font-weight:800;font-size:11px}
+table.cm{width:100%;border-collapse:collapse;font-size:10.5px}
+table.cm th{background:#eef4f1;text-align:left;padding:5px 8px;font-size:9px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+table.cm td{padding:5px 8px;border-bottom:1px solid var(--line)}table.cm td.bad{color:#d9534f;font-weight:800}table.cm td.ok{color:#1aa251;font-weight:800}
+.statmini{display:flex;gap:10px;margin-bottom:12px}
+.statmini .s{flex:1;background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 11px}
+.statmini .s .k{font-size:8.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:800}
+.statmini .s .v{font-size:18px;font-weight:800;color:var(--g-d)}
+.ui .why{font-size:9.5px;color:#7d8d88;font-style:italic;margin:-1px 0 5px;padding-left:104px;line-height:1.35}
+.ui .tbar{display:flex;gap:6px;margin-bottom:9px;align-items:center}
+.ui .tbar input,.ui .tbar select{font-size:10px;border:1px solid var(--line);border-radius:6px;padding:4px 7px;background:#fff;color:#5d716b}
+.ui .tbar input{flex:1}
+.ui .tbar select.on{border-color:var(--g);color:var(--g-d);font-weight:800;background:#f3fbf8}
+.chip.fl{background:#fbe9e8;color:#d9534f}
+.ilist .it .mt{display:flex;gap:5px;margin-top:6px;align-items:center}
+.ilist .it .mt .pc{margin-left:auto;font-size:9.5px;color:#5d716b;font-weight:700}
+.editflag{display:inline-flex;align-items:center;gap:5px;background:#fff7ea;border:1px solid #f0dcb4;color:#9a6b16;
+  font-size:10px;font-weight:700;border-radius:7px;padding:5px 9px;margin-top:9px}
+/* timeline */
+.tl{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;position:relative}
+.tl .ph{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.tl .ph::before{content:"";position:absolute;top:0;left:0;right:0;height:5px;background:var(--g)}
+.tl .ph:nth-child(2)::before{background:var(--g-l)}.tl .ph:nth-child(3)::before{background:var(--gold)}.tl .ph:nth-child(4)::before{background:var(--coral)}
+.tl .wk{font-size:11px;font-weight:800;letter-spacing:.5px;color:var(--g);text-transform:uppercase}
+.tl .drop{font-size:10px;font-weight:800;color:#fff;background:var(--g-d);border-radius:20px;padding:2px 9px;display:inline-block;margin:8px 0}
+.tl .ph:nth-child(3) .drop{background:var(--gold)}.tl .ph:nth-child(4) .drop{background:var(--coral)}
+.tl h4{margin:4px 0 8px;font-size:15px}
+.tl ul{margin:0;padding-left:0;list-style:none}
+.tl li{font-size:12px;color:var(--slate);margin:6px 0;padding-left:16px;position:relative;line-height:1.4}
+.tl li::before{content:"→";position:absolute;left:0;color:var(--g);font-weight:800}
+.tl .val{margin-top:10px;font-size:11.5px;background:var(--mint);border-radius:8px;padding:7px 9px;color:var(--g-d);font-weight:600;border:1px solid var(--mintline)}
+.seq{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
+.sq{flex:1;min-width:150px;display:flex;gap:11px;background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:15px 14px;box-shadow:var(--shadow);position:relative}
+.sq .sqn{font-size:14px;font-weight:800;color:#fff;background:var(--g);width:28px;height:28px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;flex:0 0 28px}
+.sq:nth-child(5) .sqn{background:var(--g-l)}.sq:nth-child(7) .sqn{background:var(--gold)}.sq:nth-child(9) .sqn{background:var(--coral)}
+.sqc h4{margin:0 0 4px;font-size:14.5px;line-height:1.15}
+.sqc p{margin:0;font-size:12px;color:var(--muted);line-height:1.45}
+.sqa{display:flex;align-items:center;color:var(--g-l);font-size:22px;font-weight:800;padding:0 4px}
+.platband{margin-top:18px;background:linear-gradient(120deg,var(--g-d),#0c6b56);color:#eafff8;border-radius:14px;
+  padding:18px 22px;display:flex;align-items:center;gap:16px;font-size:14.5px;line-height:1.5}
+.platband .pl{font-size:30px;flex:0 0 auto;color:#8fe6cd}
+.platband .emph{color:#8fe6cd;font-weight:800}
+.ribbon{background:var(--g-d);color:#fff;border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:14px;font-weight:600;margin-top:18px}
+.ribbon .tag{background:var(--g);padding:5px 13px;border-radius:30px;font-weight:800;font-size:13px}
+/* arch svg wrap */
+.archwrap{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow);overflow:auto}
+.legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;font-size:12px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:7px}.legend i{width:11px;height:11px;border-radius:3px}
+@media(max-width:980px){.slide{padding:36px 26px 78px}h1{font-size:34px}h2.sh{font-size:26px}.c3,.c4,.tl{grid-template-columns:1fr 1fr}.c2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="fillbar" id="fillbar"></div></div>
+<div class="brandmark"><span class="gm">gmac</span><span class="x">×</span><span>Velotio</span></div>
+<div class="deck" id="deck"></div>
+<div class="nav"><button id="prev">‹</button><div class="dots" id="dots"></div><button id="next">›</button></div>
+<div class="counter" id="counter"></div>
+<div class="hint">← → arrows to navigate</div>
+
+<script id="archsvg">
+const ARCH_SVG=`<svg viewBox="0 0 1180 470" width="100%" style="min-width:980px" font-family="-apple-system,Segoe UI,Roboto,sans-serif">
+<defs>
+ <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#86a79d"/></marker>
+ <marker id="arl" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#d9a441"/></marker>
+</defs>
+<style>.bx{rx:11;ry:11;stroke-width:1.5}.lbl{font-size:12.5px;font-weight:700;fill:#0f2620}.sub2{font-size:10px;fill:#5d716b}
+.grp{font-size:11px;font-weight:800;letter-spacing:.6px}.ln{stroke:#86a79d;stroke-width:1.6;fill:none}.lnf{stroke:#d9a441;stroke-width:1.6;fill:none;stroke-dasharray:5 4}</style>
+<rect x="20" y="46" width="225" height="392" fill="#e6f6f1" opacity=".7" rx="14"/>
+<rect x="262" y="46" width="300" height="392" fill="#efeaff" opacity=".55" rx="14"/>
+<rect x="579" y="46" width="300" height="392" fill="#fdf1e3" opacity=".6" rx="14"/>
+<rect x="896" y="46" width="262" height="392" fill="#e7f6ee" opacity=".6" rx="14"/>
+<text x="132" y="36" text-anchor="middle" class="grp" fill="#055143">INGESTION &amp; GROUNDING</text>
+<text x="412" y="36" text-anchor="middle" class="grp" fill="#6d5dd3">AI TAGGING ENGINE</text>
+<text x="729" y="36" text-anchor="middle" class="grp" fill="#b9772a">HUMAN-IN-LOOP &amp; EVALS</text>
+<text x="1027" y="36" text-anchor="middle" class="grp" fill="#1aa251">WRITEBACK &amp; DOWNSTREAM</text>
+<g><rect class="bx" x="40" y="70" width="185" height="58" fill="#fff" stroke="#bfe3d3"/><text x="56" y="94" class="lbl">QTI Item Bank</text><text x="56" y="112" class="sub2">~3,000 QTI 3.0 items</text></g>
+<g><rect class="bx" x="40" y="150" width="185" height="62" fill="#fff" stroke="#bfe3d3"/><text x="56" y="174" class="lbl">QTI Parser</text><text x="56" y="191" class="sub2">stem · options · passages</text><text x="56" y="205" class="sub2">tables/graphs → text</text></g>
+<g><rect class="bx" x="40" y="234" width="185" height="78" fill="#fff" stroke="#bfe3d3"/><text x="56" y="258" class="lbl">Codebook Store</text><text x="56" y="275" class="sub2">content + cognitive codes</text><text x="56" y="289" class="sub2">CBN crosswalk rules</text><text x="56" y="303" class="sub2">WEF skills · badging</text></g>
+<g><rect class="bx" x="40" y="334" width="185" height="68" fill="#fff" stroke="#bfe3d3"/><text x="56" y="358" class="lbl">Vocab Retriever</text><text x="56" y="375" class="sub2">legal codes for this</text><text x="56" y="389" class="sub2">section / item type</text></g>
+<text x="132" y="426" text-anchor="middle" class="sub2" font-style="italic">SkillSet Mapping.xlsx</text>
+<g><rect class="bx" x="282" y="96" width="260" height="70" fill="#fff" stroke="#d4c9f5"/><text x="300" y="120" class="lbl">Prompt Builder</text><text x="300" y="138" class="sub2">item text + retrieved legal codes</text><text x="300" y="153" class="sub2">+ curated few-shot exemplars</text></g>
+<g><rect class="bx" x="282" y="184" width="260" height="84" fill="#fff" stroke="#d4c9f5"/><text x="300" y="208" class="lbl">Constrained LLM Tagger</text><text x="300" y="226" class="sub2">classifies into taxonomy only</text><text x="300" y="241" class="sub2">code + confidence + rationale</text><text x="300" y="256" class="sub2">multi-pass self-consistency</text></g>
+<g><rect class="bx" x="282" y="286" width="260" height="74" fill="#fff" stroke="#d4c9f5"/><text x="300" y="310" class="lbl">Validation &amp; Confidence</text><text x="300" y="328" class="sub2">reject out-of-vocab labels</text><text x="300" y="343" class="sub2">flag low-confidence for SME</text></g>
+<g><rect class="bx" x="282" y="378" width="260" height="50" fill="#fff" stroke="#d4c9f5"/><text x="300" y="401" class="lbl">Tag Store (draft)</text><text x="300" y="417" class="sub2">per-item tags + provenance</text></g>
+<g><rect class="bx" x="599" y="96" width="260" height="82" fill="#fff" stroke="#f0d9b8"/><text x="617" y="120" class="lbl">SME Review UI</text><text x="617" y="138" class="sub2">categorized tags · confidence</text><text x="617" y="153" class="sub2">edit from controlled vocab</text><text x="617" y="168" class="sub2">approve / flag · multi-skill</text></g>
+<g><rect class="bx" x="599" y="196" width="260" height="78" fill="#fff" stroke="#f0d9b8"/><text x="617" y="220" class="lbl">Eval Harness</text><text x="617" y="238" class="sub2">golden set vs AI, per field</text><text x="617" y="253" class="sub2">accuracy gate ≥ 0.85</text><text x="617" y="268" class="sub2">50 → 150 → full bank</text></g>
+<g><rect class="bx" x="599" y="292" width="260" height="62" fill="#fff" stroke="#f0d9b8"/><text x="617" y="316" class="lbl">Observability</text><text x="617" y="334" class="sub2">dashboards · alerts on</text><text x="617" y="348" class="sub2">questionable outputs</text></g>
+<g><rect class="bx" x="599" y="372" width="260" height="52" fill="#fff" stroke="#f0d9b8"/><text x="617" y="395" class="lbl">Approved Tags</text><text x="617" y="412" class="sub2">SME-verified ground truth</text></g>
+<g><rect class="bx" x="916" y="110" width="222" height="70" fill="#fff" stroke="#bfe6cf"/><text x="934" y="134" class="lbl">QTI Writeback</text><text x="934" y="152" class="sub2">LOM classification +</text><text x="934" y="167" class="sub2">qti-metadata vocabulary</text></g>
+<g><rect class="bx" x="916" y="208" width="222" height="80" fill="#fff" stroke="#bfe6cf"/><text x="934" y="232" class="lbl">Personalization Engine</text><text x="934" y="250" class="sub2">content tags + difficulty</text><text x="934" y="265" class="sub2">→ adaptive item routing</text><text x="934" y="280" class="sub2">mini-assessments (5–7 q)</text></g>
+<g><rect class="bx" x="916" y="316" width="222" height="80" fill="#fff" stroke="#bfe6cf"/><text x="934" y="340" class="lbl">Badging System</text><text x="934" y="358" class="sub2">skill narrative + WEF map</text><text x="934" y="373" class="sub2">Mastery / Adept / Awareness</text><text x="934" y="388" class="sub2">per skill area</text></g>
+<path class="ln" d="M132,128 L132,150" marker-end="url(#ar)"/><path class="ln" d="M132,212 L132,234" marker-end="url(#ar)"/><path class="ln" d="M132,312 L132,334" marker-end="url(#ar)"/>
+<path class="ln" d="M225,185 C255,185 255,131 282,131" marker-end="url(#ar)"/><path class="ln" d="M225,368 C255,368 255,226 282,226" marker-end="url(#ar)"/>
+<path class="ln" d="M412,166 L412,184" marker-end="url(#ar)"/><path class="ln" d="M412,268 L412,286" marker-end="url(#ar)"/><path class="ln" d="M412,360 L412,378" marker-end="url(#ar)"/>
+<path class="ln" d="M542,403 C570,403 570,140 599,137" marker-end="url(#ar)"/>
+<path class="ln" d="M729,178 L729,196" marker-end="url(#ar)"/><path class="ln" d="M729,274 L729,292" marker-end="url(#ar)"/><path class="ln" d="M729,354 L729,372" marker-end="url(#ar)"/>
+<path class="ln" d="M859,398 C885,398 885,148 916,145" marker-end="url(#ar)"/><path class="ln" d="M1027,180 L1027,208" marker-end="url(#ar)"/><path class="ln" d="M1027,288 L1027,316" marker-end="url(#ar)"/>
+<path class="lnf" d="M729,196 C729,130 600,80 470,80 C432,80 412,90 412,96" marker-end="url(#arl)"/><text x="520" y="72" class="sub2" fill="#b9772a" font-style="italic">SME edits → new few-shot examples</text>
+<path class="lnf" d="M599,235 C575,235 560,448 412,446 C300,446 230,410 132,396" marker-end="url(#arl)"/><text x="300" y="464" class="sub2" fill="#b9772a" font-style="italic">eval &lt; 0.85 → refine grounding &amp; re-run</text>
+</svg>`;
+</script>
+<script id="slides">
+const G="#27A27D";
+/* ---- reusable screenshot mock-ups (faithful renders of the prototype) ---- */
+const SHOT_REVIEW=`
+<div class="shot"><div class="bar"><i style="background:#ec6a5e"></i><i style="background:#f4bf4f"></i><i style="background:#61c554"></i><div class="u">gmac-tagging-platform · Tag Review &amp; Edit</div></div>
+<div class="body"><div class="ui">
+ <div class="hd"><div class="lg">G</div>GMAC · AI Metadata Tagging Platform</div>
+ <div class="tabs"><span>Overview</span><span>Codebook Map</span><span class="on">Tag Review &amp; Edit</span><span>Evaluation</span><span>Architecture</span></div>
+ <div class="pane"><div class="row2">
+   <div class="ilist">
+     <div class="it sel"><div class="id">Q-10421 <span class="chip q">Quant</span></div><div class="s">If 3/8 of a number is 0.45, what is 150% of…</div></div>
+     <div class="it"><div class="id">Q-10588 <span class="chip q">Quant</span></div><div class="s">A printing press produces 240 pages in 8 min…</div></div>
+     <div class="it"><div class="id">V-20114 <span class="chip v">Verbal</span></div><div class="s">Which of the following best explains the…</div></div>
+     <div class="it"><div class="id">D-30210 <span class="chip d">Data Insights</span></div><div class="s">Is the integer n greater than 20? (1)…</div></div>
+   </div>
+   <div class="detail">
+     <div style="font-size:10px;color:#5d716b;font-weight:800;margin-bottom:5px">Q-10421 · <span class="chip q">Quant</span> · <span class="chip ai">AI · unreviewed</span></div>
+     <div class="stem">If 3/8 of a number is 0.45, what is 150% of that same number?</div>
+     <div class="cat">Content Classification</div>
+     <div class="tg"><div class="lb">Content Domain</div><div><span class="vl">Arithmetic</span> <span class="cd">ARI</span></div><div class="cbar"><i style="width:97%;background:${G}"></i></div></div>
+     <div class="tg"><div class="lb">Subtopic</div><div><span class="vl">Conversion – F/D/P</span> <span class="cd">FDP</span></div><div class="cbar"><i style="width:95%;background:${G}"></i></div></div>
+     <div class="cat">Cognitive Classification</div>
+     <div class="tg"><div class="lb">Cognitive</div><div><select><option>Pure (PUR)</option></select></div><div class="cbar"><i style="width:100%;background:${G}"></i></div></div>
+     <div class="tg"><div class="lb">Fund. Skill</div><div><span class="vl">Rates/Ratios</span> <span class="cd">QRR</span></div><div class="cbar"><i style="width:88%;background:#d9a441"></i></div></div>
+     <div class="cat">Skill &amp; Badging</div>
+     <div class="tg"><div class="lb">WEF Skill</div><div><span class="vl">Critical Thinking &amp; Problem Solving</span></div><div class="cbar"><i style="width:86%;background:#d9a441"></i></div></div>
+     <div class="tg"><div class="lb">Badge</div><div><span class="vl">Arithmetic Fluency</span></div><div class="cbar"><i style="width:95%;background:${G}"></i></div></div>
+     <div class="acts"><span class="bt p">✓ Approve tags</span><span class="bt r">⚑ Flag</span><span class="bt g">↺ Reset</span><span class="bt k">&lt;/&gt; Preview QTI</span></div>
+   </div>
+ </div></div>
+</div></div></div>`;
+
+const SHOT_QTI=`
+<div class="shot"><div class="bar"><i style="background:#ec6a5e"></i><i style="background:#f4bf4f"></i><i style="background:#61c554"></i><div class="u">Preview QTI writeback · Q-10421</div></div>
+<div class="body" style="padding:14px"><div class="qti"><span class="t">&lt;qti-assessment-item</span> <span class="a">identifier</span>=<span class="v">"Q-10421"</span><span class="t">&gt;</span>
+  <span class="t">&lt;qti-metadata&gt;</span>
+    <span class="t">&lt;gmac-classification</span> <span class="a">scheme</span>=<span class="v">"content-domain"</span> <span class="a">code</span>=<span class="v">"ARI"</span><span class="t">&gt;</span>Arithmetic<span class="t">&lt;/&gt;</span>
+    <span class="t">&lt;gmac-classification</span> <span class="a">scheme</span>=<span class="v">"subtopic"</span> <span class="a">code</span>=<span class="v">"FDP"</span><span class="t">&gt;</span>Conversion F/D/P<span class="t">&lt;/&gt;</span>
+    <span class="t">&lt;gmac-classification</span> <span class="a">scheme</span>=<span class="v">"cognitive"</span> <span class="a">code</span>=<span class="v">"PUR"</span><span class="t">/&gt;</span>
+    <span class="t">&lt;gmac-skill</span> <span class="a">wef</span>=<span class="v">"Critical Thinking &amp; Problem Solving"</span>
+                <span class="a">badge</span>=<span class="v">"Arithmetic Fluency"</span><span class="t">/&gt;</span>
+    <span class="t">&lt;gmac-skill-narrative&gt;</span>Arithmetic fluency in conversion between
+       fractions, decimals and percentages…<span class="t">&lt;/&gt;</span>
+    <span class="t">&lt;gmac-provenance</span> <span class="a">source</span>=<span class="v">"ai+sme"</span> <span class="a">status</span>=<span class="v">"approved"</span><span class="t">/&gt;</span>
+  <span class="t">&lt;/qti-metadata&gt;</span>
+<span class="t">&lt;/qti-assessment-item&gt;</span></div></div></div>`;
+
+const SHOT_EVAL=`
+<div class="shot"><div class="bar"><i style="background:#ec6a5e"></i><i style="background:#f4bf4f"></i><i style="background:#61c554"></i><div class="u">gmac-tagging-platform · Evaluation &amp; Accuracy</div></div>
+<div class="body"><div class="ui"><div class="pane" style="padding:16px">
+   <div class="gate"><span class="b">✓</span><div>Overall accuracy <b>91.7%</b> (55/60 fields) — clears the 0.85 gate. Cleared to expand to the next batch.</div></div>
+   <div class="statmini">
+     <div class="s"><div class="k">Items scored</div><div class="v">10</div></div>
+     <div class="s"><div class="k">Fields</div><div class="v">60</div></div>
+     <div class="s"><div class="k">Mismatches</div><div class="v" style="color:#d9a441">5</div></div>
+     <div class="s"><div class="k">Gate</div><div class="v" style="color:#1aa251">PASS</div></div>
+   </div>
+   <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:16px">
+     <div><div style="font-size:10px;font-weight:800;color:var(--g-d);margin-bottom:7px">ACCURACY BY FIELD</div>
+       <div class="fb"><div>Content Domain</div><div class="bar"><i style="width:100%;background:${G}"></i></div><div class="n" style="color:${G}">100%</div></div>
+       <div class="fb"><div>Subtopic</div><div class="bar"><i style="width:70%;background:#d9a441"></i></div><div class="n" style="color:#d9a441">70%</div></div>
+       <div class="fb"><div>Cognitive</div><div class="bar"><i style="width:80%;background:#d9a441"></i></div><div class="n" style="color:#d9a441">80%</div></div>
+       <div class="fb"><div>Element Type</div><div class="bar"><i style="width:100%;background:${G}"></i></div><div class="n" style="color:${G}">100%</div></div>
+       <div class="fb"><div>WEF Skill</div><div class="bar"><i style="width:100%;background:${G}"></i></div><div class="n" style="color:${G}">100%</div></div>
+     </div>
+     <div><div style="font-size:10px;font-weight:800;color:var(--g-d);margin-bottom:7px">MISMATCHES (AI vs SME)</div>
+       <table class="cm"><thead><tr><th>Item</th><th>Field</th><th>AI</th><th>SME</th></tr></thead><tbody>
+       <tr><td>D-30210</td><td>Cognitive</td><td class="bad">PUR</td><td class="ok">REA</td></tr>
+       <tr><td>V-20502</td><td>Subtopic</td><td class="bad">BUS</td><td class="ok">EVE</td></tr>
+       <tr><td>V-20114</td><td>Cognitive</td><td class="bad">CST-CCN</td><td class="ok">CST-EXP</td></tr>
+       <tr><td>D-30781</td><td>Subtopic</td><td class="bad">P</td><td class="ok">T</td></tr>
+       </tbody></table></div>
+   </div>
+</div></div></div></div>`;
+
+/* HITL: SME mid-review — rationale visible, one tag edited, one low-confidence flagged */
+const SHOT_HITL=`
+<div class="shot"><div class="bar"><i style="background:#ec6a5e"></i><i style="background:#f4bf4f"></i><i style="background:#61c554"></i><div class="u">Tag Review · SME verifying D-30210</div></div>
+<div class="body"><div class="ui">
+ <div class="hd"><div class="lg">G</div>GMAC · AI Metadata Tagging Platform</div>
+ <div class="tabs"><span>Overview</span><span>Codebook Map</span><span class="on">Tag Review &amp; Edit</span><span>Evaluation</span><span>Architecture</span></div>
+ <div class="pane">
+   <div style="font-size:10px;color:#5d716b;font-weight:800;margin-bottom:5px">D-30210 · <span class="chip d">Data Insights</span> · <span class="chip ai">AI · unreviewed</span></div>
+   <div class="detail"><div class="stem">Data Sufficiency: Is the integer n greater than 20? &nbsp;(1) n is a multiple of 6. &nbsp;(2) n² &gt; 400.</div></div>
+   <div class="cat">Cognitive Classification</div>
+   <div class="tg"><div class="lb">Cognitive</div><div><select class="on" style="border-color:var(--g)"><option>Real (REA) ✎</option></select> <span class="chip ed">edited</span></div><div class="cbar"><i style="width:100%;background:${G}"></i></div></div>
+   <div class="why">SME override — abstract DS, but item is framed in a real-number-property scenario.</div>
+   <div class="tg"><div class="lb">Fund. Skill</div><div><span class="vl">Values &amp; Operations</span> <span class="cd">QVO</span></div><div class="cbar"><i style="width:82%;background:#d9a441"></i></div></div>
+   <div class="why">AI rationale: number-value reasoning maps to the QVO cluster.</div>
+   <div class="tg"><div class="lb">Subtopic</div><div><span class="vl">Computation</span> <span class="cd">CMP</span> <span class="chip fl">low&nbsp;conf</span></div><div class="cbar"><i style="width:70%;background:#d9534f"></i></div></div>
+   <div class="why">AI rationale: number-property check; subtopic uncertain — flagged for SME.</div>
+   <div class="acts"><span class="bt p">✓ Approve tags</span><span class="bt r" style="outline:2px solid #f3cfcd;outline-offset:1px">⚑ Flag for review</span><span class="bt g">↺ Reset to AI</span></div>
+   <div class="editflag">✎ Every field shows AI confidence + a plain-English rationale, so SMEs review by exception.</div>
+ </div>
+</div></div></div>`;
+
+/* HITL: the review queue — statuses, low-confidence surfacing, filter */
+const SHOT_QUEUE=`
+<div class="shot"><div class="bar"><i style="background:#ec6a5e"></i><i style="background:#f4bf4f"></i><i style="background:#61c554"></i><div class="u">Tag Review · batch queue</div></div>
+<div class="body"><div class="ui"><div class="pane">
+   <div class="statmini">
+     <div class="s"><div class="k">Items</div><div class="v">10</div></div>
+     <div class="s"><div class="k">Reviewed</div><div class="v">4<span style="font-size:11px;color:#9fb0aa">/10</span></div></div>
+     <div class="s"><div class="k">Need attention</div><div class="v" style="color:#d9a441">3</div></div>
+     <div class="s"><div class="k">Avg conf.</div><div class="v">89%</div></div>
+   </div>
+   <div class="tbar"><input value="Search items…" readonly><select><option>All sections</option></select><select class="on"><option>Needs attention ▾</option></select></div>
+   <div class="ilist">
+     <div class="it"><div class="id">Q-10421 <span class="chip q">Quant</span></div><div class="s">If 3/8 of a number is 0.45, what is 150% of…</div><div class="mt"><span class="chip ok">approved</span><span class="pc">97%</span></div></div>
+     <div class="it sel"><div class="id">D-30210 <span class="chip d">Data Insights</span></div><div class="s">Is the integer n greater than 20? (1) n is a multiple of 6…</div><div class="mt"><span class="chip ai">AI · unreviewed</span><span class="chip fl">2 low-conf</span><span class="pc">79%</span></div></div>
+     <div class="it"><div class="id">V-20114 <span class="chip v">Verbal</span></div><div class="s">Which of the following best explains the apparent discrepancy…</div><div class="mt"><span class="chip ai">AI · unreviewed</span><span class="chip fl">1 low-conf</span><span class="pc">84%</span></div></div>
+     <div class="it"><div class="id">V-20502 <span class="chip v">Verbal</span></div><div class="s">Which of the following, if true, most weakens the argument…</div><div class="mt"><span class="chip ed">flagged</span><span class="pc">88%</span></div></div>
+   </div>
+</div></div></div></div>`;
+
+const SLIDES=[
+/* 1 TITLE */
+`<div class="slide dark active">
+  <div class="kicker">Proposal · Confidential</div>
+  <div class="fill" style="display:flex;flex-direction:column;justify-content:center;max-width:960px">
+    <h1>Turning a 3,000-item bank into the engine for<br><span style="color:#8fe6cd">personalized prep &amp; skill badging</span></h1>
+    <p class="lead" style="font-size:20px">An AI-assisted metadata tagging platform — grounded in your own skills codebook,
+    governed by your SMEs, measured continuously, and written straight back to QTI.</p>
+    <div style="display:flex;gap:12px;margin-top:24px;flex-wrap:wrap">
+      <span class="pill">Complete groundedness</span><span class="pill">Human-in-the-loop</span>
+      <span class="pill">Mini review platform → QTI</span><span class="pill">Always-on evaluations</span>
+    </div>
+  </div>
+  <div style="display:flex;gap:40px;align-items:center;border-top:1px solid rgba(255,255,255,.18);padding-top:18px">
+    <div><div class="big-num">2 mo</div><div class="label">to a fully tagged bank</div></div>
+    <div><div class="big-num">4</div><div class="label">value drops · every 2 weeks</div></div>
+    <div><div class="big-num">100%</div><div class="label">SME-reviewed</div></div>
+    <div style="margin-left:auto;text-align:right;color:#bfe9dc;font-size:13px">Prepared for GMAC<br>by Velotio</div>
+  </div>
+</div>`,
+
+/* 2 WHY NOW */
+`<div class="slide">
+  <div class="kicker">The story · where we are</div>
+  <h2 class="sh">The vision is set. One thing stands in the way.</h2>
+  <p class="lead">GMAC is moving prep from one-size-fits-all to a <span class="emph">personalized, subscription</span> experience —
+  mini diagnostics, adaptive practice, and a badging system that shows candidates their skill proficiency, targeted for a basic launch by end of 2026.</p>
+  <div class="grid c2" style="margin-top:14px">
+    <div class="card">
+      <div class="icon" style="background:#fbe9e8;color:#d9534f;border-color:#f3cfcd">!</div>
+      <h3>The blocker: inconsistent metadata</h3>
+      <p>Across ~3,000 items, content was hand-tagged by different developers over the years under different rules.
+      The psychometric parameters are trusted — but the <b>content classification is uneven</b>, and that blocks precise
+      recommendations and meaningful badges.</p>
+    </div>
+    <div class="card">
+      <div class="icon">✦</div>
+      <h3>Why it's solvable now</h3>
+      <p>You already have the answer key: a detailed <span class="tag-chip">SkillSet Mapping</span> codebook that defines every
+      legal tag and how items map to skills. We use AI to apply that codebook consistently at scale — with your SMEs in control.</p>
+    </div>
+  </div>
+  <div class="ribbon"><span class="tag">Foundational</span>Clean, consistent metadata is the enabler everything else is built on — so we start here.</div>
+</div>`,
+
+/* 3 OPPORTUNITY */
+`<div class="slide">
+  <div class="kicker">The prize</div>
+  <h2 class="sh">One clean tagging layer powers two engines</h2>
+  <p class="lead">Every item, tagged consistently against your skills framework, feeds both candidate-facing experiences GMAC is building.</p>
+  <div class="grid c2" style="margin-top:10px">
+    <div class="card">
+      <div class="icon">◎</div><h3>Personalization</h3>
+      <p>Trusted difficulty parameters + clean content tags let the system fetch exactly the right next item for a learner's
+      state — short mini-assessments (5–7 questions) that ramp difficulty as ability grows, instead of a full-length exam on day one.</p>
+      <ul class="clean"><li>Targeted practice sets by skill area</li><li>Adaptive difficulty pathway</li></ul>
+    </div>
+    <div class="card">
+      <div class="icon">★</div><h3>Badging</h3>
+      <p>The item-level skill narratives roll up to WEF-aligned skills, surfacing proficiency to candidates across
+      <span class="emph">Mastery · Adept · Awareness</span> tiers — language that translates directly to school and workplace relevance.</p>
+      <ul class="clean"><li>Skill proficiency by area</li><li>Tiers driven by performance once items are tagged</li></ul>
+    </div>
+  </div>
+  <div class="flow" style="margin-top:18px">
+    <div class="node"><div class="t">QTI items</div><div class="d">~3,000</div></div><div class="arr">→</div>
+    <div class="node" style="border-color:var(--g);box-shadow:0 0 0 2px #d4ebe2"><div class="t" style="color:var(--g-d)">Consistent tags</div><div class="d">this project</div></div><div class="arr">→</div>
+    <div class="node"><div class="t">Personalization</div><div class="d">adaptive routing</div></div><div class="arr">+</div>
+    <div class="node"><div class="t">Badging</div><div class="d">skill proficiency</div></div>
+  </div>
+</div>`,
+
+/* 4 APPROACH + PRINCIPLES */
+`<div class="slide dark">
+  <div class="kicker">Our approach</div>
+  <h2 class="sh">AI takes the first pass. People stay in control. Evidence keeps it honest.</h2>
+  <p class="lead">The whole platform is built on four design principles — each one a direct answer to the governance bar GMAC set:
+  not a black box, SME-validated, and measurably accurate before anything scales.</p>
+  <div class="grid c4" style="margin-top:18px">
+    <div class="card"><div class="pidx">PRINCIPLE 01</div><h3 style="margin-top:6px">Complete groundedness</h3><p>The AI classifies <i>into</i> your codebook. It cannot invent a label.</p></div>
+    <div class="card"><div class="pidx">PRINCIPLE 02</div><h3 style="margin-top:6px">Human-in-the-loop + feedback loop</h3><p>SMEs verify every tag; their edits make the model better.</p></div>
+    <div class="card"><div class="pidx">PRINCIPLE 03</div><h3 style="margin-top:6px">A mini platform to edit &amp; commit</h3><p>Review, change tags, and write them back into QTI.</p></div>
+    <div class="card"><div class="pidx">PRINCIPLE 04</div><h3 style="margin-top:6px">Always-on evaluations</h3><p>Run a golden set anytime; gate scale-up on accuracy.</p></div>
+  </div>
+  <p class="lead" style="margin-top:20px;font-size:15px">The next four slides walk through each principle — what it means, and how it shows up in the product.</p>
+</div>`,
+
+/* 4B APPROACH SEQUENCE */
+`<div class="slide">
+  <div class="kicker">The approach · how we build it</div>
+  <h2 class="sh">Build the engine fast, prove it on a sample, then scale</h2>
+  <p class="lead">The four principles come to life as one sequence. We stand the engine up quickly on your codebook rules,
+  earn SME trust on a sample, refine, then let it tag the whole bank — with humans and evals watching throughout.</p>
+  <div class="seq" style="margin-top:10px">
+    <div class="sq"><div class="sqn">01</div><div class="sqc"><h4>Build the rules engine</h4><p>Stand up a tagging engine <b>grounded on the codebook rules</b> — fast, deterministic first.</p></div></div>
+    <div class="sqa">→</div>
+    <div class="sq"><div class="sqn">02</div><div class="sqc"><h4>Run on a sample set</h4><p>Tag a 100–200 item sample and <b>gather SME feedback</b> on where it's right and wrong.</p></div></div>
+    <div class="sqa">→</div>
+    <div class="sq"><div class="sqn">03</div><div class="sqc"><h4>Refine the engine</h4><p>Fold feedback back in as rules &amp; exemplars until accuracy clears the gate.</p></div></div>
+    <div class="sqa">→</div>
+    <div class="sq"><div class="sqn">04</div><div class="sqc"><h4>Bulk-tag the bank</h4><p>Run the refined engine across the <b>entire ~3,000-item set</b>.</p></div></div>
+    <div class="sqa">→</div>
+    <div class="sq"><div class="sqn">05</div><div class="sqc"><h4>Review + evals</h4><p><b>Human-in-the-loop</b> review, with an <b>evals dashboard</b> tracking the agents' performance.</p></div></div>
+  </div>
+  <div class="platband">
+    <div class="pl">⬚</div>
+    <div><b>All of this is one mini platform</b> — the engine, sample runs, SME review, and the evals dashboard live in a single surface.
+    <span class="emph">And it stays available at all times</span> — GMAC can come back any day to revisit an item and edit any metadata tag.</div>
+  </div>
+</div>`,
+
+/* 5 PRINCIPLE 1 GROUNDEDNESS */
+`<div class="slide">
+  <div class="kicker">Principle 01</div>
+  <h2 class="sh">Complete groundedness — the codebook is the source of truth</h2>
+  <p class="lead">We don't ask the AI "what skill is this?" in the open. We parse your <span class="tag-chip">SkillSet Mapping</span> workbook
+  into machine-readable vocabularies and rules, then make the model <span class="emph">choose only from the legal codes</span> for that item's section.</p>
+  <div class="grid c2" style="margin-top:6px;align-items:start">
+    <div>
+      <div class="card" style="margin-bottom:14px"><h3>Three layers, one rulebook</h3>
+        <ul class="clean">
+          <li><b>Definition sheets</b> (WEF, Quant, RC, CR, DI) — what skills the exam measures &amp; the badge narratives.</li>
+          <li><b>Crosswalk sheets</b> (CBN-QR/VR/DI, ~250 rules) — each row is a legal combination of codes → a skill.</li>
+          <li><b>Annexure sheets</b> (~1,490 content + ~113 cognitive codes) — the controlled vocabularies, split by item bank.</li>
+        </ul></div>
+      <div class="card" style="background:var(--mint);border-color:var(--mintline)"><h3>Why it matters</h3>
+        <p>Out-of-vocabulary labels are rejected automatically. That makes the AI's output predictable, auditable, and fast for SMEs to trust — exactly the "not a black box" bar.</p></div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:12px">One item, traced through the codebook</h3>
+      <div class="flow" style="flex-direction:column;gap:8px">
+        <div class="node" style="text-align:left"><div class="t">content codes · ARI / FDP</div><div class="d">ARITHMETIC / CONVERSION – FRAC·DEC·PCT</div></div>
+        <div style="text-align:center;color:var(--g-l)">↓</div>
+        <div class="node" style="text-align:left"><div class="t">cognitive codes · PUR</div><div class="d">Pure (abstract maths)</div></div>
+        <div style="text-align:center;color:var(--g-l)">↓</div>
+        <div class="node" style="text-align:left"><div class="t">CBN-QR row · A·ARI·PUR·QRR·I·FDP</div><div class="d">→ "Arithmetic fluency in conversion between fractions, decimals &amp; percentages"</div></div>
+        <div style="text-align:center;color:var(--g-l)">↓</div>
+        <div class="node" style="text-align:left;border-color:var(--g)"><div class="t" style="color:var(--g-d)">WEF + Badge</div><div class="d">Critical Thinking &amp; Problem Solving · Arithmetic Fluency</div></div>
+      </div>
+    </div>
+  </div>
+</div>`,
+
+/* 6 PRINCIPLE 2 HITL */
+`<div class="slide">
+  <div class="kicker">Principle 02 · with screenshots</div>
+  <h2 class="sh">Human-in-the-loop — and a loop that gets smarter</h2>
+  <p class="lead">AI proposes; SMEs dispose. Every tag carries a <span class="emph">confidence score and a plain-English rationale</span>,
+  so reviewers work by exception — and every correction feeds back in as a new example.</p>
+  <div class="grid c2" style="margin-top:6px;align-items:start">
+    <div>${SHOT_QUEUE}<div class="cap"><b>Review queue</b> — statuses, low-confidence items surfaced, filter to "needs attention".</div></div>
+    <div>${SHOT_HITL}<div class="cap"><b>Reviewing by exception</b> — confidence + rationale on every field; one tag edited, one low-confidence flagged.</div></div>
+  </div>
+  <div class="card" style="margin-top:16px;background:var(--mint);border-color:var(--mintline)">
+    <div class="flow">
+      <div class="node"><div class="t">AI tags</div><div class="d">+ confidence</div></div><div class="arr">→</div>
+      <div class="node"><div class="t">SME edits</div><div class="d">verify / correct</div></div><div class="arr">→</div>
+      <div class="node"><div class="t">Refine prompts</div><div class="d">new exemplars</div></div><div class="arr">→</div>
+      <div class="node" style="border-color:var(--g)"><div class="t" style="color:var(--g-d)">Re-run batch</div><div class="d">higher accuracy</div></div>
+      <div class="arr" style="color:var(--gold)">↺</div>
+    </div>
+    <p style="margin:12px 0 0;color:var(--muted);font-size:13.5px">Deterministic accuracy isn't required up front — SMEs validate before any large-scale change, and early iteration (8–10 passes) is expected and built into the workflow.</p>
+  </div>
+</div>`,
+
+/* 7 PRINCIPLE 3 MINI PLATFORM + SHOTS */
+`<div class="slide">
+  <div class="kicker">Principle 03 · with screenshots</div>
+  <h2 class="sh">A mini platform to review, edit, and commit back to QTI</h2>
+  <p class="lead">Not a spreadsheet hand-off — a working surface where SMEs see every tag categorized, change anything from the
+  controlled vocabulary, and write approved tags <span class="emph">straight back into the QTI item</span>.</p>
+  <div class="grid c2" style="margin-top:6px;align-items:start">
+    <div>${SHOT_REVIEW}<div class="cap"><b>Tag Review &amp; Edit</b> — categorized tags, confidence bars, inline editing, approve / flag.</div></div>
+    <div>${SHOT_QTI}<div class="cap"><b>QTI writeback</b> — approved tags serialized to IEEE-LOM + a custom <span class="tag-chip">qti-metadata</span> vocabulary, with provenance.</div>
+      <div class="card" style="margin-top:14px;padding:16px"><h3 style="font-size:15px">Round-trips cleanly</h3>
+        <p style="font-size:13px">Items stay QTI 3.0 throughout. We reuse the QTI interface built for the Ascend Learning engagement, so complex item types are handled. Psychometric parameters are left untouched.</p></div>
+    </div>
+  </div>
+</div>`,
+
+/* 8 PRINCIPLE 4 EVALS + SHOT */
+`<div class="slide">
+  <div class="kicker">Principle 04 · with screenshot</div>
+  <h2 class="sh">An evaluations dashboard, available at all times</h2>
+  <p class="lead">Quality isn't a one-time check. An SME can upload a <span class="emph">golden dataset</span> with expected tags at any
+  point, run it through the system, and see exactly how the model is performing — per field, per section, and against the gate.</p>
+  <div class="grid c2" style="margin-top:6px;align-items:start">
+    <div>${SHOT_EVAL}<div class="cap"><b>Evaluation &amp; Accuracy</b> — overall + per-field accuracy, the 0.85 gate, and every mismatch listed for SME triage.</div></div>
+    <div>
+      <div class="card"><h3>How it's used</h3>
+        <ul class="clean">
+          <li>Upload golden set → score AI vs SME-expected, field by field</li>
+          <li>Gate scale-up at <b>0.85</b>: 50 → 150 → full bank</li>
+          <li>Mismatches point SMEs straight to the ambiguous cases worth refining</li>
+        </ul></div>
+      <div class="card" style="margin-top:14px;background:var(--mint);border-color:var(--mintline)"><h3>Where the model needs help, made visible</h3>
+        <p>In our sample run, disagreements cluster exactly where you'd expect — Data Sufficiency pure-vs-real, "explain" vs "construct" in CR, civic-vs-business context. The dashboard turns those into a focused refinement list rather than a guess.</p></div>
+    </div>
+  </div>
+</div>`,
+
+/* 9 ARCHITECTURE */
+`<div class="slide">
+  <div class="kicker">Under the hood</div>
+  <h2 class="sh">How tagging is enabled, end to end</h2>
+  <p class="lead">The codebook grounds the model; the model classifies into it; SMEs review; the eval harness gates quality; approved tags flow back to QTI and on to personalization &amp; badging.</p>
+  <div class="archwrap">${ARCH_SVG}</div>
+  <div class="legend">
+    <span><i style="background:#27A27D"></i> Ingestion &amp; grounding</span>
+    <span><i style="background:#6d5dd3"></i> AI tagging engine</span>
+    <span><i style="background:#d9a441"></i> Human-in-the-loop &amp; evals</span>
+    <span><i style="background:#1aa251"></i> Writeback &amp; downstream</span>
+    <span style="color:#b9772a">— — dashed = feedback loops</span>
+  </div>
+</div>`,
+
+/* 10 TIMELINE */
+`<div class="slide">
+  <div class="kicker">Delivery plan</div>
+  <h2 class="sh">2 months · value lands every 2 weeks</h2>
+  <p class="lead">No big-bang at the end. Four increments, each shipping something GMAC can see, use, and react to — de-risking the whole engagement as we go.</p>
+  <div class="tl" style="margin-top:8px">
+    <div class="ph"><div class="wk">Weeks 1–2</div><div class="drop">Value drop 1</div><h4>Grounding + pilot tagging</h4>
+      <ul><li>Ingest codebook → vocabularies &amp; rules</li><li>Stand up tagging engine</li><li>AI-tag a 100–200 item sample, all 3 sections</li></ul>
+      <div class="val">▸ First AI-tagged sample, viewable in the review UI</div></div>
+    <div class="ph"><div class="wk">Weeks 3–4</div><div class="drop">Value drop 2</div><h4>Review platform + evals live</h4>
+      <ul><li>Full SME review &amp; edit workflow</li><li>Evaluations dashboard + golden set</li><li>First accuracy numbers &amp; refinement loop</li></ul>
+      <div class="val">▸ SMEs editing tags; accuracy measured vs the gate</div></div>
+    <div class="ph"><div class="wk">Weeks 5–6</div><div class="drop">Value drop 3</div><h4>QTI writeback + scale-up</h4>
+      <ul><li>Commit approved tags back to QTI</li><li>Scale 50 → 150 → larger batches as gate clears</li><li>Observability &amp; alerts</li></ul>
+      <div class="val">▸ Tagged items round-tripping into QTI 3.0</div></div>
+    <div class="ph"><div class="wk">Weeks 7–8</div><div class="drop">Value drop 4</div><h4>Full bank + handoff</h4>
+      <ul><li>Tag the full item bank</li><li>Finalize accuracy &amp; documentation</li><li>Package for personalization + badging</li></ul>
+      <div class="val">▸ Fully tagged bank, ready to power launch</div></div>
+  </div>
+  <div class="ribbon"><span class="tag">De-risked</span>Each gate is a real checkpoint — we only expand a batch once accuracy clears 0.85, so quality leads pace.</div>
+</div>`,
+
+/* 11 WHY VELOTIO / CLOSE */
+`<div class="slide dark">
+  <div class="kicker">Why Velotio</div>
+  <h2 class="sh">Built for this exact problem — and ready to start</h2>
+  <div class="grid c3" style="margin-top:14px">
+    <div class="card"><div class="icon" style="background:rgba(255,255,255,.12);color:#8fe6cd;border:none">⟳</div><h3>QTI experience</h3><p>We reuse the QTI interface from the Ascend Learning engagement — AI-assisted item work across complex item types.</p></div>
+    <div class="card"><div class="icon" style="background:rgba(255,255,255,.12);color:#8fe6cd;border:none">⚖</div><h3>Governance-first</h3><p>Evaluations &amp; observability stood up from day one. Human-in-the-loop is the default, not an add-on.</p></div>
+    <div class="card"><div class="icon" style="background:rgba(255,255,255,.12);color:#8fe6cd;border:none">⚡</div><h3>Fast to value</h3><p>A working AI team and a proven pattern — first tagged sample in two weeks, full bank in two months.</p></div>
+  </div>
+  <div class="card" style="margin-top:20px;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)">
+    <h3 style="font-size:20px;margin-bottom:6px">The ask</h3>
+    <p style="color:#cdeee4;font-size:15px">Share sample QTI items + 2–3 "ideal" tagged exemplars, and align on the codebook. We kick off sample tagging and SME review immediately — and you see the first value drop in two weeks.</p>
+  </div>
+  <div style="margin-top:auto;display:flex;align-items:center;gap:12px;padding-top:20px;color:#bfe9dc;font-size:14px">
+    <span class="gm" style="font-size:22px;font-weight:800;color:#8fe6cd;letter-spacing:-1px">gmac</span><span style="opacity:.5">×</span><span style="font-weight:800">Velotio</span>
+    <span style="margin-left:auto">Let's build the foundation for personalized prep.</span>
+  </div>
+</div>`
+];
+</script>
+<script id="app">
+const deck=document.getElementById('deck');
+deck.innerHTML=SLIDES.join('');
+const slides=[...deck.querySelectorAll('.slide')];
+const dotsEl=document.getElementById('dots');
+slides.forEach((_,i)=>{const d=document.createElement('i');if(i===0)d.className='on';d.onclick=()=>go(i);dotsEl.appendChild(d);});
+const dots=[...dotsEl.children];
+let cur=0;
+function go(n){
+  cur=Math.max(0,Math.min(slides.length-1,n));
+  slides.forEach((s,i)=>s.classList.toggle('active',i===cur));
+  dots.forEach((d,i)=>d.classList.toggle('on',i===cur));
+  document.getElementById('fillbar').style.width=((cur+1)/slides.length*100)+'%';
+  document.getElementById('counter').textContent=(cur+1)+' / '+slides.length;
+  document.getElementById('prev').disabled=cur===0;
+  document.getElementById('next').disabled=cur===slides.length-1;
+  deck.scrollTop=0; slides[cur].scrollTop=0;
+}
+document.getElementById('prev').onclick=()=>go(cur-1);
+document.getElementById('next').onclick=()=>go(cur+1);
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();go(cur+1);}
+  if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(cur-1);}
+  if(e.key==='Home')go(0); if(e.key==='End')go(slides.length-1);
+});
+go(0);
+</script>
+</body>
+</html>
