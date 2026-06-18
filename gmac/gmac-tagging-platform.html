@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GMAC · AI Metadata Tagging Platform (Prototype)</title>
+<style>
+:root{
+  --navy:#0b2545; --navy2:#13315c; --teal:#0fa3b1; --teal-d:#0c8390;
+  --bg:#f4f6f9; --card:#ffffff; --ink:#1b2330; --muted:#64748b; --line:#e2e8f0;
+  --green:#1aa251; --amber:#e8a33d; --red:#d9534f; --violet:#6d5dd3;
+  --chip:#eef2f7; --shadow:0 1px 3px rgba(16,24,40,.08),0 1px 2px rgba(16,24,40,.06);
+  --radius:12px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5}
+header.topbar{background:linear-gradient(120deg,var(--navy),var(--navy2));color:#fff;padding:14px 26px;
+  display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:50;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+.logo{width:40px;height:40px;border-radius:9px;background:var(--teal);display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:18px;letter-spacing:.5px}
+.brand h1{font-size:16px;margin:0;font-weight:700}
+.brand p{margin:0;font-size:11.5px;color:#aebfd6}
+.badge-proto{margin-left:auto;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);
+  padding:5px 11px;border-radius:20px;font-size:11px;letter-spacing:.4px}
+nav.tabs{background:var(--navy);display:flex;gap:2px;padding:0 18px;position:sticky;top:68px;z-index:49;
+  box-shadow:var(--shadow);overflow-x:auto}
+nav.tabs button{background:transparent;border:none;color:#9fb3d1;padding:13px 18px;font-size:13.5px;font-weight:600;
+  cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:.15s}
+nav.tabs button:hover{color:#fff}
+nav.tabs button.active{color:#fff;border-bottom-color:var(--teal)}
+main{max-width:1240px;margin:0 auto;padding:26px 22px 70px}
+.view{display:none;animation:fade .25s ease}
+.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+h2.section-title{font-size:20px;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 20px;max-width:760px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.grid{display:grid;gap:16px}
+.stat-row{grid-template-columns:repeat(4,1fr);margin-bottom:20px}
+.stat{padding:16px 18px}
+.stat .k{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700}
+.stat .v{font-size:26px;font-weight:800;margin-top:4px;color:var(--navy)}
+.stat .v small{font-size:13px;color:var(--muted);font-weight:600}
+.pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.3px}
+.pill.q{background:#e6f6f8;color:var(--teal-d)} .pill.v{background:#efeaff;color:var(--violet)}
+.pill.d{background:#fdf1e3;color:#b9772a}
+.pill.ai{background:#eef2f7;color:#52617a} .pill.edited{background:#fdf1e3;color:#b9772a}
+.pill.approved{background:#e7f6ee;color:var(--green)} .pill.flagged{background:#fbe9e8;color:var(--red)}
+/* tag review layout */
+.review-wrap{display:grid;grid-template-columns:340px 1fr;gap:16px;align-items:start}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.toolbar input,.toolbar select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;background:#fff}
+.toolbar input[type=search]{flex:1;min-width:160px}
+.itemlist{max-height:660px;overflow:auto;padding:6px}
+.itemrow{padding:11px 12px;border-radius:9px;cursor:pointer;border:1px solid transparent;margin-bottom:4px}
+.itemrow:hover{background:#f7f9fc}
+.itemrow.sel{background:#eef5ff;border-color:#c7ddff}
+.itemrow .id{font-weight:700;font-size:12.5px}
+.itemrow .stem{color:var(--muted);font-size:12px;margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.itemrow .meta{display:flex;gap:6px;margin-top:7px;align-items:center;flex-wrap:wrap}
+.detail{padding:20px 22px;min-height:660px}
+.detail .qid{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.4px}
+.stem-box{background:#f8fafc;border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:8px;
+  padding:13px 15px;margin:10px 0 6px;font-size:13.5px;white-space:pre-wrap}
+.opts{font-size:12.5px;color:#41506a;margin:2px 0 18px;padding-left:2px}
+.catblock{margin-bottom:16px}
+.catblock h4{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--navy);margin:0 0 9px;
+  padding-bottom:6px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.catblock h4 .ic{width:7px;height:7px;border-radius:2px;background:var(--teal)}
+.tag{display:grid;grid-template-columns:150px 1fr 120px;gap:10px;align-items:center;padding:8px 6px;border-radius:7px}
+.tag:hover{background:#f7f9fc}
+.tag .label{font-size:12px;color:var(--muted);font-weight:600}
+.tag .valwrap{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tagval{font-weight:600;font-size:13px}
+.code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;background:var(--chip);
+  padding:1px 6px;border-radius:5px;color:#52617a}
+.tag select{padding:5px 7px;border:1px solid var(--line);border-radius:7px;font-size:12.5px;max-width:100%;background:#fff}
+.conf{display:flex;align-items:center;gap:7px;justify-content:flex-end}
+.confbar{width:54px;height:7px;border-radius:4px;background:#eceff3;overflow:hidden}
+.confbar i{display:block;height:100%;border-radius:4px}
+.conf small{font-size:11px;font-weight:700;width:30px;text-align:right}
+.why{font-size:11.5px;color:var(--muted);grid-column:2/4;margin:-2px 0 2px;padding-left:2px;font-style:italic}
+.narr{background:#f3f7ff;border:1px solid #dbe7fb;border-radius:8px;padding:11px 13px;font-size:12.5px;color:#34465f}
+.actionsbar{display:flex;gap:10px;margin-top:18px;padding-top:16px;border-top:1px solid var(--line);flex-wrap:wrap}
+button.btn{border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer}
+.btn.primary{background:var(--teal);color:#fff} .btn.primary:hover{background:var(--teal-d)}
+.btn.ghost{background:#eef2f7;color:#41506a} .btn.ghost:hover{background:#e2e8f0}
+.btn.danger{background:#fbe9e8;color:var(--red)} .btn.danger:hover{background:#f7d7d5}
+.btn.dark{background:var(--navy);color:#fff} .btn.dark:hover{background:var(--navy2)}
+.qti-pre{background:#0d1b2a;color:#cfe3f5;border-radius:9px;padding:14px 16px;font-family:ui-monospace,Menlo,monospace;
+  font-size:11.5px;overflow:auto;line-height:1.55;white-space:pre}
+.qti-pre .t{color:#7fd6c2}.qti-pre .a{color:#e6b96b}.qti-pre .v{color:#9ec5fe}
+/* evals */
+.eval-grid{grid-template-columns:repeat(4,1fr)}
+.uploadbox{border:2px dashed #cdd8e6;border-radius:12px;padding:26px;text-align:center;background:#fbfcfe;margin-bottom:18px}
+.uploadbox h3{margin:6px 0 4px;font-size:15px}
+.fieldbar{display:grid;grid-template-columns:200px 1fr 70px;gap:12px;align-items:center;padding:9px 4px;border-bottom:1px solid var(--line)}
+.fieldbar:last-child{border:none}
+.bar{height:9px;border-radius:5px;background:#eceff3;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:5px}
+.acc-num{font-weight:800;text-align:right;font-size:13px}
+table.cm{width:100%;border-collapse:collapse;font-size:12.5px}
+table.cm th,table.cm td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+table.cm th{background:#f6f8fb;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+table.cm td.bad{color:var(--red);font-weight:700}
+table.cm td.ok{color:var(--green);font-weight:700}
+.gate{padding:14px 18px;border-radius:10px;font-weight:700;display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.gate.pass{background:#e7f6ee;color:#0f7a3d;border:1px solid #b8e6cb}
+.gate.fail{background:#fbe9e8;color:#a3322e;border:1px solid #f0c9c6}
+.gate .big{font-size:24px}
+/* overview / arch */
+.col2{grid-template-columns:1fr 1fr}
+.col3{grid-template-columns:repeat(3,1fr)}
+.feat{padding:18px}
+.feat .n{width:34px;height:34px;border-radius:9px;background:#e6f6f8;color:var(--teal-d);display:flex;align-items:center;
+  justify-content:center;font-weight:800;margin-bottom:10px}
+.feat h3{margin:0 0 6px;font-size:14.5px}
+.feat p{margin:0;color:var(--muted);font-size:12.5px}
+.phase{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}
+.phase:last-child{border:none}
+.phase .ph{flex:0 0 92px;font-weight:800;color:var(--teal-d);font-size:12.5px}
+.phase .pc h4{margin:0 0 3px;font-size:13.5px}
+.phase .pc p{margin:0;color:var(--muted);font-size:12.5px}
+ul.clean{margin:6px 0;padding-left:18px;color:#41506a}
+ul.clean li{margin:4px 0}
+.legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;font-size:12px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:6px}
+.dot{width:11px;height:11px;border-radius:3px;display:inline-block}
+.note{font-size:11.5px;color:var(--muted);margin-top:8px}
+.kv{display:flex;gap:8px;font-size:12.5px;margin:5px 0}.kv b{flex:0 0 130px;color:var(--navy)}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;
+  padding:11px 20px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,.25);
+  opacity:0;pointer-events:none;transition:.25s;z-index:99}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+/* codebook tab */
+.layerband{border-left:4px solid var(--teal);padding:14px 18px;margin-bottom:14px;background:#fff;border-radius:0 12px 12px 0}
+.layerband.def{border-color:var(--violet)} .layerband.cross{border-color:var(--teal)} .layerband.annex{border-color:var(--amber)}
+.layerband .tag2{font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase}
+.layerband.def .tag2{color:var(--violet)} .layerband.cross .tag2{color:var(--teal-d)} .layerband.annex .tag2{color:#b9772a}
+.layerband h3{margin:4px 0 6px;font-size:15px} .layerband p{margin:0 0 8px;color:#41506a;font-size:13px}
+.sheetchips{display:flex;gap:7px;flex-wrap:wrap}
+.sheetchip{background:var(--chip);border-radius:7px;padding:5px 10px;font-size:11.5px;font-weight:600;color:#41506a}
+.sheetchip b{color:var(--navy)} .sheetchip small{color:var(--muted);font-weight:500}
+table.sheets{width:100%;border-collapse:collapse;font-size:12.5px}
+table.sheets th,table.sheets td{padding:9px 11px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+table.sheets th{background:#f6f8fb;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);position:sticky;top:0}
+table.sheets td.r{white-space:nowrap;font-weight:700;color:var(--navy)}
+.grammar{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch;margin:6px 0}
+.gcell{flex:1;min-width:96px;border:1px solid var(--line);border-radius:9px;padding:9px 11px;background:#fff;text-align:center}
+.gcell .gc{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--teal-d);font-weight:700}
+.gcell .gn{font-size:11px;color:var(--muted);margin-top:3px}
+.gcell.out{background:#f3f7ff;border-color:#dbe7fb}
+.chain{display:flex;flex-direction:column;gap:0}
+.cstep{display:grid;grid-template-columns:160px 1fr;gap:14px;align-items:center;padding:11px 0}
+.cstep .src{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--navy);text-align:right}
+.cstep .src small{display:block;color:var(--muted);font-weight:600;font-size:10.5px;text-transform:none;letter-spacing:0}
+.cstep .body{background:#fff;border:1px solid var(--line);border-radius:9px;padding:10px 13px;font-size:12.5px}
+.cstep .body .vv{font-weight:700;color:var(--ink)}
+.carrow{height:16px;display:flex;align-items:center;padding-left:172px;color:#b6c2d4}
+@media(max-width:900px){.review-wrap{grid-template-columns:1fr}.stat-row,.eval-grid{grid-template-columns:repeat(2,1fr)}.col2,.col3{grid-template-columns:1fr}.cstep{grid-template-columns:1fr}.cstep .src{text-align:left}.carrow{padding-left:0}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="logo">G</div>
+  <div class="brand">
+    <h1>GMAC · AI Metadata Tagging Platform</h1>
+    <p>Bulk item-bank tagging · grounded in the GMAC skills codebook · human-in-the-loop review &amp; evals</p>
+  </div>
+  <div class="badge-proto">PROTOTYPE · Velotio</div>
+</header>
+<nav class="tabs" id="tabs">
+  <button data-v="overview" class="active">Overview &amp; Plan</button>
+  <button data-v="codebook">Codebook Map</button>
+  <button data-v="review">Tag Review &amp; Edit</button>
+  <button data-v="evals">Evaluation &amp; Accuracy</button>
+  <button data-v="arch">Architecture</button>
+</nav>
+<main>
+  <section class="view active" id="overview"></section>
+  <section class="view" id="codebook"></section>
+  <section class="view" id="review"></section>
+  <section class="view" id="evals"></section>
+  <section class="view" id="arch"></section>
+</main>
+<div class="toast" id="toast"></div>
+<script id="appdata">
+/* ============== TAXONOMY (subset of GMAC codebook from SkillSet Mapping Excel) ============== */
+const WEF = ["Critical Thinking & Problem Solving","Data Literacy & Analytical Reasoning",
+ "Communication & Comprehension","Decision-Making Under Uncertainty","Systems Thinking",
+ "Cognitive Flexibility & Adaptability","Attention to Detail & Accuracy","Time & Cognitive Load Management",
+ "Ethical & Evidence-Based Reasoning","Digital & Information Literacy"];
+
+const VOCAB = {
+  section:["Quant","Verbal","Data Insights"],
+  itemType:["Problem Solving (A)","Data Sufficiency (DS)","Reading Comprehension (RC)",
+            "Critical Reasoning (CRR)","Two-Part Analysis (BV)","Graphical Interpretation (PM)",
+            "Table Analysis (MD)","Multi-Source Reasoning (A/MD)"],
+  cont1:{ARI:"Arithmetic",ALG:"Algebra",GEO:"Geometry",CRR:"Critical Reasoning",
+         RCS:"RC – Short",RCL:"RC – Long",GRI:"Graph (Math)",TAI:"Table (Math)",
+         PAI:"Two-Part (Math)",MD:"Multi-Source"},
+  cognitive:{PUR:"Pure (abstract maths)",REA:"Real (real-world context)",
+         "MAI":"RC / Main Idea","INF":"RC / Inference","SUI":"RC / Supporting Idea","TON":"RC / Tone",
+         "CST-CCN":"CR / Construction – Conclusion","CST-ASS":"CR / Construction – Assumption",
+         "CTQ-WKN":"CR / Critique – Weaken","CTQ-STR":"CR / Critique – Strengthen",
+         "PLA-PLA":"CR / Plan – Next steps","INM":"DI / Inference using math","APX":"DI / Application not using math"},
+  fundSkill:{QRR:"Quant Reasoning – Rates/Ratios",QVO:"Quant – Values & Operations",
+         QEU:"Quant – Equations",QCS:"Quant – Counting/Stats","–":"n/a"},
+  elmType:{I:"Single-skill (I)",II:"Composite (II)",ID:"Integrated data (ID)"},
+  cont2:{FDP:"Conversion – Frac/Dec/Pct",APP:"Applied (rate/interest/work)",PCT:"Percentages",
+         "R&P":"Ratio & Proportion","P&S":"Probability & Statistics",LE1:"Linear Equation",
+         QEI:"Quadratic Equation","CMP":"Computation",BUS:"Business scenario",SCI:"Science passage",
+         "T":"Table","G":"Graph","P":"Prose/text"},
+  cont3:{RAT:"Rate",IST:"Interest/Sales tax","P&L":"Profit & Loss",WRK:"Work","–":"—",
+         AVG:"Mean",MED:"Median",DEC:"Decimals",FRA:"Fractions"},
+  badging:["Arithmetic Fluency","Algebra Fluency","Contextual Modeling & Decision-Oriented Problem Solving",
+           "Probabilistic Reasoning & Data Literacy","Reading Comprehension & Inference",
+           "Critical Reasoning & Argument Evaluation","Data Sufficiency Judgment",
+           "Data Interpretation & Insight","Multi-Source Synthesis"]
+};
+
+/* ============== SAMPLE ITEMS with simulated AI tags (grounded in CBN crosswalks) ============== */
+/* each tag: [label, value, code, confidence(0-1), rationale]  ; status default 'ai' */
+const ITEMS = [
+ {id:"Q-10421",section:"Quant",sec:"q",
+  stem:"If 3/8 of a number is 0.45, what is 150% of that same number?",
+  opts:"(A) 0.90  (B) 1.20  (C) 1.575  (D) 1.80  (E) 2.40",
+  tags:{
+   "Structural":[["Section","Quant","",0.99,"Numeric, formula-driven single-answer item with 5 options → Quant."],
+     ["Item Type","Problem Solving (A)","A",0.98,"Five-option single-select problem → item type A (PS)."],
+     ["Element Type","Single-skill (I)","I",0.93,"Tests one core competency → Element type I."]],
+   "Content Classification":[["Content Domain","Arithmetic","ARI",0.97,"Operates on number values & conversions, no variables/equations to solve → Arithmetic."],
+     ["Subtopic","Conversion – Frac/Dec/Pct","FDP",0.95,"Requires moving between 3/8, 0.45 and 150% → FDP."],
+     ["Sub-subtopic","—","–",0.90,"No further Cont3 split applies for FDP."]],
+   "Cognitive Classification":[["Cognitive","Pure (abstract maths)","PUR",0.94,"Abstract numeric manipulation with no real-world scenario → PUR."],
+     ["Fundamental Skill","Quant Reasoning – Rates/Ratios","QRR",0.88,"Maps to QRR cluster in CBN-QR for FDP conversions."]],
+   "Skill & Badging":[["WEF Skill","Critical Thinking & Problem Solving","",0.86,"Conversion fluency under time → core problem-solving skill."],
+     ["Badging Skill","Arithmetic Fluency","",0.95,"Feeds the Arithmetic Fluency badge (Mastery/Adept/Awareness)."]]},
+  narrative:"Arithmetic fluency in conversion between fractions, decimals and percentages — ability to apply 'what' & 'how' knowledge of number operations to solve accurately under time constraints."},
+
+ {id:"Q-10588",section:"Quant",sec:"q",
+  stem:"A printing press produces 240 pages in 8 minutes. Working at the same rate, how many minutes will it take to produce 1,050 pages?",
+  opts:"(A) 30  (B) 33  (C) 35  (D) 38.5  (E) 42",
+  tags:{
+   "Structural":[["Section","Quant","",0.99,"Numeric single-answer item → Quant."],
+     ["Item Type","Problem Solving (A)","A",0.98,"5-option PS item."],
+     ["Element Type","Single-skill (I)","I",0.85,"Primarily one applied-rate skill."]],
+   "Content Classification":[["Content Domain","Arithmetic","ARI",0.92,"Rate/proportion computation → Arithmetic."],
+     ["Subtopic","Applied (rate/interest/work)","APP",0.94,"Real-world rate-of-work scenario → APP."],
+     ["Sub-subtopic","Rate","RAT",0.90,"Production rate → Cont3 RAT."]],
+   "Cognitive Classification":[["Cognitive","Real (real-world context)","REA",0.96,"Embedded in a real-world printing scenario → REA."],
+     ["Fundamental Skill","Quant Reasoning – Rates/Ratios","QRR",0.91,"Rate reasoning maps to QRR."]],
+   "Skill & Badging":[["WEF Skill","Critical Thinking & Problem Solving","",0.83,"Model the scenario then compute → problem solving."],
+     ["Badging Skill","Contextual Modeling & Decision-Oriented Problem Solving","",0.9,"Real-world modeling badge."]]},
+  narrative:"Interpret real-world arithmetic models; infer contextual logic, model the problem, and adopt a decision-oriented approach to solve accurately under time constraints."},
+
+ {id:"Q-10733",section:"Quant",sec:"q",
+  stem:"If 2x² − 5x − 3 = 0 and x > 0, what is the value of x?",
+  opts:"(A) 1/2  (B) 1  (C) 3/2  (D) 2  (E) 3",
+  tags:{
+   "Structural":[["Section","Quant","",0.99,"Equation-solving numeric item → Quant."],
+     ["Item Type","Problem Solving (A)","A",0.98,"5-option PS item."],
+     ["Element Type","Single-skill (I)","I",0.9,"Single algebra competency."]],
+   "Content Classification":[["Content Domain","Algebra","ALG",0.96,"Solving a polynomial equation in x → Algebra."],
+     ["Subtopic","Quadratic Equation","QEI",0.95,"Quadratic in standard form → QEI."],
+     ["Sub-subtopic","—","–",0.88,"No Cont3 split."]],
+   "Cognitive Classification":[["Cognitive","Pure (abstract maths)","PUR",0.93,"No real-world framing → PUR."],
+     ["Fundamental Skill","Quant – Equations","QEU",0.9,"Equation manipulation cluster → QEU."]],
+   "Skill & Badging":[["WEF Skill","Critical Thinking & Problem Solving","",0.84,"Abstract reasoning & manipulation."],
+     ["Badging Skill","Algebra Fluency","",0.94,"Feeds Algebra Fluency badge."]]},
+  narrative:"Algebraic fluency — apply 'what' & 'how' knowledge of equations and systems of equations to solve accurately under time constraints."},
+
+ {id:"Q-10902",section:"Quant",sec:"q",
+  stem:"A box contains 4 red, 5 blue, and 3 green marbles. If two are drawn at random without replacement, what is the probability both are blue?",
+  opts:"(A) 5/33  (B) 5/36  (C) 1/6  (D) 5/12  (E) 25/144",
+  tags:{
+   "Structural":[["Section","Quant","",0.98,"Numeric probability item → Quant."],
+     ["Item Type","Problem Solving (A)","A",0.97,"5-option PS item."],
+     ["Element Type","Single-skill (I)","I",0.8,"Borderline — could be composite; flag for SME."]],
+   "Content Classification":[["Content Domain","Arithmetic","ARI",0.86,"Counting/probability sits under ARI/P&S in codebook."],
+     ["Subtopic","Probability & Statistics","P&S",0.93,"Without-replacement probability → P&S."],
+     ["Sub-subtopic","—","–",0.72,"Combinatorics sub-code ambiguous (COU vs PRB)."]],
+   "Cognitive Classification":[["Cognitive","Pure (abstract maths)","PUR",0.9,"Abstract scenario → PUR."],
+     ["Fundamental Skill","Quant – Counting/Stats","QCS",0.88,"Probability cluster → QCS."]],
+   "Skill & Badging":[["WEF Skill","Data Literacy & Analytical Reasoning","",0.82,"Probabilistic reasoning → data literacy."],
+     ["Badging Skill","Probabilistic Reasoning & Data Literacy","",0.9,"Probability badge."]]},
+  narrative:"Apply probability principles and statistical measures; probabilistic reasoning and data literacy at basic level to solve under time constraints."},
+
+ {id:"V-20114",section:"Verbal",sec:"v",
+  stem:"Passage (excerpt): Although the new logistics protocol reduced average delivery times, several regional managers reported that warehouse overtime costs rose sharply during the same period...\n\nQ: Which of the following, if true, most helps to explain the apparent discrepancy described above?",
+  opts:"(A)…  (B)…  (C)…  (D)…  (E)…",
+  tags:{
+   "Structural":[["Section","Verbal","",0.97,"Argument-based single-select reasoning item → Verbal."],
+     ["Item Type","Critical Reasoning (CRR)","CRR",0.95,"Short argument + reasoning question → CR."],
+     ["Element Type","Single-skill (I)","I",0.9,"One reasoning competency."]],
+   "Content Classification":[["Content Domain","Critical Reasoning","CRR",0.95,"CR content family."],
+     ["Subtopic","Business scenario","BUS",0.88,"Logistics/cost business context → BUS."],
+     ["Sub-subtopic","—","–",0.85,"No further split."]],
+   "Cognitive Classification":[["Cognitive","CR / Construction – Conclusion","CST-CCN",0.79,"'Explain the discrepancy' resolves an apparent paradox; model leaned CST but explain-type may be CST-EXP — flag."],
+     ["Fundamental Skill","n/a","–",0.9,"FundSkill not used for Verbal."]],
+   "Skill & Badging":[["WEF Skill","Critical Thinking & Problem Solving","",0.85,"Resolve/critique reasoning."],
+     ["Badging Skill","Critical Reasoning & Argument Evaluation","",0.91,"CR badge."]]},
+  narrative:"Comprehend the scenario and critically reason through the evidence to identify the most plausible explanation that resolves the inconsistency, removing bias under time constraints."},
+
+ {id:"V-20337",section:"Verbal",sec:"v",
+  stem:"Passage (excerpt): Critics of the proposed carbon tax argue that it will disproportionately burden low-income households. Proponents counter that targeted rebates neutralize this effect...\n\nQ: The passage is primarily concerned with:",
+  opts:"(A) refuting a policy  (B) presenting two sides of a debate  (C) proposing a compromise  (D) …  (E) …",
+  tags:{
+   "Structural":[["Section","Verbal","",0.98,"Passage + comprehension question → Verbal RC."],
+     ["Item Type","Reading Comprehension (RC)","RC",0.96,"Passage-based main-idea question → RC."],
+     ["Element Type","Single-skill (I)","I",0.92,"Single comprehension competency."]],
+   "Content Classification":[["Content Domain","RC – Short","RCS",0.86,"Short single-paragraph passage → RCS."],
+     ["Subtopic","Business scenario","BUS",0.8,"Policy/economics topic."],
+     ["Sub-subtopic","—","–",0.85,"No further split."]],
+   "Cognitive Classification":[["Cognitive","RC / Main Idea","MAI",0.93,"'Primarily concerned with' → Main Idea (MAI)."],
+     ["Fundamental Skill","n/a","–",0.9,"FundSkill not used for Verbal."]],
+   "Skill & Badging":[["WEF Skill","Communication & Comprehension","",0.87,"Understand main idea/structure."],
+     ["Badging Skill","Reading Comprehension & Inference","",0.92,"RC badge."]]},
+  narrative:"Reading comprehension — understand the main idea and structure of a passage; identify author purpose and connect evidence across the text under time constraints."},
+
+ {id:"V-20502",section:"Verbal",sec:"v",
+  stem:"Argument: The city should install bike lanes on Main Street because cities that added bike lanes saw a 12% drop in traffic accidents.\n\nQ: Which of the following, if true, most weakens the argument?",
+  opts:"(A)…  (B)…  (C)…  (D)…  (E)…",
+  tags:{
+   "Structural":[["Section","Verbal","",0.97,"Argument + reasoning question → Verbal."],
+     ["Item Type","Critical Reasoning (CRR)","CRR",0.96,"CR weaken-type."],
+     ["Element Type","Single-skill (I)","I",0.91,"One competency."]],
+   "Content Classification":[["Content Domain","Critical Reasoning","CRR",0.95,"CR family."],
+     ["Subtopic","Business scenario","BUS",0.78,"Civic/policy context tagged BUS by default — SME may prefer EVE."],
+     ["Sub-subtopic","—","–",0.85,"No further split."]],
+   "Cognitive Classification":[["Cognitive","CR / Critique – Weaken","CTQ-WKN",0.94,"'Most weakens' → CTQ-WKN."],
+     ["Fundamental Skill","n/a","–",0.9,"Not used for Verbal."]],
+   "Skill & Badging":[["WEF Skill","Ethical & Evidence-Based Reasoning","",0.8,"Evaluate evidence that undermines a claim."],
+     ["Badging Skill","Critical Reasoning & Argument Evaluation","",0.92,"CR badge."]]},
+  narrative:"Assess claims and arguments by identifying evidence that undermines a piece of reasoning; identify logical flaws and connect evidence to draw conclusions under time constraints."},
+
+ {id:"D-30210",section:"Data Insights",sec:"d",
+  stem:"Data Sufficiency: Is the integer n greater than 20?\n(1) n is a multiple of 6.\n(2) n² > 400.",
+  opts:"(A) (1) alone  (B) (2) alone  (C) both together  (D) each alone  (E) neither",
+  tags:{
+   "Structural":[["Section","Data Insights","",0.95,"Data Sufficiency now sits in Data Insights → DI."],
+     ["Item Type","Data Sufficiency (DS)","DS",0.97,"Two-statement sufficiency format → DS."],
+     ["Element Type","Single-skill (I)","I",0.86,"Sufficiency judgment competency."]],
+   "Content Classification":[["Content Domain","Arithmetic","ARI",0.84,"Underlying math is number properties → ARI."],
+     ["Subtopic","Computation","CMP",0.7,"Number-property check; subtopic uncertain — flag for SME."],
+     ["Sub-subtopic","—","–",0.8,"No Cont3 split."]],
+   "Cognitive Classification":[["Cognitive","Pure (abstract maths)","PUR",0.72,"Abstract DS; some SMEs tag REA — low confidence, flag."],
+     ["Fundamental Skill","Quant – Values & Operations","QVO",0.82,"Number-value reasoning → QVO."]],
+   "Skill & Badging":[["WEF Skill","Decision-Making Under Uncertainty","",0.9,"Judge whether data is sufficient → decision under uncertainty."],
+     ["Badging Skill","Data Sufficiency Judgment","",0.93,"DS badge."]]},
+  narrative:"Determine whether the information provided is sufficient to act; model the problem and adopt a decision-oriented approach to infer contextual logic and judge sufficiency under time constraints."},
+
+ {id:"D-30455",section:"Data Insights",sec:"d",
+  stem:"Graphical Interpretation: The bar chart shows quarterly revenue (in $M) for 2024–2025. Based on the chart, complete: 'Revenue grew fastest between quarters ___ and the total H2-2025 revenue was approximately ___.'",
+  opts:"Dropdown 1: Q1→Q2 / Q2→Q3 / Q3→Q4   ·   Dropdown 2: $40M / $52M / $61M",
+  tags:{
+   "Structural":[["Section","Data Insights","",0.98,"Chart-based interpretation → DI."],
+     ["Item Type","Graphical Interpretation (PM)","PM",0.95,"Graph + fill-in-the-blank dropdowns → PM."],
+     ["Element Type","Integrated data (ID)","ID",0.88,"Reads a data visual → element ID."]],
+   "Content Classification":[["Content Domain","Graph (Math)","GRI",0.9,"Math-based graph interpretation → GRI."],
+     ["Subtopic","Graph","G",0.92,"Visual source = graph."],
+     ["Sub-subtopic","—","–",0.85,"No Cont3 split."]],
+   "Cognitive Classification":[["Cognitive","DI / Inference using math","INM",0.87,"Infer trend & compute total from graph → INM."],
+     ["Fundamental Skill","n/a","–",0.88,"FundSkill applies to pure Quant only."]],
+   "Skill & Badging":[["WEF Skill","Data Literacy & Analytical Reasoning","",0.91,"Turn a visual into insight."],
+     ["Badging Skill","Data Interpretation & Insight","",0.92,"DI insight badge."]]},
+  narrative:"Turn information presented in graphs into actionable insights; read, interpret and extrapolate evidence using mathematical reasoning to draw conclusions under time constraints."},
+
+ {id:"D-30781",section:"Data Insights",sec:"d",
+  stem:"Multi-Source Reasoning: Tab 1 gives a supplier price list; Tab 2 gives shipping terms; Tab 3 is an email about budget limits.\n\nQ: Which supplier can fulfill 500 units within the stated $9,000 budget including shipping?",
+  opts:"(A) Supplier W  (B) Supplier X  (C) Supplier Y  (D) Supplier Z  (E) Cannot be determined",
+  tags:{
+   "Structural":[["Section","Data Insights","",0.98,"Tabbed multi-source stimulus → DI."],
+     ["Item Type","Multi-Source Reasoning (A/MD)","A/MD",0.93,"Multiple tabs to be integrated → MSR."],
+     ["Element Type","Integrated data (ID)","ID",0.9,"Integrates disparate data → ID."]],
+   "Content Classification":[["Content Domain","Multi-Source","MD",0.9,"Cross-tab synthesis → MD."],
+     ["Subtopic","Prose/text","P",0.78,"Mixed prose + table sources; primary reasoning over text+price table."],
+     ["Sub-subtopic","—","–",0.82,"No Cont3 split."]],
+   "Cognitive Classification":[["Cognitive","DI / Inference using math","INM",0.8,"Budget arithmetic across sources → INM (math)."],
+     ["Fundamental Skill","n/a","–",0.86,"Not used."]],
+   "Skill & Badging":[["WEF Skill","Systems Thinking","",0.84,"Integrate conflicting information streams."],
+     ["Badging Skill","Multi-Source Synthesis","",0.9,"MSR badge."]]},
+  narrative:"Handle complex, conflicting information streams; read, integrate and interpret varied information from multiple sources, connecting and extrapolating evidence to draw conclusions under time constraints."}
+];
+ITEMS.forEach(it=>{Object.values(it.tags).forEach(arr=>arr.forEach(t=>t.push("ai")));}); // status slot index 5
+</script>
+<script id="apprender">
+/* ====================== app helpers ====================== */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2200);}
+function confColor(c){return c>=0.85?"var(--green)":c>=0.7?"var(--amber)":"var(--red)";}
+const CATS=["Structural","Content Classification","Cognitive Classification","Skill & Badging"];
+const vocabFor=label=>{
+  const m={"Section":VOCAB.section,"Item Type":VOCAB.itemType,"Element Type":Object.entries(VOCAB.elmType),
+   "Content Domain":Object.entries(VOCAB.cont1),"Subtopic":Object.entries(VOCAB.cont2),
+   "Sub-subtopic":Object.entries(VOCAB.cont3),"Cognitive":Object.entries(VOCAB.cognitive),
+   "Fundamental Skill":Object.entries(VOCAB.fundSkill),"WEF Skill":WEF,"Badging Skill":VOCAB.badging};
+  return m[label]||null;
+};
+/* tabs */
+$$("#tabs button").forEach(b=>b.onclick=()=>{
+  $$("#tabs button").forEach(x=>x.classList.remove("active"));b.classList.add("active");
+  $$(".view").forEach(v=>v.classList.remove("active"));$("#"+b.dataset.v).classList.add("active");
+});
+
+/* ====================== OVERVIEW ====================== */
+function renderOverview(){
+ $("#overview").innerHTML=`
+ <h2 class="section-title">A mini-platform for AI-assisted item-bank tagging</h2>
+ <p class="sub">GMAC has ~3,000–4,000 QTI items whose content metadata was hand-tagged inconsistently over the years.
+ This platform runs an AI first pass over the whole bank — grounded strictly in the GMAC skills codebook (the
+ <em>SkillSet Mapping</em> workbook) — then hands SMEs a review surface to verify or correct every tag, measures
+ accuracy against a golden set, and writes approved tags back into the QTI items so they can power
+ <b>personalized prep</b> and the <b>badging</b> system.</p>
+
+ <div class="grid stat-row">
+   <div class="card stat"><div class="k">Item bank</div><div class="v">3,000+ <small>QTI items</small></div></div>
+   <div class="card stat"><div class="k">Tag layers / item</div><div class="v">3–4 <small>+ skill narrative</small></div></div>
+   <div class="card stat"><div class="k">Accuracy gate</div><div class="v">0.85 <small>before scale-up</small></div></div>
+   <div class="card stat"><div class="k">Human-in-loop</div><div class="v">100% <small>SME-reviewed</small></div></div>
+ </div>
+
+ <div class="grid col3" style="margin-bottom:22px">
+   <div class="card feat"><div class="n">1</div><h3>Grounded, not guessed</h3><p>Every tag is constrained to the codebook
+     vocabularies (content codes, cognitive codes, CBN crosswalks, WEF skills). The model classifies <em>into</em>
+     the taxonomy — it can't invent labels.</p></div>
+   <div class="card feat"><div class="n">2</div><h3>Human-in-the-loop</h3><p>SMEs review categorized tags with
+     confidence scores and rationale, edit any field from controlled dropdowns, and approve or flag — exactly the
+     governance bar from the kickoff.</p></div>
+   <div class="card feat"><div class="n">3</div><h3>Measured continuously</h3><p>An eval harness scores AI output
+     against an SME golden set per field and overall, gating expansion to the next batch until accuracy clears 0.85.</p></div>
+ </div>
+
+ <div class="grid col2">
+  <div class="card" style="padding:20px">
+    <h4 style="margin:0 0 8px;font-size:14px">Build plan — phased rollout</h4>
+    <div class="phase"><div class="ph">Phase 0</div><div class="pc"><h4>Codebook ingestion</h4>
+      <p>Parse the SkillSet Mapping workbook into machine-readable vocabularies + the CBN crosswalk rules. This is the single source of truth the model is grounded on.</p></div></div>
+    <div class="phase"><div class="ph">Phase 1</div><div class="pc"><h4>Pilot — 100–200 items</h4>
+      <p>Run AI tagging on a sample across all 3 sections. SMEs review in this UI. Iterate prompts/few-shot examples over 8–10 passes.</p></div></div>
+    <div class="phase"><div class="ph">Phase 2</div><div class="pc"><h4>Quality gate</h4>
+      <p>Score against golden set. Expand only when per-field + overall accuracy ≥ 0.85: 50 → 150 → full bank.</p></div></div>
+    <div class="phase"><div class="ph">Phase 3</div><div class="pc"><h4>Writeback + downstream</h4>
+      <p>Approved tags written into QTI metadata (LOM classification / qti-metadata). Feeds personalization &amp; badging.</p></div></div>
+  </div>
+  <div class="card" style="padding:20px">
+    <h4 style="margin:0 0 8px;font-size:14px">How the tagging logic maps to the Excel</h4>
+    <div class="kv"><b>Structural</b><span>Section · Item Type · Element Type (I/II/ID) — from the CBN crosswalk sheets.</span></div>
+    <div class="kv"><b>Content</b><span>Content domain (Cont1) → Subtopic (Cont2) → Sub-subtopic (Cont3), from the <em>content codes</em> annexure (~1,490 codes).</span></div>
+    <div class="kv"><b>Cognitive</b><span>PUR/REA for Quant; CST-/CTQ-/PLA- for CR; MAI/INF/TON for RC; REM/INM… for DI — from the <em>cognitive codes</em> sheet.</span></div>
+    <div class="kv"><b>Skill &amp; badging</b><span>Item-level skill narrative + the WEF-aligned skill it feeds, which rolls up to Mastery / Adept / Awareness badge tiers.</span></div>
+    <p class="note">Tiers (Mastery/Adept/Awareness) are assigned downstream from candidate performance — this platform produces the
+    item→skill mapping those tiers depend on. One item can feed multiple skills, which the review UI supports.</p>
+    <h4 style="margin:16px 0 6px;font-size:13px">Two downstream consumers</h4>
+    <ul class="clean">
+      <li><b>Personalization</b> — trusted difficulty params + clean content tags fetch the right next item for a learner's state.</li>
+      <li><b>Badging</b> — skill narratives + WEF mapping surface proficiency by skill area.</li>
+    </ul>
+  </div>
+ </div>`;
+}
+
+/* ====================== TAG REVIEW ====================== */
+let SEL=0;
+function progress(){let total=0,rev=0;ITEMS.forEach(it=>{total++;if(it.reviewed)rev++;});return{total,rev};}
+function avgConf(it){let s=0,n=0;Object.values(it.tags).forEach(a=>a.forEach(t=>{s+=t[3];n++;}));return s/n;}
+function minConf(it){let m=1;Object.values(it.tags).forEach(a=>a.forEach(t=>{if(t[3]<m)m=t[3];}));return m;}
+function lowCount(it){let c=0;Object.values(it.tags).forEach(a=>a.forEach(t=>{if(t[3]<0.8)c++;}));return c;}
+
+function renderReview(){
+ const p=progress();
+ const lowItems=ITEMS.filter(it=>lowCount(it)>0).length;
+ $("#review").innerHTML=`
+ <h2 class="section-title">Tag Review &amp; Edit</h2>
+ <p class="sub">The AI first pass for every item, organized by category. Confidence and rationale are shown for each
+ tag. Edit any field from the controlled codebook vocabulary, then approve or flag for a second look.</p>
+ <div class="grid stat-row">
+   <div class="card stat"><div class="k">Items in batch</div><div class="v">${p.total}</div></div>
+   <div class="card stat"><div class="k">Reviewed</div><div class="v" id="revcount">${p.rev}<small>/${p.total}</small></div></div>
+   <div class="card stat"><div class="k">Need attention</div><div class="v" style="color:var(--amber)">${lowItems}<small> low-confidence</small></div></div>
+   <div class="card stat"><div class="k">Avg. confidence</div><div class="v">${Math.round(ITEMS.reduce((s,it)=>s+avgConf(it),0)/ITEMS.length*100)}%</div></div>
+ </div>
+ <div class="toolbar">
+   <input type="search" id="search" placeholder="Search items by id or text…">
+   <select id="fsec"><option value="">All sections</option><option>Quant</option><option>Verbal</option><option>Data Insights</option></select>
+   <select id="fstatus"><option value="">All statuses</option><option value="unrev">Unreviewed</option><option value="rev">Reviewed</option><option value="low">Has low-confidence</option></select>
+   <button class="btn ghost" id="bulkapprove">✓ Approve all high-confidence</button>
+ </div>
+ <div class="review-wrap">
+   <div class="card itemlist" id="itemlist"></div>
+   <div class="card detail" id="detail"></div>
+ </div>`;
+ $("#search").oninput=renderList;$("#fsec").onchange=renderList;$("#fstatus").onchange=renderList;
+ $("#bulkapprove").onclick=()=>{let n=0;ITEMS.forEach(it=>{if(lowCount(it)===0&&!it.reviewed){it.reviewed=true;it.status="approved";n++;}});renderList();renderDetail();updateRevCount();toast(n+" high-confidence items approved");};
+ renderList();renderDetail();
+}
+function updateRevCount(){const p=progress();const el=$("#revcount");if(el)el.innerHTML=`${p.rev}<small>/${p.total}</small>`;}
+function filtered(){
+ const q=($("#search")?.value||"").toLowerCase();const fs=$("#fsec")?.value||"";const st=$("#fstatus")?.value||"";
+ return ITEMS.map((it,i)=>({it,i})).filter(({it})=>{
+   if(q&&!(it.id.toLowerCase().includes(q)||it.stem.toLowerCase().includes(q)))return false;
+   if(fs&&it.section!==fs)return false;
+   if(st==="unrev"&&it.reviewed)return false;
+   if(st==="rev"&&!it.reviewed)return false;
+   if(st==="low"&&lowCount(it)===0)return false;
+   return true;});
+}
+function renderList(){
+ const list=$("#itemlist");if(!list)return;
+ const rows=filtered();
+ list.innerHTML=rows.map(({it,i})=>{
+   const stat=it.reviewed?(it.status||"approved"):"ai";
+   const lc=lowCount(it);
+   return `<div class="itemrow ${i===SEL?'sel':''}" data-i="${i}">
+     <div class="id">${it.id} <span class="pill ${it.sec}">${it.section}</span></div>
+     <div class="stem">${esc(it.stem.replace(/\n/g,' '))}</div>
+     <div class="meta">
+       <span class="pill ${stat}">${stat==='ai'?'AI · unreviewed':stat}</span>
+       ${lc?`<span class="pill flagged">${lc} low-conf</span>`:''}
+       <span style="margin-left:auto;font-size:11px;color:var(--muted)">${Math.round(avgConf(it)*100)}%</span>
+     </div></div>`;}).join("")||`<p style="padding:20px;color:var(--muted)">No items match.</p>`;
+ $$("#itemlist .itemrow").forEach(r=>r.onclick=()=>{SEL=+r.dataset.i;renderList();renderDetail();});
+}
+function renderDetail(){
+ const d=$("#detail");if(!d)return;const it=ITEMS[SEL];if(!it){d.innerHTML="";return;}
+ let cats=CATS.map(cat=>{
+   const rows=it.tags[cat].map((t,ti)=>{
+     const[label,val,code,conf,why,status]=t;
+     const vocab=vocabFor(label);
+     let valHtml;
+     if(vocab){
+       const opts=vocab.map(o=>{const isPair=Array.isArray(o);const oc=isPair?o[0]:"";const ol=isPair?o[1]:o;
+         const sel=(isPair? (oc===code||ol===val):(o===val))?"selected":"";
+         return `<option value="${esc(ol)}" data-code="${esc(oc)}" ${sel}>${esc(ol)}${oc?` (${esc(oc)})`:""}</option>`;}).join("");
+       valHtml=`<select data-cat="${cat}" data-ti="${ti}" class="tagedit">${opts}</select>`;
+     } else { valHtml=`<span class="tagval">${esc(val)}</span>`; }
+     const sp=status==="edited"?`<span class="pill edited" style="margin-left:6px">edited</span>`:"";
+     return `<div class="tag">
+        <div class="label">${esc(label)}</div>
+        <div class="valwrap">${valHtml}${code?`<span class="code">${esc(code)}</span>`:""}${sp}</div>
+        <div class="conf"><span class="confbar"><i style="width:${Math.round(conf*100)}%;background:${confColor(conf)}"></i></span><small>${Math.round(conf*100)}%</small></div>
+        <div class="why">${esc(why)}</div>
+      </div>`;}).join("");
+   return `<div class="catblock"><h4><span class="ic"></span>${cat}</h4>${rows}</div>`;
+ }).join("");
+ const stat=it.reviewed?(it.status||"approved"):"ai · unreviewed";
+ d.innerHTML=`
+   <div class="qid">${it.id} · <span class="pill ${it.sec}">${it.section}</span> · <span class="pill ${it.reviewed?(it.status||'approved'):'ai'}">${stat}</span></div>
+   <div class="stem-box">${esc(it.stem)}</div>
+   <div class="opts">${esc(it.opts)}</div>
+   ${cats}
+   <div class="catblock"><h4><span class="ic" style="background:var(--violet)"></span>Item-level skill narrative</h4>
+     <div class="narr">${esc(it.narrative)}</div></div>
+   <div class="actionsbar">
+     <button class="btn primary" id="approve">✓ Approve tags</button>
+     <button class="btn danger" id="flag">⚑ Flag for review</button>
+     <button class="btn ghost" id="reset">↺ Reset to AI</button>
+     <button class="btn dark" id="viewqti" style="margin-left:auto">&lt;/&gt; Preview QTI writeback</button>
+   </div>
+   <div id="qtibox"></div>`;
+ $$(".tagedit",d).forEach(s=>s.onchange=()=>{
+   const cat=s.dataset.cat,ti=+s.dataset.ti;const opt=s.selectedOptions[0];
+   const t=it.tags[cat][ti];t[1]=opt.value;t[2]=opt.dataset.code||"";t[3]=1;t[4]="Manually set by SME.";t[5]="edited";
+   renderDetail();renderList();toast("Tag updated");
+ });
+ $("#approve").onclick=()=>{it.reviewed=true;it.status="approved";renderDetail();renderList();updateRevCount();toast("Item approved");};
+ $("#flag").onclick=()=>{it.reviewed=true;it.status="flagged";renderDetail();renderList();updateRevCount();toast("Item flagged");};
+ $("#reset").onclick=()=>{location.reload();};
+ $("#viewqti").onclick=()=>{$("#qtibox").innerHTML=$("#qtibox").innerHTML?"":qtiPreview(it);};
+}
+function qtiPreview(it){
+ const get=(cat,label)=>{const r=it.tags[cat].find(t=>t[0]===label);return r?r:["","","",0,""];};
+ const cd=get("Content Classification","Content Domain"),st=get("Content Classification","Subtopic"),
+   cg=get("Cognitive Classification","Cognitive"),wef=get("Skill & Badging","WEF Skill"),
+   bg=get("Skill & Badging","Badging Skill"),el=get("Structural","Element Type");
+ const C=(s)=>`<span class="v">${esc(s)}</span>`;
+ return `<div style="margin-top:14px"><div class="note" style="margin-bottom:6px">Approved tags serialized into QTI 3.0 item metadata (IEEE-LOM classification + custom <span class="code">qti-metadata</span> vocabulary). Written back into the item's content-package manifest.</div>
+ <div class="qti-pre"><span class="t">&lt;qti-assessment-item</span> <span class="a">identifier</span>=${C('"'+it.id+'"')}<span class="t">&gt;</span>
+  <span class="t">&lt;qti-metadata&gt;</span>
+    <span class="t">&lt;gmac-classification</span> <span class="a">scheme</span>=${C('"content-domain"')} <span class="a">code</span>=${C('"'+cd[2]+'"')}<span class="t">&gt;</span>${C(cd[1])}<span class="t">&lt;/gmac-classification&gt;</span>
+    <span class="t">&lt;gmac-classification</span> <span class="a">scheme</span>=${C('"subtopic"')} <span class="a">code</span>=${C('"'+st[2]+'"')}<span class="t">&gt;</span>${C(st[1])}<span class="t">&lt;/gmac-classification&gt;</span>
+    <span class="t">&lt;gmac-classification</span> <span class="a">scheme</span>=${C('"cognitive"')} <span class="a">code</span>=${C('"'+cg[2]+'"')}<span class="t">&gt;</span>${C(cg[1])}<span class="t">&lt;/gmac-classification&gt;</span>
+    <span class="t">&lt;gmac-classification</span> <span class="a">scheme</span>=${C('"element-type"')} <span class="a">code</span>=${C('"'+el[2]+'"')}<span class="t">/&gt;</span>
+    <span class="t">&lt;gmac-skill</span> <span class="a">wef</span>=${C('"'+wef[1]+'"')} <span class="a">badge</span>=${C('"'+bg[1]+'"')}<span class="t">/&gt;</span>
+    <span class="t">&lt;gmac-skill-narrative&gt;</span>${C(it.narrative.slice(0,72)+'…')}<span class="t">&lt;/gmac-skill-narrative&gt;</span>
+    <span class="t">&lt;gmac-provenance</span> <span class="a">source</span>=${C('"ai+sme"')} <span class="a">status</span>=${C('"'+(it.status||"approved")+'"')}<span class="t">/&gt;</span>
+  <span class="t">&lt;/qti-metadata&gt;</span>
+<span class="t">&lt;/qti-assessment-item&gt;</span></div></div>`;
+}
+
+/* ====================== EVALS ====================== */
+/* simulated golden set: per item, expected codes for key fields; preds derived from ITEMS */
+const EVAL_FIELDS=["Content Domain","Subtopic","Cognitive","Element Type","WEF Skill","Badging Skill"];
+function buildGolden(){
+ // expected = AI value but with deliberate, realistic disagreements injected to make accuracy < 100%
+ const disagree={ "D-30210":{"Subtopic":"P&S","Cognitive":"REA"}, "V-20502":{"Subtopic":"EVE"},
+   "Q-10902":{"Sub-subtopic":"COU"}, "V-20114":{"Cognitive":"CST-EXP"}, "D-30781":{"Subtopic":"T"} };
+ return ITEMS.map(it=>{
+   const exp={};
+   ["Content Classification","Cognitive Classification","Skill & Badging","Structural"].forEach(cat=>{
+     it.tags[cat].forEach(t=>{ if(EVAL_FIELDS.includes(t[0])) exp[t[0]]=t[1]; });});
+   const dd=disagree[it.id]||{};
+   // store expected (with overrides) and predicted (raw AI)
+   const pred={};EVAL_FIELDS.forEach(f=>pred[f]=exp[f]);
+   Object.keys(dd).forEach(f=>{ if(EVAL_FIELDS.includes(f)){ /* map code->label via reverse lookup */
+     exp[f]=codeToLabel(f,dd[f]); }});
+   return {id:it.id,section:it.section,pred,exp};
+ });
+}
+function codeToLabel(field,code){
+ const map={"Subtopic":VOCAB.cont2,"Cognitive":VOCAB.cognitive};
+ if(map[field]&&map[field][code])return map[field][code]+" ("+code+")";
+ if(field==="Subtopic"&&code==="EVE")return "Everyday/Civic scenario (EVE)";
+ if(field==="Subtopic"&&code==="P&S")return VOCAB.cont2["P&S"]+" (P&S)";
+ if(field==="Subtopic"&&code==="T")return VOCAB.cont2["T"]+" (T)";
+ if(field==="Cognitive"&&code==="REA")return VOCAB.cognitive["REA"]+" (REA)";
+ if(field==="Cognitive"&&code==="CST-EXP")return "CR / Construction – Explanation (CST-EXP)";
+ return code;
+}
+let EVAL_DATA=null;
+function normalize(v){return (v||"").replace(/\s*\([^)]*\)\s*$/,"").trim().toLowerCase();}
+function scoreEval(rows){
+ const per={};EVAL_FIELDS.forEach(f=>per[f]={correct:0,total:0,mism:[]});
+ rows.forEach(r=>{EVAL_FIELDS.forEach(f=>{ if(r.exp[f]===undefined)return;
+   per[f].total++; const ok=normalize(r.pred[f])===normalize(r.exp[f]);
+   if(ok)per[f].correct++; else per[f].mism.push({id:r.id,pred:r.pred[f],exp:r.exp[f]});});});
+ let c=0,t=0;Object.values(per).forEach(p=>{c+=p.correct;t+=p.total;});
+ return {per,overall:t?c/t:0,correct:c,total:t};
+}
+function renderEvals(){
+ $("#evals").innerHTML=`
+ <h2 class="section-title">Evaluation &amp; Accuracy</h2>
+ <p class="sub">SMEs upload a golden set (items with expected tags). The harness compares the AI's tags field-by-field,
+ reports per-field and overall accuracy, lists every mismatch, and gates batch expansion against the 0.85 threshold
+ agreed in the kickoff.</p>
+ <div class="uploadbox">
+   <div style="font-size:30px">📥</div>
+   <h3>Upload golden dataset</h3>
+   <p style="color:var(--muted);max-width:560px;margin:0 auto 12px">CSV with columns: <span class="code">item_id, field, expected_value</span>
+     (long format) — or click below to run against the built-in sample golden set for this batch.</p>
+   <input type="file" id="goldfile" accept=".csv" style="display:none">
+   <button class="btn ghost" onclick="document.getElementById('goldfile').click()">Choose CSV…</button>
+   <button class="btn primary" id="runsample">▶ Run sample golden set</button>
+ </div>
+ <div id="evalresults"></div>`;
+ $("#runsample").onclick=()=>{EVAL_DATA=buildGolden();showEval(scoreEval(EVAL_DATA),EVAL_DATA);};
+ $("#goldfile").onchange=handleCSV;
+}
+function handleCSV(e){
+ const f=e.target.files[0];if(!f)return;const rd=new FileReader();
+ rd.onload=()=>{
+   try{
+     const lines=rd.result.split(/\r?\n/).filter(x=>x.trim());
+     const head=lines[0].split(",").map(h=>h.trim().toLowerCase());
+     const idx={id:head.indexOf("item_id"),field:head.indexOf("field"),exp:head.indexOf("expected_value")};
+     if(idx.id<0||idx.field<0||idx.exp<0){toast("CSV needs item_id, field, expected_value columns");return;}
+     // build exp map per id
+     const byId={};lines.slice(1).forEach(l=>{const c=l.split(",");const id=c[idx.id]?.trim();
+       if(!id)return;byId[id]=byId[id]||{};byId[id][c[idx.field].trim()]=c[idx.exp].trim();});
+     const rows=ITEMS.filter(it=>byId[it.id]).map(it=>{
+       const pred={};EVAL_FIELDS.forEach(fd=>{["Content Classification","Cognitive Classification","Skill & Badging","Structural"].forEach(cat=>{
+         it.tags[cat].forEach(t=>{if(t[0]===fd)pred[fd]=t[1];});});});
+       return {id:it.id,section:it.section,pred,exp:byId[it.id]};});
+     if(!rows.length){toast("No matching item_ids found in this batch");return;}
+     EVAL_DATA=rows;showEval(scoreEval(rows),rows);toast("Scored "+rows.length+" items from CSV");
+   }catch(err){toast("Could not parse CSV");}
+ };rd.readAsText(f);
+}
+function showEval(res,rows){
+ const pct=res.overall*100;const pass=res.overall>=0.85;
+ const fieldBars=EVAL_FIELDS.map(f=>{const p=res.per[f];if(!p.total)return"";const a=p.correct/p.total;
+   return `<div class="fieldbar"><div>${esc(f)}</div>
+     <div class="bar"><i style="width:${Math.round(a*100)}%;background:${confColor(a)}"></i></div>
+     <div class="acc-num" style="color:${confColor(a)}">${Math.round(a*100)}%</div></div>`;}).join("");
+ const mism=[];EVAL_FIELDS.forEach(f=>res.per[f].mism.forEach(m=>mism.push({field:f,...m})));
+ const mrows=mism.map(m=>`<tr><td>${m.id}</td><td>${esc(m.field)}</td>
+   <td class="bad">${esc(m.pred)}</td><td class="ok">${esc(m.exp)}</td></tr>`).join("")
+   ||`<tr><td colspan="4" style="color:var(--green)">No mismatches — perfect agreement.</td></tr>`;
+ const secAgg={};rows.forEach(r=>{secAgg[r.section]=secAgg[r.section]||{c:0,t:0};
+   EVAL_FIELDS.forEach(f=>{if(r.exp[f]===undefined)return;secAgg[r.section].t++;if(normalize(r.pred[f])===normalize(r.exp[f]))secAgg[r.section].c++;});});
+ const secCards=Object.entries(secAgg).map(([s,v])=>{const a=v.c/v.t;
+   return `<div class="card stat"><div class="k">${esc(s)}</div><div class="v" style="color:${confColor(a)}">${Math.round(a*100)}%</div><div class="note">${v.c}/${v.t} fields</div></div>`;}).join("");
+ $("#evalresults").innerHTML=`
+   <div class="gate ${pass?'pass':'fail'}">
+     <span class="big">${pass?'✓':'✕'}</span>
+     <div><div>Overall accuracy <b>${pct.toFixed(1)}%</b> (${res.correct}/${res.total} fields) —
+       ${pass?'clears':'below'} the 0.85 gate. ${pass?'Cleared to expand to the next batch.':'Refine prompts / few-shot examples and re-run before scaling.'}</div></div>
+   </div>
+   <div class="grid eval-grid" style="margin-bottom:20px">
+     <div class="card stat"><div class="k">Items scored</div><div class="v">${rows.length}</div></div>
+     <div class="card stat"><div class="k">Fields scored</div><div class="v">${res.total}</div></div>
+     <div class="card stat"><div class="k">Mismatches</div><div class="v" style="color:var(--amber)">${mism.length}</div></div>
+     <div class="card stat"><div class="k">Gate</div><div class="v" style="color:${pass?'var(--green)':'var(--red)'}">${pass?'PASS':'FAIL'}</div></div>
+   </div>
+   <div class="grid col2" style="margin-bottom:20px">
+     <div class="card" style="padding:18px"><h4 style="margin:0 0 12px;font-size:13px">Accuracy by field</h4>${fieldBars}</div>
+     <div class="card" style="padding:18px"><h4 style="margin:0 0 12px;font-size:13px">Accuracy by section</h4>
+       <div class="grid" style="grid-template-columns:1fr 1fr 1fr;gap:10px">${secCards}</div>
+       <p class="note">Weakest field gates the rollout — here cognitive &amp; subtopic edge cases (DS pure/real, CR explain-vs-construct, civic-vs-business context) are the recurring disagreements to refine.</p></div>
+   </div>
+   <div class="card" style="padding:18px">
+     <h4 style="margin:0 0 12px;font-size:13px">Mismatches (AI prediction vs SME-expected)</h4>
+     <table class="cm"><thead><tr><th>Item</th><th>Field</th><th>AI predicted</th><th>SME expected</th></tr></thead><tbody>${mrows}</tbody></table>
+   </div>`;
+ $("#evalresults").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+/* ====================== ARCHITECTURE ====================== */
+function renderArch(){
+ $("#arch").innerHTML=`
+ <h2 class="section-title">Architecture — how tagging is enabled</h2>
+ <p class="sub">The codebook is the grounding source of truth; the LLM classifies items into it; SMEs review; the eval
+ harness gates quality; approved tags are written back to QTI and flow to personalization and badging.</p>
+ <div class="card" style="padding:20px;overflow:auto">${ARCH_SVG}</div>
+ <div class="legend">
+   <span><i class="dot" style="background:#0fa3b1"></i> Ingestion &amp; grounding</span>
+   <span><i class="dot" style="background:#6d5dd3"></i> AI tagging engine</span>
+   <span><i class="dot" style="background:#e8a33d"></i> Human-in-the-loop &amp; evals</span>
+   <span><i class="dot" style="background:#1aa251"></i> Writeback &amp; downstream</span>
+ </div>
+ <div class="grid col3" style="margin-top:22px">
+   <div class="card feat"><div class="n" style="background:#e6f6f8;color:#0c8390">A</div><h3>Grounding layer</h3>
+     <p>The SkillSet Mapping workbook is parsed once into structured vocabularies (content/cognitive codes) and the CBN
+     crosswalk rules. Retrieval pulls only the legal codes for an item's section/type into the prompt.</p></div>
+   <div class="card feat"><div class="n" style="background:#efeaff;color:#6d5dd3">B</div><h3>Tagging engine</h3>
+     <p>QTI is parsed to clean text (stem, options, passages, tables). A constrained LLM call returns codes + confidence
+     + rationale per field; multi-pass self-consistency for low-confidence fields. Output validated against the vocab.</p></div>
+   <div class="card feat"><div class="n" style="background:#fdf1e3;color:#b9772a">C</div><h3>Review &amp; eval</h3>
+     <p>SMEs verify/correct in the review UI; the eval harness scores against golden sets and gates expansion at 0.85.
+     Edits become new few-shot examples — the loop that lifts accuracy over successive passes.</p></div>
+ </div>
+ <div class="card" style="padding:18px;margin-top:16px">
+   <h4 style="margin:0 0 8px;font-size:13px">QTI writeback &amp; integration notes</h4>
+   <ul class="clean">
+     <li>Items round-trip as QTI 3.0; approved tags serialize to IEEE-LOM <em>classification</em> + a custom GMAC
+       <span class="code">qti-metadata</span> vocabulary in the content-package manifest (reusing the Ascend Learning QTI interface).</li>
+     <li>Provenance (AI vs SME, status, timestamp, model version) is stored on every tag for auditability — "not a black box."</li>
+     <li>Psychometric params (difficulty / discrimination / guessing) are left untouched; personalization combines those trusted
+       params with the new content tags to route items.</li>
+   </ul>
+ </div>`;
+}
+/* ====================== CODEBOOK MAP ====================== */
+function renderCodebook(){
+ const sheetRows=[
+  ["WEF - Defined Skills","Definition","10 core skills","The 10 OECD / World Economic Forum skill categories — the top of the skill hierarchy every tag ultimately rolls up to.","Provides the controlled vocabulary for the <span class='code'>WEF Skill</span> tag."],
+  ["Quant","Definition","4 topics","GMAT Quant topics (Arithmetic, Algebra, Word Problems, Counting &amp; Probability) → Skills Measured 1/2/3 → Skill Definition (Mastery/Adept/Basic) → school/work use.","Defines the human-readable <span class='code'>skill narrative</span> &amp; badge label for Quant items."],
+  ["RC","Definition","4 topics","Reading Comprehension topics (Main Idea &amp; Structure, Inference, Tone &amp; Purpose, Detail vs Big Picture) and their skill definitions.","Skill narratives + WEF mapping for RC items."],
+  ["Critical Reasoning","Definition","4 topics","CR topics (Assumption, Strengthen/Weaken, Cause &amp; Effect, Evaluate) → skills, incl. Reaction &amp; Decision Speed model.","Skill narratives + WEF mapping for CR items."],
+  ["DI","Definition","3 topic groups","Data Insights (Data Sufficiency; Two-Part/Table/Graphical; Multi-Source) → skills measured + definitions, with math vs non-math variants.","Skill narratives + WEF mapping for DI items."],
+  ["CBN - QR","Crosswalk","~112 rules","The Quant rulebook. Each row = a legal combination of codes mapping to a skill narrative.","<b>Core matching table</b> for Quant. AI matches an item to one row."],
+  ["CBN - VR","Crosswalk","~129 rules","The Verbal rulebook (RC + Critical Reasoning) combinations → skill narratives.","Core matching table for Verbal."],
+  ["CBN - DI","Crosswalk","~10 rules","The Data Insights rulebook — item-type × cognitive × content combinations → skills.","Core matching table for Data Insights."],
+  ["cognitive codes","Annexure","~113 codes","Master dictionary of cognitive codes, split by item bank: 186 (AWA), 187 (Quant — PUR/REA), 188 (Verbal — CST/CTQ/PLA/MAI…), 211 (Integrated Reasoning — REM/INM…).","Legal values + definitions for the <span class='code'>Cognitive</span> tag."],
+  ["content codes","Annexure","~1,490 codes","Master content hierarchy <span class='code'>Cont1 / Cont2 / Cont3</span> with full descriptions, split by bank: Q187 (Quant), V188 (Verbal), D211 (Data Insights). e.g. <span class='code'>ARI/FDP → ARITHMETIC/CONVERSION-FRAC/DECIMAL/PER</span>.","Legal values + definitions for <span class='code'>Content Domain / Subtopic / Sub-subtopic</span>."],
+ ];
+ const layerClass={"Definition":"def","Crosswalk":"cross","Annexure":"annex"};
+ const tbl=sheetRows.map(r=>`<tr>
+    <td class="r">${r[0]}<div><span class="pill ${r[1]==='Definition'?'v':r[1]==='Crosswalk'?'q':'d'}" style="margin-top:5px">${r[1]}</span></div></td>
+    <td style="white-space:nowrap;color:var(--muted)">${r[2]}</td>
+    <td>${r[3]}</td>
+    <td>${r[4]}</td></tr>`).join("");
+
+ // CBN column grammar (note: column ORDER differs per sheet)
+ const gram=(arr)=>arr.map(c=>`<div class="gcell ${c[2]?'out':''}"><div class="gc">${c[0]}</div><div class="gn">${c[1]}</div></div>`).join('<div style="display:flex;align-items:center;color:#b6c2d4">›</div>');
+
+ $("#codebook").innerHTML=`
+ <h2 class="section-title">Codebook Map — how the Excel drives tagging</h2>
+ <p class="sub">The <em>SkillSet Mapping</em> workbook is the single grounding source of truth. Its 10 sheets fall into
+ three functional layers: <b>definition</b> sheets say what skills the exam measures, <b>crosswalk</b> sheets are the
+ actual tagging rulebook, and <b>annexure</b> sheets are the controlled vocabularies of codes. The AI never invents a
+ label — it classifies each item <em>into</em> these sheets.</p>
+
+ <div class="grid stat-row">
+   <div class="card stat"><div class="k">Sheets</div><div class="v">10</div></div>
+   <div class="card stat"><div class="k">Crosswalk rules</div><div class="v">~250 <small>QR+VR+DI</small></div></div>
+   <div class="card stat"><div class="k">Content codes</div><div class="v">~1,490</div></div>
+   <div class="card stat"><div class="k">Cognitive codes</div><div class="v">~113</div></div>
+ </div>
+
+ <div class="layerband def">
+   <div class="tag2">Layer 1 · Definition</div><h3>What skills the exam measures</h3>
+   <p>Top-down. The 10 WEF skills sit at the top; each section sheet maps GMAT topics to skills, writes the
+   Mastery / Adept / Awareness skill definitions, and links to school/work relevance. This layer produces the
+   <b>human-readable skill narrative</b>, the <b>WEF skill</b>, and the <b>badge label</b> a tagged item rolls up to.</p>
+   <div class="sheetchips">
+     <span class="sheetchip"><b>WEF - Defined Skills</b> <small>· 10 skills</small></span>
+     <span class="sheetchip"><b>Quant</b> <small>· 4 topics</small></span>
+     <span class="sheetchip"><b>RC</b> <small>· 4 topics</small></span>
+     <span class="sheetchip"><b>Critical Reasoning</b> <small>· 4 topics</small></span>
+     <span class="sheetchip"><b>DI</b> <small>· 3 groups</small></span>
+   </div>
+ </div>
+ <div class="layerband cross">
+   <div class="tag2">Layer 2 · Crosswalk (the rulebook)</div><h3>The legal code combinations → skill</h3>
+   <p>These <b>CBN</b> sheets are the heart of tagging. Each <em>row</em> is one legal combination of codes
+   (item type × content × cognitive × element type …) and the skill narrative it implies. Tagging an item =
+   identifying the codes, then matching the row whose combination fits. Column <em>order</em> differs per sheet (see grammar below).</p>
+   <div class="sheetchips">
+     <span class="sheetchip"><b>CBN - QR</b> <small>· ~112 rules</small></span>
+     <span class="sheetchip"><b>CBN - VR</b> <small>· ~129 rules</small></span>
+     <span class="sheetchip"><b>CBN - DI</b> <small>· ~10 rules</small></span>
+   </div>
+ </div>
+ <div class="layerband annex">
+   <div class="tag2">Layer 3 · Annexure (the vocabularies)</div><h3>What every code means</h3>
+   <p>The dictionaries that decode the abbreviations used everywhere else. Crucially, both are <b>split by item bank</b>,
+   so the AI is only ever shown the codes legal for an item's section.</p>
+   <div class="sheetchips">
+     <span class="sheetchip"><b>content codes</b> <small>· ~1,490 · Cont1/2/3 · banks Q187·V188·D211</small></span>
+     <span class="sheetchip"><b>cognitive codes</b> <small>· ~113 · banks 186·187·188·211</small></span>
+   </div>
+ </div>
+
+ <div class="card" style="padding:18px;margin:18px 0">
+   <h4 style="margin:0 0 12px;font-size:13px">Sheet-by-sheet — what each contains and its role in tagging</h4>
+   <div style="overflow:auto"><table class="sheets">
+     <thead><tr><th>Sheet</th><th>Size</th><th>What it contains</th><th>Role in tagging</th></tr></thead>
+     <tbody>${tbl}</tbody></table></div>
+ </div>
+
+ <div class="grid col2">
+   <div class="card" style="padding:18px">
+     <h4 style="margin:0 0 10px;font-size:13px">The grammar of a crosswalk row</h4>
+     <p style="color:var(--muted);font-size:12.5px;margin:0 0 10px">A CBN row reads left→right: structural &amp; content codes
+     resolve to the skill narratives on the right. The same fields appear in all three CBN sheets but in a different order.</p>
+     <div style="font-size:11px;font-weight:800;color:var(--teal-d);margin:8px 0 4px">CBN - QR</div>
+     <div class="grammar">${gram([["Item_Type","e.g. A"],["Cont1","domain"],["Cognitive","PUR/REA"],["FundSkill","QRR…"],["Elm_Type","I/II"],["Cont2","subtopic"],["Cont3","sub-sub"],["Skill 1 / 2","narrative",1]])}</div>
+     <div style="font-size:11px;font-weight:800;color:var(--violet);margin:14px 0 4px">CBN - VR</div>
+     <div class="grammar">${gram([["Item_Type",""],["Cont1","CRR/RC"],["Cont2","scenario"],["Cognitive","CST/CTQ…"],["Elm_Type","I/II"],["Skill 1 / 2","narrative",1]])}</div>
+     <div style="font-size:11px;font-weight:800;color:#b9772a;margin:14px 0 4px">CBN - DI</div>
+     <div class="grammar">${gram([["Item_Type",""],["Cognitive",""],["Cont1",""],["Cont2",""],["Cont3",""],["Elm_Type",""],["Skill 1 / 2","narrative",1]])}</div>
+     <p class="note">The platform normalizes these into one common schema so SMEs and the model see consistent fields regardless of source sheet.</p>
+   </div>
+   <div class="card" style="padding:18px">
+     <h4 style="margin:0 0 10px;font-size:13px">Worked example — one item through the codebook</h4>
+     <div class="stem-box" style="margin-top:0">If 3/8 of a number is 0.45, what is 150% of that same number?</div>
+     <div class="chain">
+       <div class="cstep"><div class="src">content codes<small>annexure · bank Q187</small></div>
+         <div class="body">Item operates on number values &amp; conversions → <span class="vv">ARI / FDP</span> = <span class="code">ARITHMETIC / CONVERSION – FRAC/DECIMAL/PER</span></div></div>
+       <div class="carrow">↓</div>
+       <div class="cstep"><div class="src">cognitive codes<small>annexure · bank 187</small></div>
+         <div class="body">Abstract, no real-world scenario → <span class="vv">PUR</span> = <span class="code">PURE</span></div></div>
+       <div class="carrow">↓</div>
+       <div class="cstep"><div class="src">CBN - QR<small>crosswalk · match a row</small></div>
+         <div class="body">Row <span class="vv">A · ARI · PUR · QRR · I · FDP</span> → narrative: <em>"Arithmetic fluency in conversion between fractions, decimals and percentages…"</em></div></div>
+       <div class="carrow">↓</div>
+       <div class="cstep"><div class="src">Quant + WEF<small>definition · roll-up</small></div>
+         <div class="body">Topic <span class="vv">Arithmetic &amp; Number Properties</span> → WEF <span class="vv">Critical Thinking &amp; Problem Solving</span> → badge <span class="vv">Arithmetic Fluency</span> (tier set later by performance)</div></div>
+     </div>
+     <p class="note">This is exactly the tag set shown for item <b>Q-10421</b> in the Tag Review tab — every field traces back to a sheet.</p>
+   </div>
+ </div>
+
+ <div class="card" style="padding:18px;margin-top:16px">
+   <h4 style="margin:0 0 8px;font-size:13px">How the AI is grounded on it</h4>
+   <ul class="clean">
+     <li><b>Ingest once:</b> the workbook is parsed into structured vocabularies (content/cognitive codes) and the CBN crosswalk rules — see the <em>Grounding layer</em> on the Architecture tab.</li>
+     <li><b>Retrieve the legal set:</b> for a given item's section/type, only the relevant bank's codes + applicable CBN rows are placed in the prompt — the model can't choose an out-of-scope label.</li>
+     <li><b>Classify &amp; match:</b> the model assigns each code field, then resolves the matching CBN row to attach the skill narrative, WEF skill and badge — with a confidence and rationale per field.</li>
+     <li><b>Validate:</b> any label not present in the annexure is rejected; multi-skill items (one item → several rows) are supported, per the Excel's own note.</li>
+   </ul>
+ </div>`;
+}
+
+</script>
+<script id="archsvg">
+const ARCH_SVG=`<svg viewBox="0 0 1180 560" width="100%" style="min-width:1000px" font-family="-apple-system,Segoe UI,Roboto,sans-serif">
+<defs>
+ <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#94a3b8"/></marker>
+ <marker id="arl" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#e8a33d"/></marker>
+</defs>
+<style>
+ .bx{rx:11;ry:11;stroke-width:1.5} .lbl{font-size:12.5px;font-weight:700;fill:#14304f} .sub2{font-size:10.5px;fill:#5b6b82}
+ .grp{font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase}
+ .ln{stroke:#94a3b8;stroke-width:1.6;fill:none} .lnf{stroke:#e8a33d;stroke-width:1.6;fill:none;stroke-dasharray:5 4}
+</style>
+<!-- group bands -->
+<rect x="20" y="50" width="225" height="470" fill="#e6f6f8" opacity=".4" rx="14"/>
+<rect x="262" y="50" width="300" height="470" fill="#efeaff" opacity=".45" rx="14"/>
+<rect x="579" y="50" width="300" height="470" fill="#fdf1e3" opacity=".5" rx="14"/>
+<rect x="896" y="50" width="262" height="470" fill="#e7f6ee" opacity=".5" rx="14"/>
+<text x="132" y="38" text-anchor="middle" class="grp" fill="#0c8390">Ingestion &amp; Grounding</text>
+<text x="412" y="38" text-anchor="middle" class="grp" fill="#6d5dd3">AI Tagging Engine</text>
+<text x="729" y="38" text-anchor="middle" class="grp" fill="#b9772a">Human-in-the-loop &amp; Evals</text>
+<text x="1027" y="38" text-anchor="middle" class="grp" fill="#1aa251">Writeback &amp; Downstream</text>
+
+<!-- col1 -->
+<g><rect class="bx" x="40" y="80" width="185" height="64" fill="#fff" stroke="#bfe6ea"/>
+ <text x="56" y="106" class="lbl">QTI Item Bank</text><text x="56" y="124" class="sub2">~3,000 QTI 3.0 items</text></g>
+<g><rect class="bx" x="40" y="170" width="185" height="70" fill="#fff" stroke="#bfe6ea"/>
+ <text x="56" y="196" class="lbl">QTI Parser</text><text x="56" y="213" class="sub2">stem · options · passages</text><text x="56" y="228" class="sub2">tables/graphs → text</text></g>
+<g><rect class="bx" x="40" y="266" width="185" height="86" fill="#fff" stroke="#bfe6ea"/>
+ <text x="56" y="291" class="lbl">Codebook Store</text><text x="56" y="308" class="sub2">content + cognitive codes</text><text x="56" y="323" class="sub2">CBN crosswalk rules</text><text x="56" y="338" class="sub2">WEF skills · badging map</text></g>
+<g><rect class="bx" x="40" y="378" width="185" height="76" fill="#fff" stroke="#bfe6ea"/>
+ <text x="56" y="403" class="lbl">Vocab Retriever</text><text x="56" y="420" class="sub2">legal codes for this</text><text x="56" y="435" class="sub2">section / item type</text></g>
+<text x="132" y="492" text-anchor="middle" class="sub2" font-style="italic">SkillSet Mapping.xlsx</text>
+
+<!-- col2 -->
+<g><rect class="bx" x="282" y="110" width="260" height="78" fill="#fff" stroke="#d4c9f5"/>
+ <text x="300" y="136" class="lbl">Prompt Builder</text><text x="300" y="154" class="sub2">item text + retrieved legal codes</text><text x="300" y="170" class="sub2">+ curated few-shot exemplars</text></g>
+<g><rect class="bx" x="282" y="208" width="260" height="92" fill="#fff" stroke="#d4c9f5"/>
+ <text x="300" y="234" class="lbl">Constrained LLM Tagger</text><text x="300" y="252" class="sub2">classifies into taxonomy only</text><text x="300" y="268" class="sub2">returns code + confidence + rationale</text><text x="300" y="284" class="sub2">multi-pass self-consistency</text></g>
+<g><rect class="bx" x="282" y="320" width="260" height="84" fill="#fff" stroke="#d4c9f5"/>
+ <text x="300" y="346" class="lbl">Validation &amp; Confidence</text><text x="300" y="364" class="sub2">reject out-of-vocab labels</text><text x="300" y="380" class="sub2">flag low-confidence for SME</text></g>
+<g><rect class="bx" x="282" y="424" width="260" height="64" fill="#fff" stroke="#d4c9f5"/>
+ <text x="300" y="450" class="lbl">Tag Store (draft)</text><text x="300" y="468" class="sub2">per-item tags + provenance</text></g>
+
+<!-- col3 -->
+<g><rect class="bx" x="599" y="110" width="260" height="92" fill="#fff" stroke="#f0d9b8"/>
+ <text x="617" y="136" class="lbl">SME Review UI</text><text x="617" y="154" class="sub2">categorized tags · confidence</text><text x="617" y="170" class="sub2">edit from controlled vocab</text><text x="617" y="186" class="sub2">approve / flag · multi-skill</text></g>
+<g><rect class="bx" x="599" y="222" width="260" height="86" fill="#fff" stroke="#f0d9b8"/>
+ <text x="617" y="248" class="lbl">Eval Harness</text><text x="617" y="266" class="sub2">golden set vs AI, per field</text><text x="617" y="282" class="sub2">accuracy gate ≥ 0.85</text><text x="617" y="298" class="sub2">50 → 150 → full bank</text></g>
+<g><rect class="bx" x="599" y="328" width="260" height="80" fill="#fff" stroke="#f0d9b8"/>
+ <text x="617" y="354" class="lbl">Observability</text><text x="617" y="372" class="sub2">dashboards · alerts on</text><text x="617" y="388" class="sub2">questionable outputs</text></g>
+<g><rect class="bx" x="599" y="428" width="260" height="60" fill="#fff" stroke="#f0d9b8"/>
+ <text x="617" y="453" class="lbl">Approved Tags</text><text x="617" y="471" class="sub2">SME-verified ground truth</text></g>
+
+<!-- col4 -->
+<g><rect class="bx" x="916" y="130" width="222" height="78" fill="#fff" stroke="#bfe6cf"/>
+ <text x="934" y="156" class="lbl">QTI Writeback</text><text x="934" y="174" class="sub2">LOM classification +</text><text x="934" y="190" class="sub2">qti-metadata vocabulary</text></g>
+<g><rect class="bx" x="916" y="240" width="222" height="86" fill="#fff" stroke="#bfe6cf"/>
+ <text x="934" y="266" class="lbl">Personalization Engine</text><text x="934" y="284" class="sub2">content tags + difficulty</text><text x="934" y="300" class="sub2">→ adaptive item routing</text><text x="934" y="316" class="sub2">mini-assessments (5–7 q)</text></g>
+<g><rect class="bx" x="916" y="356" width="222" height="86" fill="#fff" stroke="#bfe6cf"/>
+ <text x="934" y="382" class="lbl">Badging System</text><text x="934" y="400" class="sub2">skill narrative + WEF map</text><text x="934" y="416" class="sub2">Mastery / Adept / Awareness</text><text x="934" y="432" class="sub2">per skill area</text></g>
+
+<!-- flows col1 -->
+<path class="ln" d="M132,144 L132,170" marker-end="url(#ar)"/>
+<path class="ln" d="M132,240 L132,266" marker-end="url(#ar)"/>
+<path class="ln" d="M132,352 L132,378" marker-end="url(#ar)"/>
+<!-- col1 -> col2 -->
+<path class="ln" d="M225,205 C255,205 255,150 282,150" marker-end="url(#ar)"/>
+<path class="ln" d="M225,416 C255,416 255,260 282,255" marker-end="url(#ar)"/>
+<!-- col2 internal -->
+<path class="ln" d="M412,188 L412,208" marker-end="url(#ar)"/>
+<path class="ln" d="M412,300 L412,320" marker-end="url(#ar)"/>
+<path class="ln" d="M412,404 L412,424" marker-end="url(#ar)"/>
+<!-- col2 -> col3 -->
+<path class="ln" d="M542,456 C570,456 570,160 599,156" marker-end="url(#ar)"/>
+<!-- col3 internal -->
+<path class="ln" d="M729,202 L729,222" marker-end="url(#ar)"/>
+<path class="ln" d="M729,308 L729,328" marker-end="url(#ar)"/>
+<path class="ln" d="M729,408 L729,428" marker-end="url(#ar)"/>
+<!-- col3 -> col4 -->
+<path class="ln" d="M859,458 C885,458 885,169 916,169" marker-end="url(#ar)"/>
+<path class="ln" d="M1027,208 L1027,240" marker-end="url(#ar)"/>
+<path class="ln" d="M1027,326 L1027,356" marker-end="url(#ar)"/>
+<!-- feedback loops -->
+<path class="lnf" d="M729,222 C729,150 600,92 470,92 C430,92 412,104 412,110" marker-end="url(#arl)"/>
+<text x="520" y="84" class="sub2" fill="#b9772a" font-style="italic">SME edits → new few-shot examples (iterative refinement)</text>
+<path class="lnf" d="M599,265 C575,265 560,510 412,508 C300,508 230,470 132,455" marker-end="url(#arl)"/>
+<text x="300" y="528" class="sub2" fill="#b9772a" font-style="italic">eval failures &lt; 0.85 → refine prompts / grounding &amp; re-run</text>
+</svg>`;
+</script>
+<script id="boot">
+renderOverview();renderCodebook();renderReview();renderEvals();renderArch();
+</script>
+</body>
+</html>
