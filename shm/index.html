@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NExT Platform — Codebase Discovery</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">N</div>
+      <div>
+        <h1>NExT Platform</h1>
+        <div class="sub">Codebase Discovery</div>
+      </div>
+    </div>
+    <nav class="nav" id="nav">
+      <div class="sep">Overview</div>
+      <button data-view="overview" class="active"><span class="ico">▣</span> Dashboard</button>
+      <button data-view="architecture"><span class="ico">◈</span> Architecture</button>
+      <div class="sep">Inventory</div>
+      <button data-view="components"><span class="ico">▤</span> Components</button>
+      <button data-view="modules"><span class="ico">▦</span> Business Modules</button>
+      <button data-view="migration"><span class="ico">⇄</span> Migration Status</button>
+      <div class="sep">Platform</div>
+      <button data-view="techstack"><span class="ico">⚙</span> Tech Stack</button>
+      <button data-view="infrastructure"><span class="ico">☁</span> Infrastructure</button>
+      <button data-view="data"><span class="ico">⛁</span> Data &amp; Persistence</button>
+      <button data-view="security"><span class="ico">🔐</span> Security &amp; Identity</button>
+      <button data-view="integrations"><span class="ico">🔌</span> Integrations</button>
+      <div class="sep">Analysis</div>
+      <button data-view="analyses"><span class="ico">📄</span> Deep Dives</button>
+      <button data-view="risks"><span class="ico">⚠</span> Risk Register</button>
+    </nav>
+    <div class="sidebar-foot" id="foot">Loading…</div>
+  </aside>
+
+  <main class="main" id="main">
+    <div class="empty">Loading discovery data…</div>
+  </main>
+</div>
+
+<div class="drawer-backdrop" id="backdrop"></div>
+<div class="drawer" id="drawer"></div>
+
+<script src="data.js"></script>
+<script src="diagram.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
