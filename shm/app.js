@@ -12,6 +12,13 @@
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function titleCase(s){ return String(s||"").replace(/[-_]/g," ").replace(/\b\w/g, function(c){return c.toUpperCase();}); }
   function arr(x){ return Array.isArray(x) ? x : (x ? [x] : []); }
+  function yesNo(v){ return v ? '<span class="yes">Yes</span>' : '<span class="no">—</span>'; }
+  function monthYear(iso){
+    var m = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    var p = String(iso || "").split("-");
+    if (p.length >= 2) { var mi = parseInt(p[1], 10) - 1; if (mi >= 0 && mi < 12) return m[mi] + " " + p[0]; }
+    return iso || "";
+  }
 
   /* ---------------- tiny markdown renderer ---------------- */
   function mdInline(s) {
@@ -83,11 +90,48 @@
     var s = D.stats || {};
     var comps = D.components || [];
     var byCat = countBy(comps, "category");
-    var byStatus = countBy(comps, "migrationStatus");
+    var byCapStatus = countBy(D.modules || [], "status");
     var byComplexity = countBy(comps, "complexity");
 
+    // ---- hero: the survey thesis + migration soundings ----
+    var mods = D.modules || [];
+    var order = ["monolith", "hybrid", "in-progress", "service"];
+    var sndLabels = { monolith: "In the monolith", hybrid: "Hybrid coupling", "in-progress": "In progress", service: "Extracted" };
+    var modBy = countBy(mods, "status");
+    var totalCaps = mods.length || 1;
+    var monoCount = modBy.monolith || 0;
+    var gen = (D.meta && D.meta.generated) || "";
+
+    var figs = [
+      [comps.length, "Components surveyed", ""],
+      [byCat["backend-service"] || 0, "Backend services", "green"],
+      [monoCount + " / " + totalCaps, "Monolith-resident", "purple"],
+      [fmt(s.csFiles), "C# files", ""],
+    ];
+    var soundings = '<div class="soundings"><div class="soundings-bar">';
+    order.forEach(function (k) {
+      var n = modBy[k] || 0; if (!n) return;
+      var pct = (n / totalCaps) * 100;
+      soundings += '<div class="soundings-seg" style="flex:' + n + ';background:' + statusColor(k) + '" title="' + esc(sndLabels[k]) + ": " + n + '">' + (n >= 2 ? '<span class="snd-n">' + n + "</span>" : "") + "</div>";
+    });
+    soundings += "</div><div class=\"soundings-scale\">";
+    order.forEach(function (k) {
+      var n = modBy[k] || 0; if (!n) return;
+      soundings += '<span class="snd-key"><span class="dot" style="background:' + statusColor(k) + '"></span>' + esc(sndLabels[k]) + " <b>" + n + "</b></span>";
+    });
+    soundings += "</div></div>";
+
+    var h = '<div class="hero">' +
+      '<div class="hero-kicker">Surveyed ' + esc(monthYear(gen)) + ' · Strangler-fig decomposition</div>' +
+      '<h1 class="hero-title">Most of the platform is <em>still in the monolith</em>.</h1>' +
+      '<p class="hero-lede">The NExT platform is an Orleans-based .NET estate that Safe Harbor’s teams are decomposing into independent services. This survey charts every component and shows where each capability lives today — <b>' + monoCount + ' of ' + totalCaps + '</b> core capabilities remain in the monolith, with <b>' + (modBy.hybrid || 0) + '</b> still coupled to the legacy database.</p>' +
+      soundings +
+      '<div class="hero-figs">' + figs.map(function (f) {
+        return '<div class="fig"><div class="fig-num ' + f[2] + '">' + f[0] + '</div><div class="fig-lbl">' + f[1] + "</div></div>";
+      }).join("") + "</div>" +
+      "</div>";
+
     var cards = [
-      ["Components profiled", comps.length, "accent"],
       ["Backend services", byCat["backend-service"] || 0, "green"],
       ["C# files", fmt(s.csFiles), ""],
       ["TypeScript files", fmt(s.tsFiles), "accent"],
@@ -99,14 +143,13 @@
       ["SSRS reports", fmt(s.rdlReports), ""],
     ];
 
-    var h = '<div class="page-head"><h2>Platform Dashboard</h2><p>' + esc(D.meta && D.meta.intro || "") + "</p></div>";
     h += '<div class="stat-grid">' + cards.map(function (c) {
       return '<div class="stat"><div class="num ' + c[2] + '">' + c[1] + '</div><div class="lbl">' + c[0] + "</div></div>";
     }).join("") + "</div>";
 
     h += '<div class="two-col">';
     h += '<div class="panel"><h3>Components by category</h3>' + barChart(byCat) + "</div>";
-    h += '<div class="panel"><h3>Migration status</h3>' + barChart(byStatus, true) + "</div>";
+    h += '<div class="panel"><h3>Capability migration status</h3><p class="topic-summary" style="margin:-4px 0 8px">Business capabilities — most are still served by the monolith.</p>' + barChart(byCapStatus, true) + "</div>";
     h += "</div>";
 
     h += '<div class="two-col">';
@@ -170,7 +213,9 @@
       document.getElementById("compCount").textContent = list.length + " of " + (D.components || []).length + " components";
       grid.innerHTML = list.length ? list.map(compCard).join("") : '<div class="empty">No components match.</div>';
       Array.prototype.forEach.call(grid.querySelectorAll(".ccard"), function (card) {
-        card.addEventListener("click", function () { openComponent(card.getAttribute("data-name")); });
+        var open = function () { openComponent(card.getAttribute("data-name")); };
+        card.addEventListener("click", open);
+        card.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } });
       });
     }
     if (search) search.addEventListener("input", function () { compFilters.q = search.value; draw(); });
@@ -182,7 +227,7 @@
   function compCard(c) {
     var m = c.metrics || {};
     var tags = (c.frameworks || []).slice(0, 4).map(function (f) { return '<span class="tag">' + esc(f) + "</span>"; }).join("");
-    return '<div class="ccard" data-name="' + esc(c.name) + '">' +
+    return '<div class="ccard" data-name="' + esc(c.name) + '" tabindex="0" role="button" aria-label="' + esc(c.name) + ' — open profile">' +
       '<div class="top"><h4>' + esc(c.name) + "</h4>" + statusBadge(c.migrationStatus) + "</div>" +
       '<div class="purpose">' + esc(truncate(c.businessPurpose, 140)) + "</div>" +
       '<div class="meta">' + tags + "</div>" +
@@ -190,7 +235,7 @@
         (m.cs ? "<span><b>" + fmt(m.cs) + "</b> cs</span>" : "") +
         (m.ts ? "<span><b>" + fmt(m.ts) + "</b> ts</span>" : "") +
         (m.sql ? "<span><b>" + fmt(m.sql) + "</b> sql</span>" : "") +
-        '<span class="' + cxClass(c.complexity) + '">' + esc(titleCase(c.complexity || "")) + "</span>" +
+        '<span class="cx-tag ' + cxClass(c.complexity) + '">' + esc(titleCase(c.complexity || "")) + "</span>" +
       "</div></div>";
   }
 
@@ -205,8 +250,8 @@
     h += '<div class="k">Complexity</div><div class="' + cxClass(c.complexity) + '">' + esc(titleCase(c.complexity)) + "</div>";
     h += '<div class="k">Confidence</div><div>' + esc(titleCase(c.confidence || "—")) + "</div>";
     h += '<div class="k">SQL migrations</div><div>' + esc(c.sqlMigrationTool || "—") + "</div>";
-    h += '<div class="k">CI pipeline</div><div>' + (c.hasPipeline ? "✅ yes" : "—") + "</div>";
-    h += '<div class="k">Tests</div><div>' + (c.hasTests ? "✅ yes" : "—") + "</div>";
+    h += '<div class="k">CI pipeline</div><div>' + yesNo(c.hasPipeline) + "</div>";
+    h += '<div class="k">Tests</div><div>' + yesNo(c.hasTests) + "</div>";
     h += '<div class="k">Code size</div><div>' + (m.cs ? fmt(m.cs) + " C#" : "") + (m.ts ? "  ·  " + fmt(m.ts) + " TS" : "") + (m.sql ? "  ·  " + fmt(m.sql) + " SQL" : "") + (m.csproj ? "  ·  " + fmt(m.csproj) + " proj" : "") + "</div>";
     h += "</div>";
     h += pillSection("Languages", c.primaryLanguages);
@@ -233,7 +278,7 @@
 
   views.modules = function () {
     var mods = D.modules || [];
-    var h = '<div class="page-head"><h2>Business Modules</h2><p>The functional module map of the platform mapped to where each lives today. Note: the source module map is ~6 months stale; statuses below are verified against code where evidence allowed.</p></div>';
+    var h = '<div class="page-head"><h2>Business Modules</h2><p>The platform’s functional modules, each mapped to where it lives today. Note: the source module map is ~6 months stale; statuses below are verified against code wherever evidence allowed.</p></div>';
     if (!mods.length) {
       var t = findMono("modules") || findTopic("decomposition-status") || {};
       return h + '<div class="panel"><div class="md">' + renderMarkdown(t.markdown || "No module map captured.") + "</div></div>";
@@ -250,21 +295,44 @@
 
   views.migration = function () {
     var t = findTopic("decomposition-status") || {};
+    var mods = D.modules || [];
+    var order = ["monolith", "hybrid", "in-progress", "service"];
+    var capLabels = { monolith: "Still in the monolith", hybrid: "Hybrid — service + legacy DB", "in-progress": "In progress / moving", service: "Extracted (service)" };
+    var modBy = countBy(mods, "status");
     var h = '<div class="page-head"><h2>Monolith → Service Migration</h2><p>' + esc(t.summary || "") + "</p></div>";
-    var comps = (D.components || []).filter(function (c) { return ["monolith", "service", "hybrid", "in-progress"].indexOf(c.migrationStatus) >= 0; });
-    var groups = { service: [], hybrid: [], "in-progress": [], monolith: [] };
-    comps.forEach(function (c) { if (groups[c.migrationStatus]) groups[c.migrationStatus].push(c); });
-    var labels = { service: "Extracted services (green)", hybrid: "Hybrid — service logic, legacy DB (red)", "in-progress": "In progress / moving", monolith: "Still in the monolith (purple)" };
+
+    // Headline = business capabilities (the meaningful "what has left the monolith" measure)
+    h += '<p class="topic-summary">Headline counts are <b>business capabilities</b> (functional modules) — the meaningful measure of what has left the monolith. The monolith is still the system of record for most of them.</p>';
     h += '<div class="stat-grid">';
-    Object.keys(labels).forEach(function (k) {
-      h += '<div class="stat"><div class="num">' + (groups[k].length) + '</div><div class="lbl">' + esc(labels[k]) + "</div></div>";
+    order.forEach(function (k) {
+      h += '<div class="stat"><div class="num" style="color:' + statusColor(k) + '">' + (modBy[k] || 0) + '</div><div class="lbl">' + esc(capLabels[k]) + "</div></div>";
     });
     h += "</div>";
-    Object.keys(labels).forEach(function (k) {
-      if (!groups[k].length) return;
-      h += '<div class="panel"><h3>' + statusBadge(k) + " &nbsp;" + esc(labels[k]) + '</h3><div class="pill-list">' +
-        groups[k].map(function (c) { return '<span class="pill" style="cursor:pointer" data-comp="' + esc(c.name) + '">' + esc(c.name) + "</span>"; }).join("") + "</div></div>";
+
+    // Capability breakdown grouped by status
+    h += '<div class="panel"><h3>Business capabilities by status</h3>';
+    order.forEach(function (k) {
+      var list = mods.filter(function (m) { return m.status === k; });
+      if (!list.length) return;
+      h += '<div style="margin:12px 0 4px">' + statusBadge(k) + ' <span class="count-chip">' + list.length + '</span></div>';
+      h += '<div class="pill-list">' + list.map(function (m) { return '<span class="pill">' + esc(m.name) + "</span>"; }).join("") + "</div>";
     });
+    h += "</div>";
+
+    // Repository-level lens (components)
+    var comps = (D.components || []).filter(function (c) { return ["monolith", "service", "hybrid", "in-progress"].indexOf(c.migrationStatus) >= 0; });
+    var groups = { monolith: [], hybrid: [], "in-progress": [], service: [] };
+    comps.forEach(function (c) { if (groups[c.migrationStatus]) groups[c.migrationStatus].push(c); });
+    var repoLabels = { monolith: "Monolith", hybrid: "Hybrid — writes to legacy DB", "in-progress": "In progress", service: "Extracted service repo" };
+    h += '<div class="panel"><h3>Service repositories by extraction status</h3>';
+    h += '<p class="topic-summary">Repository-level lens: how the ' + comps.length + ' code repositories map onto the monolith. (A capability can still be "in the monolith" even when a partial service repo exists.)</p>';
+    order.forEach(function (k) {
+      if (!groups[k].length) return;
+      h += '<div style="margin:12px 0 4px">' + statusBadge(k) + " " + esc(repoLabels[k]) + ' <span class="count-chip">' + groups[k].length + '</span></div>';
+      h += '<div class="pill-list">' + groups[k].map(function (c) { return '<span class="pill" style="cursor:pointer" data-comp="' + esc(c.name) + '">' + esc(c.name) + "</span>"; }).join("") + "</div>";
+    });
+    h += "</div>";
+
     h += '<div class="panel"><h3>Decomposition analysis</h3><div class="md">' + renderMarkdown(t.markdown || "") + "</div></div>";
     setTimeout(function () {
       Array.prototype.forEach.call(document.querySelectorAll("[data-comp]"), function (p) {
@@ -281,8 +349,10 @@
       if (!groups[g] || !groups[g].length) return;
       h += '<div class="panel tech-group"><h4>' + esc(g) + '</h4><div class="pill-list">' +
         groups[g].map(function (t) {
-          var label = typeof t === "string" ? t : (t.name + (t.count ? '  ·  ' + t.count : ""));
-          return '<span class="pill">' + esc(label) + "</span>";
+          if (typeof t === "string") return '<span class="pill">' + esc(t) + "</span>";
+          var cnt = t.count ? ' <span class="tcount">' + t.count + "</span>" : "";
+          var cls = (t.count && t.count <= 1) ? "pill pill-faint" : "pill";
+          return '<span class="' + cls + '">' + esc(t.name) + cnt + "</span>";
         }).join("") + "</div></div>";
     });
     return h;
@@ -316,10 +386,11 @@
   views.analyses = function () {
     var h = '<div class="page-head"><h2>Deep-Dive Analyses</h2><p>Full cross-cutting and monolith analysis sections produced during discovery.</p></div>';
     (D.monolith || []).forEach(function (m) {
-      h += '<div class="panel"><h3>🏛 ' + esc(m.topic) + '</h3><div class="topic-summary">' + esc(m.summary || "") + "</div>" + techTags(m.keyTechnologies) + '<div class="md">' + renderMarkdown(m.markdown || "") + "</div></div>";
+      h += '<div class="panel"><h3>' + esc(m.topic) + '</h3><div class="topic-summary">' + esc(m.summary || "") + "</div>" + techTags(m.keyTechnologies) + '<div class="md">' + renderMarkdown(m.markdown || "") + "</div></div>";
     });
     (D.crossCutting || []).forEach(function (t) {
-      h += '<div class="panel"><h3>' + esc(titleCase(t.topic || t.key)) + '</h3><div class="topic-summary">' + esc(t.summary || "") + "</div>" + techTags(t.keyTechnologies) + '<div class="md">' + renderMarkdown(t.markdown || "") + "</div></div>";
+      var diagram = (t.key === "architecture-patterns" && window.ARCH_SVG) ? '<div class="diagram-panel" style="margin:6px 0 14px">' + window.ARCH_SVG + "</div>" : "";
+      h += '<div class="panel"><h3>' + esc(titleCase(t.topic || t.key)) + '</h3><div class="topic-summary">' + esc(t.summary || "") + "</div>" + techTags(t.keyTechnologies) + diagram + '<div class="md">' + renderMarkdown(t.markdown || "") + "</div></div>";
     });
     return h;
   };
@@ -329,7 +400,8 @@
     (D.crossCutting || []).forEach(function (t) { (t.risks || []).forEach(function (r) { rows.push(Object.assign({ area: titleCase(t.topic || t.key) }, r)); }); });
     (D.monolith || []).forEach(function (t) { (t.risks || []).forEach(function (r) { rows.push(Object.assign({ area: t.topic }, r)); }); });
     var order = { high: 0, medium: 1, low: 2 };
-    rows.sort(function (a, b) { return (order[a.severity] || 3) - (order[b.severity] || 3); });
+    function rank(sev) { return order.hasOwnProperty(sev) ? order[sev] : 3; }
+    rows.sort(function (a, b) { return rank(a.severity) - rank(b.severity); });
     var h = '<div class="page-head"><h2>Risk &amp; Observation Register</h2><p>Technical risks and notable observations surfaced across the discovery. Severity is an engineering assessment, evidence-gated to what the code shows.</p></div>';
     var counts = countBy(rows, "severity");
     h += '<div class="stat-grid">' +
@@ -376,7 +448,7 @@
     }).join("");
   }
   function statusColor(s) {
-    return { monolith: "#a974ff", service: "#2ecc8f", hybrid: "#ff6b6b", frontend: "#4ea1ff", infra: "#38d6d6", "in-progress": "#f5b942" }[s] || "#9fb0cc";
+    return { monolith: "#9b86f0", service: "#5ccb8d", hybrid: "#e0709e", frontend: "#62a8e6", infra: "#82b2bd", "in-progress": "#f3a95e" }[s] || "#93a6a4";
   }
   function buildTechStack() {
     var groups = { Languages: {}, "Backend frameworks": {}, "Frontend & UI": {}, "Data & messaging": {}, "Cloud & DevOps": {}, Integrations: {} };
@@ -398,14 +470,41 @@
   }
 
   /* ---------------- drawer ---------------- */
-  function openDrawer() { drawer.classList.add("open"); backdrop.classList.add("open"); }
-  function closeDrawer() { drawer.classList.remove("open"); backdrop.classList.remove("open"); }
+  var lastTrigger = null;
+  function openDrawer() {
+    lastTrigger = document.activeElement;
+    drawer.setAttribute("role", "dialog");
+    drawer.setAttribute("aria-modal", "true");
+    drawer.classList.add("open"); backdrop.classList.add("open");
+    var cb = document.getElementById("drawerClose"); if (cb) cb.focus();
+  }
+  function closeDrawer() {
+    drawer.classList.remove("open"); backdrop.classList.remove("open");
+    if (lastTrigger && lastTrigger.focus) lastTrigger.focus();
+    lastTrigger = null;
+  }
   backdrop.addEventListener("click", closeDrawer);
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeDrawer(); });
+  // focus trap while the drawer is open
+  drawer.addEventListener("keydown", function (e) {
+    if (e.key !== "Tab" || !drawer.classList.contains("open")) return;
+    var f = drawer.querySelectorAll('button, a[href], [tabindex]:not([tabindex="-1"])');
+    if (!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
 
   /* ---------------- router ---------------- */
   function go(view) {
-    Array.prototype.forEach.call(nav.querySelectorAll("button"), function (b) { b.classList.toggle("active", b.getAttribute("data-view") === view); });
+    var activeBtn = null;
+    Array.prototype.forEach.call(nav.querySelectorAll("button"), function (b) {
+      var on = b.getAttribute("data-view") === view;
+      b.classList.toggle("active", on);
+      if (on) activeBtn = b;
+    });
+    var crumb = document.getElementById("crumb");
+    if (crumb && activeBtn) { var lbl = activeBtn.querySelector("span"); crumb.textContent = lbl ? lbl.textContent : "Dashboard"; }
     main.innerHTML = (views[view] || views.overview)();
     main.scrollTop = 0; window.scrollTo(0, 0);
     if (location.hash !== "#" + view) history.replaceState(null, "", "#" + view);
@@ -415,8 +514,11 @@
   /* ---------------- boot ---------------- */
   function boot() {
     if (!D || !D.components) { main.innerHTML = '<div class="empty">data.js not loaded or empty.</div>'; return; }
+    var gen = D.meta && D.meta.generated ? esc(D.meta.generated) : "—";
     var foot = document.getElementById("foot");
-    foot.innerHTML = (D.meta && D.meta.generated ? "Generated " + esc(D.meta.generated) + "<br>" : "") + (D.components.length) + " components · read-only assessment";
+    foot.innerHTML = "Read-only assessment<br>" + (D.components.length) + " components surveyed<br>Generated " + gen;
+    var sd = document.getElementById("surveyDate");
+    if (sd) sd.textContent = gen;
     var initial = (location.hash || "#overview").slice(1);
     go(views[initial] ? initial : "overview");
   }

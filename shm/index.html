@@ -3,43 +3,115 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>NExT Platform — Codebase Discovery</title>
+<title>NExT Platform — Codebase Survey · RSI for Safe Harbor Marinas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+<!-- icon sprite: stroked line icons (replaces casual emoji glyphs) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="i-overview" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="7" height="9" rx="1.2"/><rect x="14" y="3" width="7" height="5" rx="1.2"/><rect x="14" y="12" width="7" height="9" rx="1.2"/><rect x="3" y="16" width="7" height="5" rx="1.2"/>
+    </g>
+    <g id="i-architecture" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2 22 7 12 12 2 7z"/><path d="M2 12l10 5 10-5"/><path d="M2 17l10 5 10-5"/>
+    </g>
+    <g id="i-components" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+    </g>
+    <g id="i-modules" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><circle cx="17.5" cy="17.5" r="3.5"/>
+    </g>
+    <g id="i-migration" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 8h13"/><path d="M13 4l4 4-4 4"/><path d="M20 16H7"/><path d="M11 20l-4-4 4-4"/>
+    </g>
+    <g id="i-techstack" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2 21 7v10l-9 5-9-5V7z"/><path d="M3.3 7.2 12 12l8.7-4.8"/><path d="M12 12v9.6"/>
+    </g>
+    <g id="i-infrastructure" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M7 17a4 4 0 0 1-.6-7.95 5 5 0 0 1 9.7-1.2A3.6 3.6 0 0 1 17.5 17z"/><path d="M9 20.5h6"/>
+    </g>
+    <g id="i-data" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/>
+    </g>
+    <g id="i-security" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2.5 4.5 5.3V11c0 4.8 3.2 8.2 7.5 9.7 4.3-1.5 7.5-4.9 7.5-9.7V5.3z"/><path d="M9 11.7l2.2 2.2L15.2 10"/>
+    </g>
+    <g id="i-integrations" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="5" cy="12" r="2.6"/><circle cx="19" cy="6" r="2.6"/><circle cx="19" cy="18" r="2.6"/><path d="M7.4 10.9 16.6 6.9"/><path d="M7.4 13.1l9.2 4"/>
+    </g>
+    <g id="i-analyses" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 2.5h7l5 5V21a.5.5 0 0 1-.5.5h-11A.5.5 0 0 1 6 21z"/><path d="M13 2.5V8h5"/><path d="M9 13h6M9 16.5h4"/>
+    </g>
+    <g id="i-risks" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3.2 21.5 20a1 1 0 0 1-.87 1.5H3.37A1 1 0 0 1 2.5 20z"/><path d="M12 9.5v5"/><path d="M12 17.6h.01"/>
+    </g>
+    <g id="i-compass" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/><path d="M15.5 8.5 13 13l-4.5 2.5L11 11z"/>
+    </g>
+  </defs>
+</svg>
+
 <div class="layout">
   <aside class="sidebar">
     <div class="brand">
-      <div class="logo">N</div>
-      <div>
+      <div class="logo"><span>N</span></div>
+      <div class="brand-text">
         <h1>NExT Platform</h1>
-        <div class="sub">Codebase Discovery</div>
+        <div class="sub">Codebase Survey</div>
       </div>
     </div>
+
     <nav class="nav" id="nav">
-      <div class="sep">Overview</div>
-      <button data-view="overview" class="active"><span class="ico">▣</span> Dashboard</button>
-      <button data-view="architecture"><span class="ico">◈</span> Architecture</button>
+      <div class="sep">Survey</div>
+      <button data-view="overview" class="active"><svg class="ico"><use href="#i-overview"/></svg><span>Dashboard</span></button>
+      <button data-view="architecture"><svg class="ico"><use href="#i-architecture"/></svg><span>Architecture</span></button>
       <div class="sep">Inventory</div>
-      <button data-view="components"><span class="ico">▤</span> Components</button>
-      <button data-view="modules"><span class="ico">▦</span> Business Modules</button>
-      <button data-view="migration"><span class="ico">⇄</span> Migration Status</button>
+      <button data-view="components"><svg class="ico"><use href="#i-components"/></svg><span>Components</span></button>
+      <button data-view="modules"><svg class="ico"><use href="#i-modules"/></svg><span>Business Modules</span></button>
+      <button data-view="migration"><svg class="ico"><use href="#i-migration"/></svg><span>Migration Status</span></button>
       <div class="sep">Platform</div>
-      <button data-view="techstack"><span class="ico">⚙</span> Tech Stack</button>
-      <button data-view="infrastructure"><span class="ico">☁</span> Infrastructure</button>
-      <button data-view="data"><span class="ico">⛁</span> Data &amp; Persistence</button>
-      <button data-view="security"><span class="ico">🔐</span> Security &amp; Identity</button>
-      <button data-view="integrations"><span class="ico">🔌</span> Integrations</button>
+      <button data-view="techstack"><svg class="ico"><use href="#i-techstack"/></svg><span>Tech Stack</span></button>
+      <button data-view="infrastructure"><svg class="ico"><use href="#i-infrastructure"/></svg><span>Infrastructure</span></button>
+      <button data-view="data"><svg class="ico"><use href="#i-data"/></svg><span>Data &amp; Persistence</span></button>
+      <button data-view="security"><svg class="ico"><use href="#i-security"/></svg><span>Security &amp; Identity</span></button>
+      <button data-view="integrations"><svg class="ico"><use href="#i-integrations"/></svg><span>Integrations</span></button>
       <div class="sep">Analysis</div>
-      <button data-view="analyses"><span class="ico">📄</span> Deep Dives</button>
-      <button data-view="risks"><span class="ico">⚠</span> Risk Register</button>
+      <button data-view="analyses"><svg class="ico"><use href="#i-analyses"/></svg><span>Deep Dives</span></button>
+      <button data-view="risks"><svg class="ico"><use href="#i-risks"/></svg><span>Risk Register</span></button>
     </nav>
-    <div class="sidebar-foot" id="foot">Loading…</div>
+
+    <div class="sidebar-credit">
+      <div class="cred-line"><span class="cred-k">Prepared by</span><span class="cred-v">RSI</span></div>
+      <div class="cred-line"><span class="cred-k">For</span><span class="cred-v">Safe Harbor Marinas</span></div>
+      <div class="sidebar-foot" id="foot">Loading…</div>
+    </div>
   </aside>
 
-  <main class="main" id="main">
-    <div class="empty">Loading discovery data…</div>
-  </main>
+  <div class="main-col">
+    <header class="survey-bar">
+      <div class="sb-left">
+        <svg class="sb-mark"><use href="#i-compass"/></svg>
+        <span class="sb-eyebrow">Codebase Survey</span>
+        <span class="sb-sep">/</span>
+        <span class="sb-crumb" id="crumb">Dashboard</span>
+      </div>
+      <div class="sb-credit">
+        <div class="cred-col"><span class="cred-k">Prepared by</span><span class="cred-v">RSI</span></div>
+        <span class="cred-div"></span>
+        <div class="cred-col"><span class="cred-k">For</span><span class="cred-v">Safe Harbor Marinas</span></div>
+        <span class="cred-div"></span>
+        <div class="cred-col"><span class="cred-k">Survey date</span><span class="cred-v mono" id="surveyDate">—</span></div>
+      </div>
+    </header>
+
+    <main class="main" id="main">
+      <div class="empty">Loading survey data…</div>
+    </main>
+  </div>
 </div>
 
 <div class="drawer-backdrop" id="backdrop"></div>
