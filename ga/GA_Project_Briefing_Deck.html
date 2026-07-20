@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G&A Compass — Project Briefing</title>
+<style>
+:root{
+  --red:#C60C30; --navy:#23394A; --grey:#5f6b73; --lgrey:#9aa4ac;
+  --fog:#F8FAFB; --warm:#FFF9F3; --rule:#E4EAEF; --white:#fff;
+  --pos:#2A8F60; --posbg:#E6F4EC; --blue:#0088CE; --bluebg:#E6F2FC;
+  --teal:#0E8C8C; --tealbg:#E2F4F4; --amber:#E8801A; --amberbg:#FDECD8;
+  --purple:#7B4FD6; --purplebg:#F0EBFB; --redbg:#FBE7EB; --navybg:#EDF1F5;
+  --accent:#C60C30; --accsoft:#FBE7EB;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:var(--navy);background:var(--navy);font-size:16.6px;line-height:1.5;overflow:hidden;}
+/* header */
+.hdr{background:#fff;height:50px;padding:0 26px;display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;left:0;right:0;z-index:300;border-bottom:1px solid var(--rule);}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand .ga{display:flex;align-items:center;gap:7px;}
+.brand .arc{width:22px;height:22px;border-radius:50%;background:conic-gradient(from 220deg,var(--red) 0 62%,transparent 62%);position:relative;}
+.brand .arc:after{content:"";position:absolute;inset:5px;background:#fff;border-radius:50%;}
+.brand .nm{font-size:20.5px;font-weight:800;color:var(--navy);letter-spacing:-.3px;}
+.brand .nm .r{color:var(--red);}
+.brand .tg{font-size:12.8px;font-style:italic;color:var(--lgrey);border-left:1px solid var(--rule);padding-left:10px;}
+.hdr-badge{font-size:10.9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:3px;background:var(--redbg);color:var(--red);border:1px solid #f2c9d2;}
+/* stage */
+.stage{position:fixed;top:50px;bottom:46px;left:0;right:0;background:var(--fog);overflow:hidden;}
+.slide{position:absolute;inset:0;overflow-y:auto;padding:30px 44px;opacity:0;pointer-events:none;transition:opacity .3s ease;display:flex;flex-direction:column;justify-content:center;}
+.slide.active{opacity:1;pointer-events:auto;}
+.wrap{max-width:1420px;margin:0 auto;width:100%;}
+.slide::-webkit-scrollbar{width:8px;}.slide::-webkit-scrollbar-thumb{background:var(--rule);border-radius:4px;}
+/* footer nav */
+.nav{position:fixed;bottom:0;left:0;right:0;height:46px;background:var(--navy);display:flex;align-items:center;justify-content:space-between;padding:0 22px;z-index:300;}
+.nav .dots{display:flex;gap:5px;align-items:center;flex-wrap:wrap;max-width:60%;}
+.nav .dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.22);cursor:pointer;transition:.2s;}
+.nav .dot.on{background:var(--red);width:18px;border-radius:4px;}
+.nav .ctrls{display:flex;align-items:center;gap:12px;}
+.nav button{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:5px;padding:6px 13px;font-size:14.1px;font-weight:600;cursor:pointer;font-family:inherit;}
+.nav button:hover{background:rgba(255,255,255,.18);}
+.nav button:disabled{opacity:.3;cursor:default;}
+.nav .count{font-size:12.8px;color:var(--lgrey);letter-spacing:1px;min-width:58px;text-align:right;}
+.nav .dname{font-size:11.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--lgrey);font-weight:600;}
+/* typography */
+.kicker{font-size:14.1px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);font-weight:800;margin-bottom:7px;display:flex;align-items:center;gap:8px;}
+.kicker .kdot{width:9px;height:9px;border-radius:50%;background:var(--accent);}
+.stitle{font-size:32px;font-weight:800;color:var(--navy);letter-spacing:-.5px;line-height:1.12;margin-bottom:8px;}
+.stitle .hl{color:var(--accent);}
+.lead{font-size:16px;color:var(--grey);max-width:940px;line-height:1.55;margin-bottom:15px;}
+.lead b{color:var(--navy);}
+.sec-label{font-size:11.5px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin:14px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--rule);}
+/* cards & grid */
+.card{background:#fff;border:1px solid var(--rule);border-radius:9px;padding:14px 15px;box-shadow:0 1px 4px rgba(35,57,74,.05);}
+.grid{display:grid;gap:12px;}
+.g2{grid-template-columns:repeat(2,1fr);}.g3{grid-template-columns:repeat(3,1fr);}.g4{grid-template-columns:repeat(4,1fr);}.g5{grid-template-columns:repeat(5,1fr);}
+.row{display:flex;gap:12px;}
+/* stats */
+.statrow{display:grid;gap:10px;}
+.stat{background:#fff;border:1px solid var(--rule);border-radius:8px;padding:11px 13px;border-top:3px solid var(--accent);}
+.stat .v{font-size:28.2px;font-weight:800;color:var(--navy);letter-spacing:-.5px;line-height:1;}
+.stat .k{font-size:11.5px;color:var(--grey);text-transform:uppercase;letter-spacing:.5px;margin-top:5px;font-weight:600;line-height:1.25;}
+.big{font-size:33.3px;font-weight:800;letter-spacing:-1px;line-height:1;}
+.big.red{color:var(--red);}.big.pos{color:var(--pos);}.big.navy{color:var(--navy);}.big.acc{color:var(--accent);}
+.lbl{font-size:12.8px;color:var(--grey);text-transform:uppercase;letter-spacing:.6px;font-weight:600;}
+/* tags & chips */
+.tag{display:inline-block;font-size:10.9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:2.5px 7px;border-radius:3px;}
+.t-red{background:var(--redbg);color:var(--red);}.t-pos{background:var(--posbg);color:var(--pos);}.t-blue{background:var(--bluebg);color:#006fa6;}.t-amber{background:var(--amberbg);color:#8a4e00;}.t-purple{background:var(--purplebg);color:#5a35a8;}.t-teal{background:var(--tealbg);color:#0a6b6b;}.t-navy{background:var(--navybg);color:var(--navy);}.t-acc{background:var(--accsoft);color:var(--accent);}
+.chip{border:1px solid var(--rule);background:var(--fog);border-radius:6px;padding:6px 10px;font-size:12.8px;font-weight:700;color:var(--navy);}
+/* lists */
+.list{list-style:none;}
+.list li{font-size:14.1px;color:var(--grey);line-height:1.45;padding-left:14px;position:relative;margin-bottom:5px;}
+.list li:before{content:"";position:absolute;left:2px;top:6px;width:5px;height:5px;border-radius:50%;background:var(--accent);}
+.list li b{color:var(--navy);font-weight:800;}
+.li{font-size:14.1px;color:var(--grey);line-height:1.45;padding-left:14px;position:relative;margin-bottom:5px;}
+.li:before{content:"";position:absolute;left:2px;top:6px;width:5px;height:5px;border-radius:50%;background:var(--accent);}
+.li b{color:var(--navy);font-weight:800;}
+/* process flow (flowchart) */
+.flowrow{display:flex;align-items:stretch;gap:5px;}
+.fstep{flex:1;background:#fff;border:1px solid var(--rule);border-top:3px solid var(--accent);border-radius:8px;padding:9px 10px;display:flex;flex-direction:column;}
+.fstep .fn{font-size:11.5px;font-weight:800;color:var(--accent);letter-spacing:.5px;}
+.fstep .ft{font-size:14.7px;font-weight:800;color:var(--navy);margin:2px 0 4px;line-height:1.2;}
+.fstep .fmeta{font-size:10.9px;color:#0072a8;font-weight:700;line-height:1.3;margin-bottom:5px;}
+.fstep .fpain{font-size:10.9px;color:var(--red);font-weight:600;line-height:1.3;margin-top:auto;background:var(--redbg);border-radius:4px;padding:4px 6px;}
+.fchev{display:flex;align-items:center;color:var(--accent);font-weight:800;font-size:19.2px;flex:0 0 auto;}
+.fstep.bn{border-top-color:var(--red);}
+.fstep.bn .fn{color:var(--red);}
+.fstep .frole{display:inline-block;font-size:9.6px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;background:var(--accsoft);color:var(--accent);border-radius:3px;padding:2px 5px;margin:0 0 4px;align-self:flex-start;line-height:1.25;}
+.fstep.bn .frole{background:var(--redbg);color:var(--red);}
+.roles{display:grid;gap:8px;}
+.roleteam{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin:8px 0 6px;}
+.rolecard{background:#fff;border:1px solid var(--rule);border-radius:7px;padding:8px 10px;border-left:3px solid var(--accent);}
+.rolecard .rn{font-size:13.4px;font-weight:800;color:var(--navy);}
+.rolecard .rd{font-size:11.5px;color:var(--grey);line-height:1.3;margin-top:2px;}
+/* impact / improvement card */
+.impact{background:#fff;border:1px solid var(--rule);border-left:4px solid var(--accent);border-radius:8px;padding:11px 13px;}
+.impact .it{font-size:16px;font-weight:800;color:var(--navy);margin-bottom:3px;}
+.impact .id{font-size:12.8px;color:var(--grey);line-height:1.4;margin-bottom:7px;}
+.impact .imeta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.impact .ba{font-size:11.5px;color:var(--grey);}
+.impact .ba b{color:var(--navy);}
+.impact .arw{color:var(--accent);font-weight:800;}
+/* panels */
+.panel{background:#fff;border:1px solid var(--rule);border-radius:9px;padding:13px 15px;}
+.panel .ph{font-size:16.6px;font-weight:800;color:var(--navy);display:flex;align-items:center;gap:8px;margin-bottom:9px;}
+.panel .sq{width:11px;height:11px;border-radius:2px;background:var(--accent);flex:0 0 auto;}
+.note{background:var(--accsoft);border:1px solid var(--rule);border-radius:8px;padding:11px 14px;font-size:14.1px;color:var(--navy);line-height:1.5;}
+.foot-note{font-size:11.5px;color:var(--lgrey);margin-top:12px;font-style:italic;line-height:1.5;}
+.divider{height:1px;background:var(--rule);margin:10px 0;}
+/* area accents */
+.a-sales{--accent:#0088CE;--accsoft:#E6F2FC;}
+.a-onboarding{--accent:#E8801A;--accsoft:#FDECD8;}
+.a-benefits{--accent:#2A8F60;--accsoft:#E6F4EC;}
+.a-payroll{--accent:#0E8C8C;--accsoft:#E2F4F4;}
+.a-clientsuccess{--accent:#7B4FD6;--accsoft:#F0EBFB;}
+/* slide 13 themes */
+.theme-item{display:flex;gap:11px;align-items:flex-start;background:#fff;border:1px solid var(--rule);border-radius:8px;padding:9px 12px;}
+.theme-item .tnum{width:32px;height:32px;flex:0 0 auto;background:var(--red);color:#fff;border-radius:6px;font-size:19.2px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.theme-item .tt{font-size:16px;font-weight:800;color:var(--red);line-height:1.15;}
+.theme-item .td{font-size:12.8px;color:var(--grey);line-height:1.35;margin-top:2px;}
+.found{background:#fff;border:1px solid var(--rule);border-radius:8px;padding:10px 11px;border-top:3px solid var(--red);}
+.found .fh{font-size:14.1px;font-weight:800;color:var(--red);margin-bottom:4px;}
+.found .fd{font-size:12.2px;color:var(--grey);line-height:1.35;}
+/* slide 14 compass OS */
+.os{border:1.5px solid var(--navy);border-radius:11px;overflow:hidden;background:#fff;}
+.os-top{background:var(--red);color:#fff;padding:8px 15px;display:flex;align-items:center;justify-content:space-between;}
+.os-top .ot{display:flex;align-items:center;gap:9px;font-size:16.6px;font-weight:800;}
+.os-top .m{width:20px;height:20px;border-radius:5px;background:#fff;color:var(--red);display:inline-flex;align-items:center;justify-content:center;font-size:15.4px;font-weight:800;}
+.os-top .osub{font-size:11.5px;color:rgba(255,255,255,.85);text-transform:uppercase;letter-spacing:1px;font-weight:600;}
+.uni{margin:11px 14px 0;background:var(--redbg);border:1px dashed #e6b8c2;border-radius:7px;padding:6px 12px;text-align:center;font-size:12.8px;font-weight:800;color:var(--navy);}
+.uni span{color:var(--red);}
+.pillars{display:grid;grid-template-columns:1fr;gap:9px;padding:10px 14px 4px;}
+.pillar{border-radius:9px;padding:11px 13px;border:1px solid var(--rule);}
+.pillar .ph2{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.pillar .pn2{font-size:16.6px;font-weight:800;color:var(--navy);}
+.sflow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.sflow .sn{background:#fff;border:1px solid var(--rule);border-radius:6px;padding:6px 10px;font-size:12.8px;font-weight:700;color:var(--navy);}
+.sflow .sa{color:var(--accent);font-weight:800;}
+.fgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.fnc{border-radius:7px;padding:9px 10px;color:#fff;}
+.fnc .fn2{font-size:14.7px;font-weight:800;}
+.fnc .fd2{font-size:11.5px;opacity:.92;line-height:1.3;margin-top:2px;}
+.fnc .fm2{font-size:10.2px;opacity:.85;margin-top:4px;font-weight:700;}
+.foundbar{margin:8px 14px 13px;border-radius:9px;background:linear-gradient(135deg,#1e3242,#33536c);color:#fff;padding:11px 14px;}
+.foundbar .fbh{font-size:14.1px;font-weight:800;margin-bottom:8px;display:flex;gap:7px;flex-wrap:wrap;align-items:center;}
+.foundbar .fbt{font-size:10.2px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);border-radius:4px;padding:2px 7px;font-weight:700;}
+.fbeng{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;}
+.fbe{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:7px 8px;}
+.fbe .en{font-size:12.2px;font-weight:800;}
+.fbe .ed{font-size:10.2px;color:rgba(255,255,255,.75);line-height:1.25;margin-top:2px;}
+.fbsor{font-size:10.9px;color:rgba(255,255,255,.72);margin-top:8px;border-top:1px solid rgba(255,255,255,.14);padding-top:8px;}
+.fbsor b{color:#fff;}
+/* systems map */
+.sysgroup{background:#fff;border:1px solid var(--rule);border-radius:9px;padding:11px 12px;}
+.sysgroup .sgh{font-size:14.1px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.sysgroup .sgh .sgd{width:9px;height:9px;border-radius:2px;}
+.sysrow{display:flex;justify-content:space-between;gap:8px;font-size:12.2px;padding:4px 0;border-bottom:1px dashed var(--rule);}
+.sysrow:last-child{border-bottom:none;}
+.sysrow .sname{font-weight:800;color:var(--navy);flex:0 0 auto;}
+.sysrow .sdesc{color:var(--grey);text-align:right;line-height:1.3;}
+.core-band{background:linear-gradient(135deg,#23394A,#33536c);border-radius:9px;padding:12px 15px;color:#fff;}
+.core-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:8px;}
+.core-item{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.15);border-radius:7px;padding:8px 10px;}
+.core-item .cn{font-size:14.1px;font-weight:800;}
+.core-item .cd{font-size:10.9px;color:rgba(255,255,255,.8);line-height:1.3;margin-top:2px;}
+/* demos */
+.demo{background:#fff;border:1px solid var(--rule);border-radius:9px;padding:12px 13px;border-left:4px solid var(--accent);}
+.demo .dh{font-size:15.4px;font-weight:800;color:var(--navy);}
+.demo .darea{font-size:10.9px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--accent);margin-bottom:3px;}
+.demo .dd{font-size:12.8px;color:var(--grey);line-height:1.4;margin:5px 0 7px;}
+@media print{.nav,.hdr{position:static;}.slide{position:static;opacity:1;page-break-after:always;}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="brand">
+    <span class="ga"><span class="arc"></span><span class="nm">G&amp;A <span class="r">Partners</span></span></span>
+    <span class="tg">Time to grow.</span>
+  </div>
+  <span class="hdr-badge">Project Briefing · New-Teammate Onboarding · R Systems</span>
+</div>
+
+<div class="stage" id="stage">
+
+  <!-- ============ SLIDE 1 · ABOUT G&A ============ -->
+  <section class="slide active">
+    <div class="wrap">
+      <div class="kicker"><span class="kdot"></span>Project Briefing · Start Here</div>
+      <div class="stitle">Who is G&amp;A Partners — and what are we building for them?</div>
+      <div class="lead">G&amp;A is a leading <b>Professional Employer Organization (PEO)</b>. Under a co-employment model it runs <b>payroll, benefits, HR, workers' comp and risk</b> for its clients' employees. Revenue = <b>worksite-employee count × PEPM fee</b>, plus arbitrage on benefits &amp; workers'-comp programs. AlixPartners engaged us across <b>five business processes</b>; our job is to make those operations AI-native through the G&amp;A Compass platform.</div>
+
+      <div class="statrow g4" style="margin-bottom:12px;">
+        <div class="stat"><div class="v">$26.6M</div><div class="k">2025 Gross Margin closed</div></div>
+        <div class="stat"><div class="v">932</div><div class="k">Deals closed (2025) · ~$28K avg GM</div></div>
+        <div class="stat"><div class="v">~4,000</div><div class="k">Clients · ~100K–130K worksite employees</div></div>
+        <div class="stat"><div class="v">~568</div><div class="k">People in scope · 143 sales + ~425 ops FTEs</div></div>
+      </div>
+
+      <div class="sec-label" style="margin-top:0;">How to read G&amp;A's revenue — gross (systemwide) vs. fee-based (what they earn)</div>
+      <div class="row" style="align-items:stretch;margin-bottom:12px;">
+        <div class="card" style="flex:1;border-top:3px solid var(--navy);">
+          <div class="lbl">Gross / systemwide revenue</div>
+          <div class="big navy" style="margin:5px 0 4px;">~$7.4B</div>
+          <div style="font-size:13px;color:var(--grey);line-height:1.5;">2024, up 20%+ YoY (#4 on Houston's Chron 100). Almost entirely <b style="color:var(--navy);">pass-through</b> — the worksite payroll, payroll taxes &amp; benefit premiums G&amp;A collects and remits on clients' behalf. Large, but <b style="color:var(--navy);">not what G&amp;A actually earns.</b></div>
+        </div>
+        <div class="card" style="flex:1;border-top:3px solid var(--pos);">
+          <div class="lbl">Fee-based (net) revenue — the real P&amp;L</div>
+          <div class="big pos" style="margin:5px 0 4px;">Admin fee + arbitrage</div>
+          <div style="font-size:13px;color:var(--grey);line-height:1.5;">What G&amp;A keeps: the <b style="color:var(--navy);">PEPM administrative fee</b> per worksite employee, plus <b style="color:var(--navy);">margin on the master benefits &amp; workers'-comp programs</b>. A small slice of the gross number — and the P&amp;L our work actually moves.</div>
+        </div>
+      </div>
+      <div class="note" style="margin-bottom:12px;font-size:13px;">The <b>$26.6M → $32.5M</b> above is <b>new-business gross margin</b> closed by Sales in a year — a fee-based production metric, <b>not</b> total company revenue. It is the lever behind Project 35's margin uplift.</div>
+
+      <div class="row" style="align-items:stretch;">
+        <div class="card" style="flex:1.15;">
+          <div class="sec-label" style="margin-top:0;">Three product lines</div>
+          <div class="grid g3">
+            <div><div class="tag t-pos">PEO — core</div><div style="font-size:13.4px;color:var(--grey);margin-top:5px;line-height:1.4;">Full co-employment; client uses G&amp;A master health &amp; WC programs. <b style="color:var(--navy);">Highest PEPM &amp; margin — majority of revenue.</b></div></div>
+            <div><div class="tag t-blue">ASO</div><div style="font-size:13.4px;color:var(--grey);margin-top:5px;line-height:1.4;">Admin services only; client keeps its own insurance. Lower PEPM, more admin overhead.</div></div>
+            <div><div class="tag t-navy">HCM (iSolved)</div><div style="font-size:13.4px;color:var(--grey);margin-top:5px;line-height:1.4;">Standalone payroll/HR software. Separate stack &amp; team — out of scope for us.</div></div>
+          </div>
+          <div class="divider"></div>
+          <div style="font-size:13.4px;color:var(--grey);line-height:1.5;"><b style="color:var(--navy);">Typical client size:</b> Inside Sales handles 1–25 WSEs; Business Advisors handle 20–500+ WSEs. Deals are priced and delivered per worksite employee, per month.</div>
+        </div>
+
+        <div class="card" style="flex:1;background:linear-gradient(160deg,#23394A,#33536c);border:none;color:#fff;">
+          <div style="font-size:11.5px;letter-spacing:2px;text-transform:uppercase;color:#ff9db0;font-weight:800;margin-bottom:8px;">The mandate behind the work</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <div style="text-align:center;background:rgba(255,255,255,.1);border-radius:8px;padding:9px 12px;flex:1;"><div style="font-size:24.3px;font-weight:800;">$26.6M</div><div style="font-size:10.2px;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:.5px;">2025 GM</div></div>
+            <div style="font-size:23px;color:#ff8da3;font-weight:800;">→</div>
+            <div style="text-align:center;background:rgba(198,12,48,.3);border:1px solid rgba(198,12,48,.5);border-radius:8px;padding:9px 12px;flex:1;"><div style="font-size:24.3px;font-weight:800;">$32.5M</div><div style="font-size:10.2px;color:rgba(255,255,255,.8);text-transform:uppercase;letter-spacing:.5px;">2026 goal</div></div>
+          </div>
+          <div style="font-size:13.4px;color:rgba(255,255,255,.88);line-height:1.5;"><b style="color:#fff;">TPG-owned</b> (private equity) — now in <b style="color:#fff;">year 4 of the PE cycle</b>. <b style="color:#fff;">Project 35</b>: reach a 35% operating margin by 2027. AI in operations is a direct lever toward that uplift.</div>
+        </div>
+      </div>
+
+      <div class="sec-label">AlixPartners engaged us across five business processes</div>
+      <div class="grid g5">
+        <div class="chip" style="border-top:3px solid #0088CE;text-align:center;"><b>Sales</b><br><span style="font-weight:500;color:var(--grey);font-size:11.5px;">win the client</span></div>
+        <div class="chip" style="border-top:3px solid #E8801A;text-align:center;"><b>Onboarding Ops</b><br><span style="font-weight:500;color:var(--grey);font-size:11.5px;">implement the client</span></div>
+        <div class="chip" style="border-top:3px solid #2A8F60;text-align:center;"><b>Benefits Ops</b><br><span style="font-weight:500;color:var(--grey);font-size:11.5px;">quote → enroll → admin</span></div>
+        <div class="chip" style="border-top:3px solid #0E8C8C;text-align:center;"><b>Payroll Ops</b><br><span style="font-weight:500;color:var(--grey);font-size:11.5px;">run every payroll</span></div>
+        <div class="chip" style="border-top:3px solid #7B4FD6;text-align:center;"><b>Client Success Ops</b><br><span style="font-weight:500;color:var(--grey);font-size:11.5px;">retain &amp; grow</span></div>
+      </div>
+      <div class="foot-note">Sources: G&amp;A Sales, Benefits, Client Success, Onboarding &amp; Payroll PRDs (2026). PEPM = per-employee-per-month; WSE = worksite employee; GM = gross margin.</div>
+    </div>
+  </section>
+
+<section class="slide">
+    <div class="wrap">
+      <div class="kicker"><span class="kdot"></span>The Existing Landscape</div>
+      <div class="stitle">The systems that run G&amp;A today — <span class="hl">and what each one does</span></div>
+      <div class="lead">G&amp;A runs on <b>30+ systems with near-zero native integration</b>. Four systems of record show up in <b>every</b> process — everything else is process-specific. Learn these four first; they are what Compass connects to.</div>
+
+      <div class="core-band">
+        <div style="font-size:14.1px;font-weight:800;letter-spacing:.5px;">★ The four core systems — present across all processes</div>
+        <div class="core-grid">
+          <div class="core-item"><div class="cn">PrismHR</div><div class="cd">The HRIS &amp; payroll system of record. All plan configs, enrollments, deductions &amp; payroll runs live here. Limited outbound API.</div></div>
+          <div class="core-item"><div class="cn">ClientSpace / Pro</div><div class="cd">PEO-specific CRM &amp; case management (a PrismHR product). Pricing, cases, escalations, onboarding triggers.</div></div>
+          <div class="core-item"><div class="cn">WorkSight</div><div class="cd">Client- &amp; employee-facing portal — an internal wrapper over PrismHR. Enrollment, KB, self-service.</div></div>
+          <div class="core-item"><div class="cn">Salesforce</div><div class="cd">Primary sales CRM — opportunities, pipeline, account management. Feeds ClientSpace at the win.</div></div>
+        </div>
+      </div>
+
+      <div class="grid g5" style="margin-top:12px;">
+        <div class="sysgroup">
+          <div class="sgh" style="color:#0088CE;"><span class="sgd" style="background:#0088CE;"></span>Sales</div>
+          <div class="sysrow"><span class="sname">ZoomInfo</span><span class="sdesc">lead &amp; intent data</span></div>
+          <div class="sysrow"><span class="sname">6sense</span><span class="sdesc">ABM intent scoring</span></div>
+          <div class="sysrow"><span class="sname">Outreach.io</span><span class="sdesc">email sequencing</span></div>
+          <div class="sysrow"><span class="sname">Orum</span><span class="sdesc">parallel auto-dialer</span></div>
+          <div class="sysrow"><span class="sname">PandaDoc</span><span class="sdesc">proposals &amp; CSA</span></div>
+          <div class="sysrow"><span class="sname">DocuSign</span><span class="sdesc">e-signature</span></div>
+          <div class="sysrow"><span class="sname">Terret AI</span><span class="sdesc">meeting intelligence</span></div>
+        </div>
+        <div class="sysgroup">
+          <div class="sgh" style="color:#E8801A;"><span class="sgd" style="background:#E8801A;"></span>Onboarding</div>
+          <div class="sysrow"><span class="sname">GuideCX</span><span class="sdesc">client data collection</span></div>
+          <div class="sysrow"><span class="sname">Click Boarding</span><span class="sdesc">employee onboarding</span></div>
+          <div class="sysrow"><span class="sname">HRWorkCycles</span><span class="sdesc">I-9 verification</span></div>
+          <div class="sysrow"><span class="sname">Informer</span><span class="sdesc">SUTA rate reporting</span></div>
+          <div class="sysrow"><span class="sname">G:Drive</span><span class="sdesc">document storage</span></div>
+          <div class="sysrow"><span class="sname">Excel</span><span class="sdesc">assignment tracking</span></div>
+        </div>
+        <div class="sysgroup">
+          <div class="sgh" style="color:#2A8F60;"><span class="sgd" style="background:#2A8F60;"></span>Benefits</div>
+          <div class="sysrow"><span class="sname">Milliman HERO</span><span class="sdesc">medical underwriting</span></div>
+          <div class="sysrow"><span class="sname">Gradient</span><span class="sdesc">state underwriting</span></div>
+          <div class="sysrow"><span class="sname">WEX</span><span class="sdesc">COBRA / FSA / HSA</span></div>
+          <div class="sysrow"><span class="sname">Beacon</span><span class="sdesc">recon (partial)</span></div>
+          <div class="sysrow"><span class="sname">NextGen</span><span class="sdesc">enrollment portal</span></div>
+          <div class="sysrow"><span class="sname">Carrier EDI</span><span class="sdesc">master-plan feeds</span></div>
+        </div>
+        <div class="sysgroup">
+          <div class="sgh" style="color:#0E8C8C;"><span class="sgd" style="background:#0E8C8C;"></span>Payroll</div>
+          <div class="sysrow"><span class="sname">Treasury</span><span class="sdesc">reverse-wire (email)</span></div>
+          <div class="sysrow"><span class="sname">AccessHR</span><span class="sdesc">client inquiry cases</span></div>
+          <div class="sysrow"><span class="sname">UPS / FedEx</span><span class="sdesc">live-check shipping</span></div>
+          <div class="sysrow"><span class="sname">SaaS HR feeds</span><span class="sdesc">ADP · Paylocity time</span></div>
+          <div class="sysrow"><span class="sname">Outlook / Teams</span><span class="sdesc">coordination</span></div>
+        </div>
+        <div class="sysgroup">
+          <div class="sgh" style="color:#7B4FD6;"><span class="sgd" style="background:#7B4FD6;"></span>Client Success</div>
+          <div class="sysrow"><span class="sname">Qualtrics</span><span class="sdesc">NPS surveys</span></div>
+          <div class="sysrow"><span class="sname">TalkDesk</span><span class="sdesc">inbound telephony</span></div>
+          <div class="sysrow"><span class="sname">PRISM · TLM</span><span class="sdesc">service &amp; time data</span></div>
+          <div class="sysrow"><span class="sname">Cornerstone</span><span class="sdesc">learning data</span></div>
+          <div class="sysrow"><span class="sname">Power BI</span><span class="sdesc">NPS reporting</span></div>
+        </div>
+      </div>
+      <div class="note" style="margin-top:12px;"><b>Cross-cutting AI vendor:</b> <b style="color:var(--red);">Ciklum</b> — the existing automation partner targeted for AI service-triage in both Client Success and Payroll. <b style="color:var(--navy);">Terret AI</b> (sales meeting intelligence) and <b style="color:var(--navy);">Outlook/Teams</b> also recur across areas.</div>
+    </div>
+  </section>
+
+<section class="slide a-sales"><div class="wrap">
+  <div class="kicker"><span class="kdot"></span>Sales · Current Process</div>
+  <div class="stitle">How a deal moves today — <span class="hl">six phases, mostly by hand</span></div>
+  <div class="lead">Business Advisors own the full cycle; SDRs feed them meetings and RSAs do the admin. Here is who does what at each phase — and where the time goes.</div>
+
+  <div class="statrow g4">
+    <div class="stat"><div class="sv">$26.6M</div><div class="sl">2025 GM closed</div></div>
+    <div class="stat"><div class="sv">932</div><div class="sl">deals closed (2025)</div></div>
+    <div class="stat"><div class="sv">143</div><div class="sl">sales professionals</div></div>
+    <div class="stat"><div class="sv">200 pts/wk</div><div class="sl">KPI activity minimum</div></div>
+  </div>
+
+  <div class="flowrow">
+    <div class="fstep">
+      <div class="fn">1 · PROSPECTING</div>
+      <div class="frole">SDR · ISR</div>
+      <div class="ft">Prospecting</div>
+      <div class="fmeta">Salesforce · ZoomInfo · Outreach · Orum</div>
+      <div class="fpain">⚠ SDRs 24 hrs/wk auditing accounts; ~80% mass-loaded contacts invalid; bulk-send hurts deliverability</div>
+    </div>
+    <div class="fchev">→</div>
+    <div class="fstep">
+      <div class="fn">2 · QUALIFICATION</div>
+      <div class="frole">BA</div>
+      <div class="ft">Qualification</div>
+      <div class="fmeta">Terret AI · Salesforce → ClientSpace</div>
+      <div class="fpain">⚠ Manual data-request emails; CRM logging &lt;50% for high-volume BAs</div>
+    </div>
+    <div class="fchev">→</div>
+    <div class="fstep">
+      <div class="fn">3 · PRICING</div>
+      <div class="frole">RSA + BA</div>
+      <div class="ft">Pricing</div>
+      <div class="fmeta">ClientSpace · Milliman HERO</div>
+      <div class="fpain">⚠ Census cleaning 1–2 hrs; ClientSpace entry ~25 min/deal; approval chain opaque</div>
+    </div>
+    <div class="fchev">→</div>
+    <div class="fstep bn">
+      <div class="fn">4 · RESEARCH &amp; PROPOSAL</div>
+      <div class="frole">BA (+ RSA)</div>
+      <div class="ft">Research &amp; Proposal</div>
+      <div class="fmeta">PandaDoc · ad-hoc AI</div>
+      <div class="fpain">⚠ Avg BA 2–2.5 hrs/proposal; RSA comparison table wrong ~70%</div>
+    </div>
+    <div class="fchev">→</div>
+    <div class="fstep">
+      <div class="fn">5 · DEMO &amp; CLOSING</div>
+      <div class="frole">BA</div>
+      <div class="ft">Demo &amp; Closing</div>
+      <div class="fmeta">PandaDoc · DocuSign</div>
+      <div class="fpain">⚠ Manual scheduling adds 2–3 days; Q&amp;A from memory</div>
+    </div>
+    <div class="fchev">→</div>
+    <div class="fstep">
+      <div class="fn">6 · HANDOFF</div>
+      <div class="frole">BA</div>
+      <div class="ft">Handoff</div>
+      <div class="fmeta">ClientSpace · PrismHR</div>
+      <div class="fpain">⚠ Manual email to onboarding; 1–3 day delay; zero automation</div>
+    </div>
+  </div>
+
+  <div class="sec-label">Who's involved — roles &amp; who owns each step</div>
+  <div class="roles g5">
+    <div class="rolecard"><div class="rn">BA — Business Advisor</div><div class="rd">Owns the full sales cycle for 20–500+ WSE accounts (high- &amp; low-volume).</div></div>
+    <div class="rolecard"><div class="rn">ISR — Inside Sales Rep</div><div class="rd">Owns the full cycle for small 1–25 WSE accounts.</div></div>
+    <div class="rolecard"><div class="rn">SDR — Sales Development Rep</div><div class="rd">Books initial meetings via cold calls &amp; sequences; no closing quota.</div></div>
+    <div class="rolecard"><div class="rn">RSA — Regional Sales Admin</div><div class="rd">Document routing, CRM data entry &amp; census cleaning support.</div></div>
+    <div class="rolecard"><div class="rn">RSD / VP / CRO — Leadership</div><div class="rd">Territory coverage, pricing approvals &amp; deal oversight.</div></div>
+  </div>
+
+  <div class="note">Business Advisors split into high-volume BAs (broker/referral-fed) and low-volume BAs (prospecting-heavy) — the same title, but very different day-to-day workloads.</div>
+</div></section>
+
+<section class="slide a-sales">
+  <div class="wrap">
+    <div class="kicker"><span class="kdot"></span>Sales · Improvement Areas</div>
+    <div class="stitle">Broad automation targets — <span class="hl">better leads in, admin out</span></div>
+    <div class="lead">Six automation targets remove the manual data prep and proposal assembly that consume rep hours — <b>two are the requested demo priorities</b> (Prospecting and Research &amp; Proposal).</div>
+
+    <div class="grid g2">
+      <div class="impact">
+        <div class="it">AI account scrubbing &amp; auto-sequencing</div>
+        <div class="id">Agent validates every account (ZoomInfo + LinkedIn), finds the right contacts, and auto-sequences personalized emails from the G&amp;A domain — no rep effort.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> 24 hrs/wk SDR data prep</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> near-zero, 35+ hrs/wk calling</span> <span class="tag t-red">Demo Priority</span></div>
+      </div>
+
+      <div class="impact">
+        <div class="it">Intent-driven call prioritization + Voice AI outbound</div>
+        <div class="id">Rank the daily queue by intent score, renewal proximity, and competitor flag; a voice agent can dial on the rep's behalf and surface only live conversations.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> manual queue sort</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> daily ranked queue + live-conversation handoff</span> <span class="tag t-blue">Prospecting</span></div>
+      </div>
+
+      <div class="impact">
+        <div class="it">Self-service data-request portal</div>
+        <div class="id">Prospects upload census, WC dec pages, and invoices directly; AI scans for completeness and auto-sends reminders until the full package arrives.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> manual chase, 3–7 day doc delay</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> completeness tracking + auto follow-ups</span> <span class="tag t-teal">Qualification</span></div>
+      </div>
+
+      <div class="impact">
+        <div class="it">CRM auto-logging from Terret AI</div>
+        <div class="id">Meeting transcript auto-populates the Salesforce opportunity and ClientSpace with notes, next steps, and next best action — the rep only confirms.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> 15–20 min/call manual notes</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> transcript auto-populates CRM; rep confirms</span> <span class="tag t-purple">Qualification</span></div>
+      </div>
+
+      <div class="impact">
+        <div class="it">Census cleaning + ClientSpace/HERO pre-fill</div>
+        <div class="id">AI extracts and normalizes census from any format, pre-fills the underwriting platform and ClientSpace pricing fields — the BA approves before submission.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> 1–2 hrs clean + 25 min entry</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> 5-min review each</span> <span class="tag t-amber">Pricing</span></div>
+      </div>
+
+      <div class="impact">
+        <div class="it">Proposal Builder (research + competitor cost comparison)</div>
+        <div class="id">AI assembles the full proposal from call summary, rates, and competitor invoice into a populated PandaDoc template with a clear talk track.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> 2–2.5 hrs/proposal</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> proposal-ready in &lt;30 min</span> <span class="tag t-red">Demo Priority</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide a-onboarding"><div class="wrap">
+  <div class="kicker"><span class="kdot"></span>Onboarding · Current Process</div>
+  <div class="stitle">CSA sign to first payroll — <span class="hl">40–60 days, and who runs each phase</span></div>
+  <div class="lead">Two roles carry onboarding: the Project Manager (client-facing) and the Payroll Analyst (payroll build), with their Managers reviewing the CSA and Sales handing off. Here's who owns each phase.</div>
+
+  <div class="statrow g4">
+    <div class="stat"><div class="sv">704</div><div class="sl">clients onboarded (2025)</div></div>
+    <div class="stat"><div class="sv">35</div><div class="sl">onboarding FTEs</div></div>
+    <div class="stat"><div class="sv">~$4.5M</div><div class="sl">fully-loaded cost</div></div>
+    <div class="stat"><div class="sv">40–60 days</div><div class="sl">avg cycle (norm ~3 wks)</div></div>
+  </div>
+
+  <div class="flowrow">
+    <div class="fstep">
+      <div class="fn">1 · DEAL INITIATION</div>
+      <div class="frole">PM &amp; PA Managers</div>
+      <div class="ft">Deal Initiation</div>
+      <div class="fmeta">ClientSpace · Excel</div>
+      <div class="fpain">⚠ CSA reviewed 4× independently; PM/PA assigned via Excel pivots, uneven load</div>
+    </div>
+    <div class="fchev">→</div>
+    <div class="fstep">
+      <div class="fn">2 · SALES HANDOFF</div>
+      <div class="frole">OBPM (+ BA)</div>
+      <div class="ft">Sales Handoff</div>
+      <div class="fmeta">ClientSpace · Teams</div>
+      <div class="fpain">⚠ BA availability stretches this to 4–7 days; placeholder data surfaces late</div>
+    </div>
+    <div class="fchev">→</div>
+    <div class="fstep bn">
+      <div class="fn">3 · KICKOFF &amp; DATA COLLECTION</div>
+      <div class="frole">OBPM</div>
+      <div class="ft">Kickoff &amp; Data Collection</div>
+      <div class="fmeta">GuideCX · G:Drive</div>
+      <div class="fpain">⚠ PRIMARY BOTTLENECK: 10–20 day wait, no enforced SLA, manual doc routing</div>
+    </div>
+    <div class="fchev">→</div>
+    <div class="fstep">
+      <div class="fn">4 · SYSTEM CONFIGURATION</div>
+      <div class="frole">OBPM → OBPA</div>
+      <div class="ft">System Configuration</div>
+      <div class="fmeta">PrismHR · WorkSight</div>
+      <div class="fpain">⚠ Serial PM→PA dependency; SUTA exec approval adds 3–5 days</div>
+    </div>
+    <div class="fchev">→</div>
+    <div class="fstep">
+      <div class="fn">5 · TESTING &amp; TRAINING</div>
+      <div class="frole">OBPA</div>
+      <div class="ft">Testing &amp; Training</div>
+      <div class="fmeta">PrismHR · HRWorkCycles</div>
+      <div class="fpain">⚠ Mock-payroll WC/SUTA errors "consistent"; I-9 errors; WorkSight access = 3-day case</div>
+    </div>
+    <div class="fchev">→</div>
+    <div class="fstep">
+      <div class="fn">6 · FIRST PAYROLL</div>
+      <div class="frole">OBPA + OBPM</div>
+      <div class="ft">First Payroll</div>
+      <div class="fmeta">PrismHR · ClientSpace</div>
+      <div class="fpain">⚠ Mock errors resurface live; status triple-entered across 3 systems</div>
+    </div>
+  </div>
+
+  <div class="sec-label">Who's involved — roles &amp; who owns each step</div>
+  <div class="roles g5">
+    <div class="rolecard"><div class="rn">OBPM — Onboarding Project Manager</div><div class="rd">Client-facing lead from handoff to transition; builds the PrismHR shell &amp; WorkSight.</div></div>
+    <div class="rolecard"><div class="rn">OBPA — Onboarding Payroll Analyst</div><div class="rd">Configures billing/SUTA/pay groups; runs mock &amp; first payroll; trains the client admin.</div></div>
+    <div class="rolecard"><div class="rn">PM / PA Managers</div><div class="rd">Supervise the teams; both independently review the CSA at deal initiation.</div></div>
+    <div class="rolecard"><div class="rn">BA — Business Advisor (Sales)</div><div class="rd">Closes the deal and runs the sales-to-onboarding handoff.</div></div>
+    <div class="rolecard"><div class="rn">PS — Payroll Specialist</div><div class="rd">Receives the client after the first payrolls (downstream owner).</div></div>
+  </div>
+
+  <div class="note">At 704 clients/yr with 8–12 docs each, that's 5,600–8,400 manual document-routing actions per year.</div>
+</div></section>
+
+<section class="slide a-onboarding">
+  <div class="wrap">
+    <div class="kicker"><span class="kdot"></span>Onboarding · Improvement Areas</div>
+    <div class="stitle">Compress the cycle &amp; kill the coordination tax — <span class="hl">target 10–14 days faster</span></div>
+    <div class="lead"><b>Most compression is achievable without fundamental process redesign — a mix of automated SLAs, document AI, and integration removes the coordination tax that dominates PM and PA time.</b></div>
+
+    <div class="grid g2">
+      <div class="impact">
+        <div class="it">AI CSA Extraction &amp; Cross-Validation</div>
+        <div class="id">Document AI extracts structured fields from the CSA PDF on upload — fee structure, services, SUTA coverage, billing exceptions — and auto-flags discrepancies against ClientSpace handoff data.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> CSA reviewed 4× by hand</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> 1 validation; auto-flag discrepancies to Sales</span> <span class="tag t-red">PRD Priority</span></div>
+      </div>
+      <div class="impact">
+        <div class="it">Mock-Payroll Pre-Flight Validation</div>
+        <div class="id">Pre-flight engine checks PrismHR config completeness — WC codes, SUTA rates, billing rules, pay-group alignment — before initialization.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> iterative calculate-fail-fix loop</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> pass/fail report with remediation before mock</span> <span class="tag t-red">PRD Priority</span></div>
+      </div>
+      <div class="impact">
+        <div class="it">Automated Data-Collection SLAs &amp; Escalation</div>
+        <div class="id">Hard data deadlines with automated escalating reminders replace the open-ended, unenforced wait that is the single most variable phase in the cycle.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> 10–20 day open-ended wait</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> day-5/10/15 auto-escalation</span> <span class="tag t-amber">Automation</span></div>
+      </div>
+      <div class="impact">
+        <div class="it">Automated PM Workflows</div>
+        <div class="id">Auto-sync case status across ClientSpace, PrismHR, and the Master Client List on phase events; auto-generate task notes and departmental follow-ups.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> status triple-entered across ClientSpace/Prism/Excel</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> auto-sync on phase events</span> <span class="tag t-blue">Automation</span></div>
+      </div>
+      <div class="impact">
+        <div class="it">AI Client Communication &amp; Status Compilation</div>
+        <div class="id">AI drafts responses to common inquiries, auto-routes non-payroll questions to the right department, and compiles weekly status from live system data.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> manual replies + weekly status by hand</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> AI drafts, auto-routes, compiles from live data</span> <span class="tag t-teal">AI</span></div>
+      </div>
+      <div class="impact">
+        <div class="it">ClientSpace–WorkSight Integration + GuideCX Migration</div>
+        <div class="id">Webhook-based document routing and role-based auto-provisioning replace the manual GuideCX cycle and the 3-day WorkSight access case.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> manual download→G:Drive→ClientSpace; 3-day access case</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> webhook routing + role-based auto-provisioning</span> <span class="tag t-purple">Integration</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide a-benefits">
+  <div class="wrap">
+    <div class="kicker"><span class="kdot"></span>Benefits · Current Process</div>
+    <div class="stitle">Quote to ongoing admin — <span class="hl">GAB hands off to Ben Admin at the CAP</span></div>
+    <div class="lead">GAB (pre-implementation) quotes, underwrites and builds the CAP; Ben Admin (ongoing) sets up the client in Prism and runs servicing, reconciliation &amp; compliance. Here's who owns each phase.</div>
+
+    <div class="statrow g4">
+      <div class="stat"><div class="statn">189</div><div class="statl">Benefits FTEs (GAB + Ben Admin)</div></div>
+      <div class="stat"><div class="statn">~$17.6M</div><div class="statl">fully-loaded cost</div></div>
+      <div class="stat"><div class="statn">10,426</div><div class="statl">annual quotes</div></div>
+      <div class="stat"><div class="statn">~130K</div><div class="statl">worksite employees</div></div>
+    </div>
+
+    <div class="flowrow">
+      <div class="fstep">
+        <div class="fn">1 · REQUIREMENTS &amp; QUOTE</div>
+        <div class="frole">GAB · AM/AE</div>
+        <div class="ft">Requirements &amp; Quote</div>
+        <div class="fmeta">Salesforce</div>
+        <div class="fpain">⚠ 80–90% of underwriting submissions arrive incomplete; back-and-forth ≈ 20% of UW capacity</div>
+      </div>
+      <div class="fchev">→</div>
+      <div class="fstep">
+        <div class="fn">2 · UNDERWRITING</div>
+        <div class="frole">GAB · Underwriter</div>
+        <div class="ft">Underwriting</div>
+        <div class="fmeta">Milliman HERO · Gradient</div>
+        <div class="fpain">⚠ 20–30 min doc scrub per case; 70% of deals need 2–3 concession rounds</div>
+      </div>
+      <div class="fchev">→</div>
+      <div class="fstep bn">
+        <div class="fn">3 · CAP BUILD-OUT</div>
+        <div class="frole">GAB · AM/AE + Coordinator</div>
+        <div class="ft">CAP Build-out</div>
+        <div class="fmeta">Excel</div>
+        <div class="fpain">⚠ 2–4 hrs/client by hand; referenced in 8+ processes; #1 cause of Ben Admin setup blocking</div>
+      </div>
+      <div class="fchev">→</div>
+      <div class="fstep">
+        <div class="fn">4 · ONBOARDING &amp; ENROLLMENT</div>
+        <div class="frole">GAB · Coordinator</div>
+        <div class="ft">Onboarding &amp; Enrollment</div>
+        <div class="fmeta">DocuSign · NextGen/WorkSight</div>
+        <div class="fpain">⚠ AOR carrier setup 30–45 days; booklet built by hand from the CAP</div>
+      </div>
+      <div class="fchev">→</div>
+      <div class="fstep">
+        <div class="fn">5 · BEN ADMIN SYSTEM SETUP</div>
+        <div class="frole">Ben Admin · Analyst</div>
+        <div class="ft">Ben Admin System Setup</div>
+        <div class="fmeta">PrismHR</div>
+        <div class="fpain">⚠ 48% of analyst time; open-market carrier enrollment 13–17 min each (no EDI); coverage-gap (SOX) risk</div>
+      </div>
+      <div class="fchev">→</div>
+      <div class="fstep">
+        <div class="fn">6 · SERVICING · RECON · COMPLIANCE</div>
+        <div class="frole">Ben Admin · Specialist / Recon / QC</div>
+        <div class="ft">Servicing · Recon · Compliance</div>
+        <div class="fmeta">WEX · Beacon</div>
+        <div class="fpain">⚠ Beacon partial → Excel fallback; ACA ~800 clients Jan–Mar; COBRA one-at-a-time in WEX</div>
+      </div>
+    </div>
+
+    <div class="sec-label">Who's involved — the two teams &amp; who owns each step</div>
+
+    <div class="roleteam">GAB · Pre-implementation brokerage</div>
+    <div class="roles g3">
+      <div class="rolecard"><div class="rn">AM / AE</div><div class="rd">Account Manager/Executive: owns the client relationship, the CAP build &amp; annual renewals.</div></div>
+      <div class="rolecard"><div class="rn">Benefits Coordinator</div><div class="rd">CAP batch review, benefits-booklet prep &amp; enrollment-portal build.</div></div>
+      <div class="rolecard"><div class="rn">Benefits Underwriter</div><div class="rd">Risk scoring (Hero/Gradient), financial comparison &amp; proposal release.</div></div>
+    </div>
+
+    <div class="roleteam">Ben Admin · Ongoing operations</div>
+    <div class="roles g4">
+      <div class="rolecard"><div class="rn">Benefits Specialist</div><div class="rd">Carrier enrollment, monthly deduction audits &amp; WSE/client issue resolution.</div></div>
+      <div class="rolecard"><div class="rn">Benefits Analyst</div><div class="rd">New-client system setup &amp; configuration in Prism (downstream of the CAP).</div></div>
+      <div class="rolecard"><div class="rn">Recon Specialist</div><div class="rd">Monthly payroll-to-carrier-invoice reconciliation &amp; payments.</div></div>
+      <div class="rolecard"><div class="rn">QC / EDI / Compliance Admin</div><div class="rd">EDI feeds, ACA filings &amp; COBRA administration.</div></div>
+    </div>
+
+    <div class="note">CAP accuracy is the #1 cross-boundary pain — GAB errors cascade directly into Ben Admin setup blocking.</div>
+  </div>
+</section>
+
+<section class="slide a-benefits">
+  <div class="wrap">
+    <div class="kicker"><span class="kdot"></span>Benefits · Improvement Areas</div>
+    <div class="stitle">Fix the CAP first — <span class="hl">then everything downstream</span></div>
+    <div class="lead"><b>The CAP document sits upstream of 8+ processes across both teams. Migrating it off Excel and into a Prism-integrated cloud tool is the PRD's #1 priority — the remaining initiatives clear the manual bottlenecks that CAP quality can't fix on its own.</b></div>
+
+    <div class="grid g2">
+      <div class="impact">
+        <div class="it">CAP Migration to cloud + Prism</div>
+        <div class="id">Replace the manual Excel CAP with a cloud-hosted, Prism-integrated solution that auto-generates and validates against source data; renewals auto-populate from prior-year Prism configurations.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> 2–4 hr Excel build, renewals rebuilt</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> auto-generate + validate vs Prism; renewal auto-populate</span> <span class="tag t-red">PRD Priority</span></div>
+      </div>
+      <div class="impact">
+        <div class="it">AI Underwriting Assistant</div>
+        <div class="id">AI extraction layer scrubs PDFs, SBCs, and invoices to pre-populate comparison fields; a completeness check gates incomplete submissions before they enter the queue.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> 20–30 min PDF/SBC/invoice scrub</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> auto-extract + completeness gating; review-and-confirm</span> <span class="tag t-acc">GAB</span></div>
+      </div>
+      <div class="impact">
+        <div class="it">Carrier Portal API/RPA (open-market)</div>
+        <div class="id">API or RPA reads Prism enrollment data and executes field-by-field carrier portal entry for non-EDI plans; the specialist retains the audit review step.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> 13–17 min manual enrollment each</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> RPA entry + retained audit review</span> <span class="tag t-blue">Ben Admin</span></div>
+      </div>
+      <div class="impact">
+        <div class="it">Payroll-deduction audit automation</div>
+        <div class="id">Auto-pull the deduction register, CAP rates, and prior-period data into a single consolidated variance report; specialists review exception-flagged variances only.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> 4+ Prism reports combined in Excel, 20–60 min/client</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> consolidated variance report</span> <span class="tag t-purple">Sidekick</span></div>
+      </div>
+      <div class="impact">
+        <div class="it">Reconciliation tool (Beacon) rollout</div>
+        <div class="id">Complete Beacon UAT and stabilize production for employee-level payroll-to-invoice comparison, eliminating the monthly Excel fallback across all carrier payment methods.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> Excel fallback, 8 pay methods</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> employee-level auto-compare, exception-only</span> <span class="tag t-teal">Beacon</span></div>
+      </div>
+      <div class="impact">
+        <div class="it">Ciklum service automation</div>
+        <div class="id">Automated case creation, self-service deflection for ID cards and FAQs, and AI after-call summaries redirect specialist capacity from low-complexity intake to complex cases.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> every WSE inquiry to a specialist</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> self-service deflection + AI after-call summaries</span> <span class="tag t-amber">Ciklum</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide a-payroll">
+  <div class="wrap">
+    <div class="kicker"><span class="kdot"></span>Payroll · Current Process</div>
+    <div class="stitle">Every payroll, end-to-end — <span class="hl">who runs it, and why only 3 steps are automated</span></div>
+    <div class="lead">Payroll Specialists own the full lifecycle; Payroll Assistants own shipping; Management handles assignment &amp; SOX; Treasury (cross-functional) releases funds. PrismHR automates only calc + ACH post + ACH debit — the rest is manual.</div>
+
+    <div class="statrow g4">
+      <div class="stat"><div class="sv">~4,000</div><div class="sl">clients served</div></div>
+      <div class="stat"><div class="sv">~100K</div><div class="sl">worksite employees</div></div>
+      <div class="stat"><div class="sv">118</div><div class="sl">payroll FTEs</div></div>
+      <div class="stat"><div class="sv">30–35%</div><div class="sl">payrolls miss the 2–3 day posting target</div></div>
+    </div>
+
+    <div class="flowrow">
+      <div class="fstep">
+        <div class="fn">a · Time-File Intake</div>
+        <div class="frole">Specialist</div>
+        <div class="ft">Ingest &amp; normalize time files</div>
+        <div class="fmeta">SaaS HR feeds · Excel</div>
+        <div class="fpain">⚠ 20–30% of files incompatible; IT macros break on any column change; 5–30+ min manual fix</div>
+      </div>
+      <div class="fchev">→</div>
+      <div class="fstep">
+        <div class="fn">b · Calc &amp; Invoice Recon</div>
+        <div class="frole">Specialist</div>
+        <div class="ft">Run calc &amp; reconcile invoice</div>
+        <div class="fmeta">PrismHR</div>
+        <div class="fpain">⚠ Investigate every line &gt;20% variance; Benefits/Tax setup errors halt the run</div>
+      </div>
+      <div class="fchev">→</div>
+      <div class="fstep bn">
+        <div class="fn">c · Treasury Reverse Wire</div>
+        <div class="frole">Specialist ↔ Treasury</div>
+        <div class="ft">Request &amp; confirm fund release</div>
+        <div class="fmeta">Treasury (email/Teams)</div>
+        <div class="fpain">⚠ 2–7 hr manual email cycle; primary reason 30–35% of payrolls miss posting</div>
+      </div>
+      <div class="fchev">→</div>
+      <div class="fstep">
+        <div class="fn">d · Payroll Posting</div>
+        <div class="frole">Specialist</div>
+        <div class="ft">Post the payroll</div>
+        <div class="fmeta">PrismHR</div>
+        <div class="fpain">⚠ Gated on Treasury release; idle wait + context-switching across active payrolls</div>
+      </div>
+      <div class="fchev">→</div>
+      <div class="fstep">
+        <div class="fn">e · Shipping</div>
+        <div class="frole">Payroll Assistant</div>
+        <div class="ft">Print, pack &amp; ship checks</div>
+        <div class="fmeta">ClientSpacePRO · UPS/FedEx</div>
+        <div class="fpain">⚠ No carrier API; up to 20+ locations/client; 3 regional queues; 100% of assistant capacity</div>
+      </div>
+      <div class="fchev">→</div>
+      <div class="fstep">
+        <div class="fn">f · CS &amp; Off-Cycle</div>
+        <div class="frole">Specialist</div>
+        <div class="ft">Client service &amp; off-cycle runs</div>
+        <div class="fmeta">WorkSight · AccessHR</div>
+        <div class="fpain">⚠ No pre-pulled context; off-cycle config = the "biggest pain point"</div>
+      </div>
+    </div>
+
+    <div class="sec-label">Who's involved — roles &amp; who owns each step</div>
+
+    <div class="roles g4">
+      <div class="rolecard">
+        <div class="rn">Payroll Specialist</div>
+        <div class="rd">Owns the full payroll lifecycle for assigned clients — 16 of 27 process steps (intake, calc, recon, Treasury, off-cycle, service).</div>
+      </div>
+      <div class="rolecard">
+        <div class="rn">Payroll Assistant</div>
+        <div class="rd">100% dedicated to shipping — print/sort/pack, carrier labels &amp; the SOX dual-person audit.</div>
+      </div>
+      <div class="rolecard">
+        <div class="rn">Payroll Management</div>
+        <div class="rd">Specialist assignment (capacity/time-zone/complexity), SOX oversight, reversal authorization &amp; escalation.</div>
+      </div>
+      <div class="rolecard">
+        <div class="rn">Treasury (cross-functional)</div>
+        <div class="rd">Processes reverse-wire fund release for non-ACH payroll — a dependency, not a payroll role.</div>
+      </div>
+    </div>
+
+    <div class="note">Six SOX controls govern posting &amp; check handling — any automation must preserve them; they stay human.</div>
+  </div>
+</section>
+
+<section class="slide a-payroll">
+  <div class="wrap">
+    <div class="kicker"><span class="kdot"></span>Payroll · Improvement Areas</div>
+    <div class="stitle">Remove the typing &amp; chasing — <span class="hl">SOX &amp; judgment stay human</span></div>
+    <div class="lead"><b>Automation targets the manual coordination, typing, and portal work that sits around Prism</b> — not the controls or the judgment calls. SOX sign-off, dual-person audit, and exception handling remain with specialists.</div>
+
+    <div class="grid g2">
+      <div class="impact">
+        <div class="it">Treasury Reverse-Wire Automation</div>
+        <div class="id">Prism invoice finalization triggers a structured reverse-wire request and bank-API wire, with real-time status sync to ClientSpace and payroll auto-release on wire receipt.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> 2–7 hr manual email per wire</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> Prism event → bank-API wire → auto-release; SOX sign-off retained</span> <span class="tag t-red">Bottleneck</span></div>
+      </div>
+
+      <div class="impact">
+        <div class="it">Time-File Import Standardization</div>
+        <div class="id">Adaptive parser normalizes any client spreadsheet to Prism-compatible structure and learns each client's schema, replacing brittle IT-built macros.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> brittle IT macros, mid-import failures</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> adaptive schema mapping + pre-import validation</span> <span class="tag t-blue">AI</span></div>
+      </div>
+
+      <div class="impact">
+        <div class="it">Shipping Case Creation &amp; Attachment</div>
+        <div class="id">Prism posting event auto-creates the ClientSpacePRO shipping case with pre-attached check file and batch print report, and auto-populates PSR fields.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> 8-step manual case per live-check payroll</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> Prism posting auto-creates case + PSR fields</span> <span class="tag t-acc">Q1</span></div>
+      </div>
+
+      <div class="impact">
+        <div class="it">Automated Label Generation, Tracking &amp; Alerts</div>
+        <div class="id">Carrier-API integration generates labels from case data, retrieves tracking numbers automatically, and pushes proactive delay alerts to assigned specialists.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> manual carrier portals, next-morning delay discovery</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> carrier-API labels + tracking + proactive alerts</span> <span class="tag t-acc">Q1</span></div>
+      </div>
+
+      <div class="impact">
+        <div class="it">CS Triage &amp; Research Assistant (Ciklum)</div>
+        <div class="id">AI intake classifies inquiries, pre-pulls WorkSight &amp; Prism data before the case opens, and drafts responses for routine request types.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> every inquiry researched from scratch across systems</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> classify + pre-pull data + draft routine replies</span> <span class="tag t-navy">Outside PRD scope</span></div>
+      </div>
+    </div>
+
+    <div class="note">Recommended sequencing — Shipping (C+D) in Q1, Treasury (A) in Q2, Time-File (B) in Q3–Q4.</div>
+  </div>
+</section>
+
+<section class="slide a-clientsuccess">
+  <div class="wrap">
+    <div class="kicker"><span class="kdot"></span>Client Success · Current Process</div>
+    <div class="stitle">Post-sale relationship management — <span class="hl">two tiers, and who owns each step</span></div>
+    <div class="lead">Platinum/Gold accounts get a dedicated CSM (~50 accts/FTE); Silver/Bronze are served by pooled Client Advocates (~200 accts/FTE); inbound calls split across an Inbound CSM team and HR Support Specialists. Here's who owns each phase.</div>
+
+    <div class="statrow g4">
+      <div class="stat"><div class="statn">4,900</div><div class="statl">accounts managed</div></div>
+      <div class="stat"><div class="statn">83</div><div class="statl">Client Success FTEs</div></div>
+      <div class="stat"><div class="statn">~$8.4M</div><div class="statl">fully-loaded cost</div></div>
+      <div class="stat"><div class="statn">$18.2M</div><div class="statl">controllable churn lost (2025)</div></div>
+    </div>
+
+    <div class="flowrow">
+      <div class="fstep">
+        <div class="fn">1 · Onboarding &amp; Assignment</div>
+        <div class="frole">CSM · Advocate</div>
+        <div class="ft">Account assigned to tier &amp; owner</div>
+        <div class="fmeta">ClientSpace · Excel macro</div>
+        <div class="fpain">⚠ Manual client scoring (macro may be blocked); contact lists copy-pasted ClientSpace → Outlook</div>
+      </div>
+      <div class="fchev">→</div>
+      <div class="fstep">
+        <div class="fn">2 · Relationship Mgmt (QBRs)</div>
+        <div class="frole">CSM (P/G) · Advocate (S/B)</div>
+        <div class="ft">Quarterly business reviews &amp; check-ins</div>
+        <div class="fmeta">ClientSpace·WorkSight·PRISM·TLM·Cornerstone</div>
+        <div class="fpain">⚠ 15–30 min prep across 5 systems; no single source of truth</div>
+      </div>
+      <div class="fchev">→</div>
+      <div class="fstep">
+        <div class="fn">3 · Case Mgmt &amp; Support</div>
+        <div class="frole">CSM · Advocate</div>
+        <div class="ft">Work &amp; resolve client cases</div>
+        <div class="fmeta">ClientSpacePro</div>
+        <div class="fpain">⚠ Read full case history 2×/day; manual notes 10–15 min/case; aged cases found by hand</div>
+      </div>
+      <div class="fchev">→</div>
+      <div class="fstep bn">
+        <div class="fn">4 · Escalation Management</div>
+        <div class="frole">CSM</div>
+        <div class="ft">Chase internal teams to resolve</div>
+        <div class="fmeta">Teams</div>
+        <div class="fpain">⚠ BIGGEST WASTE — manual multi-step chase, no directory outside IT, Platinum flags ignored, ≈25% of P/G time</div>
+      </div>
+      <div class="fchev">→</div>
+      <div class="fstep">
+        <div class="fn">5 · Inbound &amp; WSE Service</div>
+        <div class="frole">Inbound CSM · HR Support Spec</div>
+        <div class="ft">Answer &amp; route inbound calls</div>
+        <div class="fmeta">TalkDesk · WorkSight</div>
+        <div class="fpain">⚠ TalkDesk→ClientSpace auto-pop BROKEN; "KB search is not good"; 200 accts/FTE</div>
+      </div>
+      <div class="fchev">→</div>
+      <div class="fstep">
+        <div class="fn">6 · Retention · NPS · Churn</div>
+        <div class="frole">CSM · Advocate</div>
+        <div class="ft">Measure sentiment &amp; save at-risk</div>
+        <div class="fmeta">Qualtrics</div>
+        <div class="fpain">⚠ NPS dumps into ONE text field; no early warning; churn seen only when client serves notice</div>
+      </div>
+    </div>
+
+    <div class="sec-label">Who's involved — roles &amp; who owns each step</div>
+    <div class="roles g5">
+      <div class="rolecard"><div class="rn">CSM — Client Success Manager</div><div class="rd">Dedicated relationship owner for Platinum/Gold (~50 accts/FTE); QBRs, escalations, renewals &amp; upsell.</div></div>
+      <div class="rolecard"><div class="rn">Client Advocate</div><div class="rd">Pooled proactive outreach for Silver/Bronze (~200 accts/FTE), ~5 outreaches/wk each.</div></div>
+      <div class="rolecard"><div class="rn">Inbound CSM Team</div><div class="rd">First point of contact for inbound client calls — triage, case creation &amp; routing.</div></div>
+      <div class="rolecard"><div class="rn">HR Support Specialist</div><div class="rd">Handles WSE (worksite-employee) inbound calls &amp; chats on platform, payroll &amp; benefits.</div></div>
+      <div class="rolecard"><div class="rn">CSM – Broker</div><div class="rd">Manages the broker relationship channel &amp; broker-escalated client issues.</div></div>
+    </div>
+
+    <div class="note">680 accounts churned in 2025 = $30.4M lost, of which $18.2M was controllable — with no predictive early warning.</div>
+  </div>
+</section>
+
+<section class="slide a-clientsuccess">
+  <div class="wrap">
+    <div class="kicker"><span class="kdot"></span>Client Success · Improvement Areas</div>
+    <div class="stitle">Unify the data, predict the churn — <span class="hl">the relationship stays human</span></div>
+    <div class="lead"><b>AI removes the manual overhead, not the relationship.</b> Six targeted improvements aggregate the five source systems, restore broken integrations, and surface risk before a client serves notice — freeing CSMs and Advocates to spend time on clients, not systems.</div>
+
+    <div class="sec-label">Where AI helps</div>
+    <div class="grid g2">
+      <div class="impact">
+        <div class="it">Unified Client 360 Dashboard</div>
+        <div class="id">One ClientSpace screen aggregating services, case history, NPS trends, open escalations and an AI-computed health score — no more five-system navigation before a touchpoint.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> 15–30 min prep across 5 systems</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> one ClientSpace screen + AI health score</span> <span class="tag t-red">PRD Priority</span></div>
+      </div>
+      <div class="impact">
+        <div class="it">AI Churn Propensity Model</div>
+        <div class="id">ML model aggregates NPS, case volume &amp; aging, escalation history and utilization into a continuous risk score — trained on 2020–2025 attrition data, targeting the $18.2M controllable churn segment.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> churn seen only at notice</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> monthly risk score per account</span> <span class="tag t-red">PRD Priority</span></div>
+      </div>
+      <div class="impact">
+        <div class="it">Automated Escalation Routing + SLA</div>
+        <div class="id">Auto-notify the case owner on escalation, start a response timer, and escalate through the management chain on non-response — replicating IT's Teams model for payroll, benefits, 401k, tax and HR.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> manual Teams chase</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> auto-notify + 24h/48h escalation timers</span> <span class="tag t-amber">Automation</span></div>
+      </div>
+      <div class="impact">
+        <div class="it">AI Case Notes + Aged-Case Alerts</div>
+        <div class="id">AI generates a structured note (summary · status · next action) after every interaction for CSM approval; daily review becomes scanning a summary, and alerts surface cases open beyond SLA thresholds.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> 10–15 min manual notes</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> AI structured notes + SLA alerts</span> <span class="tag t-blue">AI</span></div>
+      </div>
+      <div class="impact">
+        <div class="it">Inbound AI CX (Ciklum)</div>
+        <div class="id">Auto case creation on call pickup with client identity and history pre-populated, AI-generated call summaries, and an AI search layer over WorkSight's knowledge base to lift first-call resolution.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> manual case lookup + poor KB</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> auto case on pickup + AI KB answers + summaries</span> <span class="tag t-teal">Outside PRD Scope</span></div>
+      </div>
+      <div class="impact">
+        <div class="it">Qualtrics Data-Mapping Fix</div>
+        <div class="id">Repair the Qualtrics→Salesforce→ClientSpace mapping so NPS score, comments and category land in dedicated fields — unblocking Power BI reporting and enabling the Unified 360 and churn model.</div>
+        <div class="imeta"><span class="ba"><b>Today:</b> NPS in one field, Power BI broken</span> <span class="arw">→</span> <span class="ba"><b>Target:</b> mapped to dedicated fields</span> <span class="tag t-purple">Prerequisite for the 360</span></div>
+      </div>
+    </div>
+
+    <div class="note">The two PRD priorities — the Unified Client 360 Dashboard (Opp A) and the AI Churn Propensity Model (Opp E) — are where a winning partner response should concentrate.</div>
+  </div>
+</section>
+
+<section class="slide">
+    <div class="wrap">
+      <div class="kicker"><span class="kdot"></span>What Our Analysis Found</div>
+      <div class="stitle">The opportunity — <span class="hl">run G&amp;A on an AI-driven operating system</span></div>
+      <div class="lead">Reading all five processes end-to-end, the same five themes surfaced everywhere — and they collapse into five reusable agentic foundations that every business function can share.</div>
+
+      <div class="sec-label" style="margin-top:4px;">Five cross-cutting themes</div>
+      <div class="grid g2" style="gap:9px;">
+        <div class="theme-item"><div class="tnum">01</div><div><div class="tt">Intelligence is locked in tribal knowledge</div><div class="td">Best practices live with the top 10% of performers and ad-hoc personal AI — never codified or shared.</div></div></div>
+        <div class="theme-item"><div class="tnum">02</div><div><div class="tt">Severe fragmentation — humans are the API between systems</div><div class="td">Manual steps remain despite integrations; people re-key data between tools that don't talk.</div></div></div>
+        <div class="theme-item"><div class="tnum">03</div><div><div class="tt">Value leaks at every handoff</div><div class="td">Manual, SLA-less email. Sales → Onboarding → Payroll → GAB ↔ Ben Admin — every boundary stalls.</div></div></div>
+        <div class="theme-item"><div class="tnum">04</div><div><div class="tt">No intelligence / data layer exists</div><div class="td">Churn, intent &amp; loss signals go unused. Ops are reactive; leaders have no ROI or audit visibility.</div></div></div>
+        <div class="theme-item" style="grid-column:1 / -1;"><div class="tnum">05</div><div><div class="tt">The same five problems, rebuilt in every unit</div><div class="td">Document reasoning · cross-system orchestration · SLA · drafting · prediction — solved four times over if siloed.</div></div></div>
+      </div>
+
+      <div class="sec-label">Pain addressed through five reusable agentic foundations <span style="color:var(--red);float:right;">4× redundant build if siloed</span></div>
+      <div class="grid g5">
+        <div class="found"><div class="fh">1 · Document Intelligence</div><div class="fd">Reasons over CSA, census, SBC, invoices, time files — extract, validate, flag.</div></div>
+        <div class="found"><div class="fh">2 · Cross-System Orchestration</div><div class="fd">Creates &amp; syncs cases/records across systems on events — no re-keying.</div></div>
+        <div class="found"><div class="fh">3 · SLA &amp; Escalation</div><div class="fd">Timers, routing &amp; auto-chase on every handoff that stalls today.</div></div>
+        <div class="found"><div class="fh">4 · Drafting &amp; Summarization</div><div class="fd">Notes, status, replies — generated, human reviews &amp; sends.</div></div>
+        <div class="found"><div class="fh">5 · Predictive Scoring</div><div class="fd">Churn, risk &amp; prioritization from signals across the stack.</div></div>
+      </div>
+    </div>
+  </section>
+
+<section class="slide">
+    <div class="wrap">
+      <div class="kicker"><span class="kdot"></span>Our Solution</div>
+      <div class="stitle">G&amp;A Compass — <span class="hl">one system for your entire sales-to-delivery engine</span></div>
+      <div class="note" style="margin-bottom:12px;border-left:4px solid var(--red);"><b>What Compass is —</b> a system of intelligence &amp; orchestration that sits on top of your systems of record. It does <b>not</b> replace PrismHR, ClientSpace, WorkSight or Salesforce — it connects to them, reads &amp; writes through a governed connector layer, and lets AI agents do the cognitively heavy, cross-system work people do by hand today. <b style="color:var(--red);">Build once, run everywhere.</b></div>
+
+      <div class="os">
+        <div class="os-top"><div class="ot"><span class="m">C</span> G&amp;A Compass · The Agentic Operating System</div><div class="osub">Prospect → Proposal → Delivery, on one platform</div></div>
+        <div class="uni">One unified platform — two modules sharing the <span>same agents, data, connectors &amp; governance</span></div>
+        <div class="pillars">
+          <div class="pillar a-sales" style="background:#F2F8FC;">
+            <div class="ph2"><span class="pn2">① Sales Compass</span><span class="tag t-blue">Revenue module</span></div>
+            <div class="sflow"><span class="sn">Prospecting</span><span class="sa">→</span><span class="sn">Qualify</span><span class="sa">→</span><span class="sn">Price</span><span class="sa">→</span><span class="sn">Proposal</span><span class="sa">→</span><span class="sn">Closed-Won</span></div>
+          </div>
+          <div class="pillar" style="background:#fff;">
+            <div class="ph2"><span class="pn2">② Operations Compass</span><span class="tag t-red">Delivery module · 4 business functions</span></div>
+            <div class="fgrid">
+              <div class="fnc" style="background:#2A8F60;"><div class="fn2">Benefits</div><div class="fd2">CAP · underwriting · enrollment · recon</div><div class="fm2">189 FTEs · ~$17.6M</div></div>
+              <div class="fnc" style="background:#7B4FD6;"><div class="fn2">Client Success</div><div class="fd2">Client 360 · churn · escalations</div><div class="fm2">83 FTEs · ~$8.4M</div></div>
+              <div class="fnc" style="background:#E8801A;"><div class="fn2">Onboarding</div><div class="fd2">CSA validation · setup · first payroll</div><div class="fm2">35 FTEs · ~$4.5M</div></div>
+              <div class="fnc" style="background:#0E8C8C;"><div class="fn2">Payroll</div><div class="fd2">Processing · recon · shipping · service</div><div class="fm2">118 FTEs · ~$10M</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foundbar">
+          <div class="fbh">One shared foundation under both modules <span class="fbt">Non-invasive</span><span class="fbt">Connector-native</span><span class="fbt">Governed &amp; audited</span><span class="fbt">ROI-measured</span></div>
+          <div class="fbeng">
+            <div class="fbe"><div class="en">1 · Document Intelligence</div><div class="ed">reads CSA · census · SBC · invoices</div></div>
+            <div class="fbe"><div class="en">2 · Cross-System Orchestration</div><div class="ed">syncs cases across systems</div></div>
+            <div class="fbe"><div class="en">3 · SLA &amp; Escalation</div><div class="ed">timers &amp; auto-chase</div></div>
+            <div class="fbe"><div class="en">4 · Drafting &amp; Summary</div><div class="ed">notes · status · replies</div></div>
+            <div class="fbe"><div class="en">5 · Predictive Scoring</div><div class="ed">churn · risk · priority</div></div>
+          </div>
+          <div class="fbsor">Five agentic systems (each with sub-agents inside) · over a swappable connector ecosystem to <b>PrismHR · ClientSpace · WorkSight · Salesforce · Milliman HERO · DocuSign · Carrier EDI · Outlook/M365</b>.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<section class="slide">
+    <div class="wrap">
+      <div class="kicker"><span class="kdot"></span>Proof, Already Built</div>
+      <div class="stitle">What we've already built — <span class="hl">live demos across the engine</span></div>
+      <div class="lead">Five working demos already span Sales, Benefits, Onboarding and Client Success — each one is a Compass agent or tool running the exact bottleneck from that function's process slides.</div>
+
+      <div class="grid g3" style="margin-bottom:12px;">
+        <div class="demo a-sales"><div class="darea">Sales</div><div class="dh">Prospecting + Activation Agent</div><div class="dd">Scrubs &amp; validates accounts (ZoomInfo + LinkedIn), finds the right contacts, and auto-sequences personalized outreach from the G&amp;A domain — zero rep effort.</div><span class="tag t-blue">Demo-ready</span></div>
+        <div class="demo a-sales"><div class="darea">Sales</div><div class="dh">Proposal Builder Agent</div><div class="dd">Assembles a full proposal — company research, plan &amp; cost comparison from a competitor invoice — turning a 2.5-hour manual build into minutes.</div><span class="tag t-blue">Demo-ready</span></div>
+        <div class="demo a-benefits"><div class="darea">Benefits</div><div class="dh">CAP Builder — cloud tool</div><div class="dd">Replaces the 2–4 hr Excel CAP with a cloud, Prism-synced builder: new-CAP wizard, renewal diff, and write-back to Prism.</div><span class="tag t-pos">Demo-ready</span></div>
+        <div class="demo a-onboarding"><div class="darea">Onboarding</div><div class="dh">CSA Extraction Tool</div><div class="dd">Extracts structured fields from the CSA PDF on upload and cross-validates against ClientSpace — replacing four independent manual reviews.</div><span class="tag t-amber">Demo-ready</span></div>
+        <div class="demo a-onboarding"><div class="darea">Onboarding</div><div class="dh">Pre-Flight Validation for Mock Payroll</div><div class="dd">Checks PrismHR config (WC codes, SUTA, billing, pay groups) before mock payroll — a pass/fail report with remediation, ending the calculate-fail-fix loop.</div><span class="tag t-amber">Demo-ready</span></div>
+        <div class="demo a-clientsuccess"><div class="darea">Client Success</div><div class="dh">Client 360 Dashboard</div><div class="dd">One screen aggregating 5 systems + AI health score, with churn signals and a churn journey view for proactive retention.</div><span class="tag t-purple">Demo-ready</span></div>
+      </div>
+      <div class="note">Each demo maps to a flagged bottleneck in the process slides — they are the front-of-screen proof that the five agentic foundations work on G&amp;A's real workflows.</div>
+    </div>
+  </section>
+
+<section class="slide">
+    <div class="wrap">
+      <div class="kicker"><span class="kdot"></span>What's Next</div>
+      <div class="stitle">The Orals — <span class="hl">a half-day, in-person workshop</span></div>
+      <div class="lead">This is not a one-way pitch. It's a <b>half-day, in-person workshop</b> where we should expect both <b>strategic and tactical</b> inputs live. Preparation is everything.</div>
+
+      <div class="row" style="align-items:stretch;margin-bottom:12px;">
+        <div class="card" style="flex:1;">
+          <div class="sec-label" style="margin-top:0;">Format &amp; who's in the room</div>
+          <div class="li"><b>Half-day, in person</b> — interactive; expect strategic + tactical intervention throughout.</div>
+          <div class="li"><b>Old CEO + New CEO both present</b>, plus most of the CXO suite.</div>
+          <div class="li">Audience is cloud-savvy but business-first — they will probe and look for flaws while absorbing.</div>
+        </div>
+        <div class="card" style="flex:1;background:var(--redbg);border-color:#f2c9d2;">
+          <div class="sec-label" style="margin-top:0;color:var(--red);">The bar to clear</div>
+          <div style="font-size:14.7px;color:var(--navy);line-height:1.5;">Make Compass <b>tangible and business-friendly</b>. If detail is lost on a sympathetic reviewer, it will definitely be lost on a skeptical executive — so we lead with the front-of-screen story and make the room <b>touch and feel</b> the solution.</div>
+        </div>
+      </div>
+
+      <div class="sec-label">Preparation checklist — Nitesh's feedback</div>
+      <div class="grid g2">
+        <div class="impact" style="border-left-color:var(--red);"><div class="it">Interactive workshop materials</div><div class="id">Touch-and-feel booklets for G&amp;A participants and/or a QR code to the Compass prototype so attendees experience it firsthand. Ship ahead of the workshop and monitor engagement in advance.</div><span class="tag t-red">Ship early · track engagement</span></div>
+        <div class="impact" style="border-left-color:var(--red);"><div class="it">Workflow posters (A2)</div><div class="id">A2-sized posters of the key workflows — Sales, Benefits, Client Success, Onboarding, Payroll — for the room.</div><span class="tag t-red">5 posters</span></div>
+        <div class="impact" style="border-left-color:var(--red);"><div class="it">Simplified demo experience</div><div class="id">Refine the prototype to be more business-friendly and intuitive — e.g. a streamlined Figma click-through that leads with the user's view before the engineering detail.</div><span class="tag t-red">Business-friendly click-through</span></div>
+        <div class="impact" style="border-left-color:var(--red);"><div class="it">Question readiness</div><div class="id">Anticipate audience questions and prepare a list of likely discussion points and responses ahead of the session.</div><span class="tag t-red">Q&amp;A prep pack</span></div>
+      </div>
+      <div class="foot-note">Goal: every CXO leaves able to explain what Compass is, see it working on their own function, and trust that we understand the complexity — including the exceptions and what stays human.</div>
+    </div>
+  </section>
+
+</div>
+
+<div class="nav">
+  <div class="dname">G&amp;A Compass · Project Briefing</div>
+  <div class="dots" id="dots"></div>
+  <div class="ctrls">
+    <button id="prev">‹ Prev</button>
+    <span class="count" id="count">01 / 16</span>
+    <button id="next">Next ›</button>
+  </div>
+</div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  const dotsWrap=document.getElementById('dots'),count=document.getElementById('count'),prev=document.getElementById('prev'),next=document.getElementById('next');
+  let i=0;
+  slides.forEach((_,idx)=>{const d=document.createElement('div');d.className='dot'+(idx===0?' on':'');d.onclick=()=>go(idx);dotsWrap.appendChild(d);});
+  const dots=[...dotsWrap.children];
+  function go(n){i=Math.max(0,Math.min(slides.length-1,n));slides.forEach((s,x)=>s.classList.toggle('active',x===i));dots.forEach((d,x)=>d.classList.toggle('on',x===i));count.textContent=String(i+1).padStart(2,'0')+' / '+String(slides.length).padStart(2,'0');prev.disabled=i===0;next.disabled=i===slides.length-1;slides[i].scrollTop=0;}
+  prev.onclick=()=>go(i-1);next.onclick=()=>go(i+1);
+  document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='PageDown')go(i+1);if(e.key==='ArrowLeft'||e.key==='PageUp')go(i-1);if(e.key==='Home')go(0);if(e.key==='End')go(slides.length-1);});
+  go(0);
+</script>
+</body>
+</html>
