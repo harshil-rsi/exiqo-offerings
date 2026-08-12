@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agentic Platform for Headless Vendor Data Entry — GTCR PRD Part B</title>
+<style>
+:root{
+  --bg:#080A0F;--bg2:#0D1017;--panel:#12161F;--panel2:#171C27;
+  --line:#232A38;--line2:#2E3849;
+  --ink:#E9EDF5;--ink2:#A9B4C8;--ink3:#6E7B92;
+  --cy:#2DD4E8;--vi:#A78BFA;--am:#F5B544;--em:#3ECF9B;--ro:#FB7185;--bl:#60A5FA;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden}
+body{display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(1200px 700px at 82% -12%,rgba(45,212,232,.075),transparent 60%),
+             radial-gradient(900px 600px at 8% 112%,rgba(167,139,250,.075),transparent 60%),var(--bg)}
+#stage{width:1280px;height:720px;position:relative;flex:0 0 auto;transform-origin:center center}
+.slide{position:absolute;inset:0;padding:46px 60px 58px;opacity:0;pointer-events:none;
+  transition:opacity .3s ease,transform .3s cubic-bezier(.22,.8,.3,1);transform:translateY(12px);
+  display:flex;flex-direction:column;overflow:hidden}
+.slide.on{opacity:1;pointer-events:auto;transform:none}
+#bar{position:absolute;left:0;top:0;height:2px;background:linear-gradient(90deg,var(--cy),var(--vi));
+  width:0;transition:width .3s ease;z-index:61;box-shadow:0 0 12px rgba(45,212,232,.5)}
+#chrome{position:absolute;left:0;right:0;bottom:0;height:36px;display:flex;align-items:center;gap:12px;
+  padding:0 60px;font-size:11px;color:var(--ink3);letter-spacing:.06em;z-index:60}
+#chrome .sp{flex:1}#num{font-family:var(--mono)}#num b{color:var(--ink2)}
+#sect{text-transform:uppercase;font-weight:650}
+.navbtn{background:none;border:1px solid var(--line);color:var(--ink3);width:22px;height:22px;border-radius:5px;
+  cursor:pointer;font-size:11px;display:grid;place-items:center}
+.navbtn:hover{border-color:var(--line2);color:var(--ink)}
+
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--cy);
+  margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.kicker::after{content:"";height:1px;flex:1;background:linear-gradient(90deg,rgba(45,212,232,.35),transparent)}
+h2{font-size:38px;line-height:1.1;letter-spacing:-.025em;font-weight:670}
+h3{font-size:14.5px;font-weight:660}
+.sub{font-size:15.5px;color:var(--ink2);line-height:1.5;max-width:940px;margin-top:10px}
+.mono{font-family:var(--mono)}.dim{color:var(--ink3)}
+em{color:var(--ink);font-style:normal;font-weight:620}
+.hl{color:var(--cy)}.hlv{color:var(--vi)}.hla{color:var(--am)}.hle{color:var(--em)}.hlr{color:var(--ro)}
+
+.card{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--line);
+  border-radius:11px;padding:15px 17px;position:relative;overflow:hidden}
+.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--accent,var(--line2))}
+.card p{font-size:12.5px;color:var(--ink2);line-height:1.5;margin-top:6px}
+.card .fix{font-size:11.5px;color:var(--ink3);line-height:1.45;margin-top:8px;padding-top:8px;
+  border-top:1px dashed var(--line);font-family:var(--mono)}
+.card .fix b{color:var(--em);font-weight:600}
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.tag{display:inline-block;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+  padding:3px 8px;border-radius:999px;border:1px solid var(--line2);color:var(--ink3);background:rgba(255,255,255,.02)}
+.tag.prd{border-color:rgba(245,181,68,.35);color:var(--am);background:rgba(245,181,68,.07)}
+.tag.ok{border-color:rgba(62,207,155,.35);color:var(--em);background:rgba(62,207,155,.07)}
+ul.b{list-style:none;display:flex;flex-direction:column;gap:6px}
+ul.b li{font-size:12.5px;color:var(--ink2);line-height:1.5;padding-left:15px;position:relative}
+ul.b li::before{content:"";position:absolute;left:0;top:7px;width:5px;height:5px;border-radius:1px;
+  background:var(--accent,var(--ink3));transform:rotate(45deg)}
+ul.b li b{color:var(--ink);font-weight:620}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink3);font-weight:600;padding:0 10px 8px;border-bottom:1px solid var(--line2)}
+td{padding:9px 10px;border-bottom:1px solid var(--line);color:var(--ink2);vertical-align:top;line-height:1.4}
+tr.pick td{background:rgba(62,207,155,.055)}
+tr.pick td:first-child{box-shadow:inset 2px 0 0 var(--em)}
+td b{color:var(--ink);font-weight:620}
+.quote{border-left:2px solid var(--am);padding:3px 0 3px 15px;font-size:13.5px;line-height:1.5;color:var(--ink)}
+.quote cite{display:block;margin-top:7px;font-size:10.5px;color:var(--ink3);font-style:normal;font-family:var(--mono)}
+.footnote{font-size:10px;color:var(--ink3);line-height:1.5;font-family:var(--mono);margin-top:auto;padding-top:10px}
+
+/* ---------- slide 2 infographic ---------- */
+.vs{display:grid;grid-template-columns:1fr 44px 1fr;gap:0;align-items:stretch}
+.vsbox{border:1px solid var(--line);border-radius:11px;padding:14px 16px;background:var(--bg2)}
+.vsbox .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:11px}
+.stackrow{display:flex;gap:6px;margin-bottom:6px;align-items:center}
+.chn{font-family:var(--mono);font-size:10px;color:var(--ink3);width:52px;flex:0 0 52px}
+.blk{flex:1;height:20px;border-radius:4px;display:grid;place-items:center;font-family:var(--mono);font-size:8.5px;
+  letter-spacing:.04em;color:var(--ink2)}
+.vsmid{display:grid;place-items:center;font-size:18px;color:var(--ink3)}
+.coreblk{border-radius:6px;padding:8px;text-align:center;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em}
+.benefit{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--bg2);position:relative}
+.benefit .ic{font-family:var(--mono);font-size:15px;font-weight:700;margin-bottom:7px;display:block}
+.benefit h3{font-size:13.5px;margin-bottom:4px}
+.benefit p{font-size:11.5px;color:var(--ink3);line-height:1.45}
+
+/* ---------- slide 3 architecture ---------- */
+#arch{flex:1;display:grid;grid-template-columns:186px 1fr 186px;gap:12px;min-height:0;align-content:start}
+.rail{display:flex;flex-direction:column;gap:11px}
+.rail .L{flex:1;display:flex;flex-direction:column;justify-content:center}
+.raillbl{font-family:var(--mono);font-size:9px;letter-spacing:.15em;color:var(--ink3);margin-bottom:1px}
+.spine{display:flex;flex-direction:column;gap:11px;min-width:0}
+.band{display:grid;gap:11px}
+.L{border:1px solid var(--line);border-radius:9px;background:var(--bg2);padding:11px 13px;cursor:pointer;
+  position:relative;transition:.15s;overflow:hidden}
+.L::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2.5px;background:var(--c)}
+.L:hover{border-color:var(--c);background:var(--panel);transform:translateY(-1px)}
+.L .n{font-family:var(--mono);font-size:8.5px;color:var(--ink3);letter-spacing:.1em}
+.L .t{font-size:12.5px;font-weight:640;color:var(--ink);line-height:1.25;margin-top:2px}
+.L .s{font-family:var(--mono);font-size:9px;color:var(--ink3);margin-top:3px;letter-spacing:.02em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.corebox{border:1px solid rgba(167,139,250,.4);border-radius:11px;background:rgba(167,139,250,.05);padding:12px 12px}
+.corehdr{font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--vi);margin-bottom:9px;
+  display:flex;align-items:center;gap:8px;cursor:pointer}
+.corehdr:hover{color:#C4B5FD}
+.corehdr::after{content:"";height:1px;flex:1;background:linear-gradient(90deg,rgba(167,139,250,.3),transparent)}
+.arrow{text-align:center;color:var(--ink3);font-size:11px;line-height:1;margin:-4px 0}
+.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.term{border:1px solid rgba(96,165,250,.4);border-radius:9px;background:rgba(96,165,250,.07);padding:10px 13px;
+  display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:.15s}
+.term:hover{background:rgba(96,165,250,.12)}
+.term .t{font-size:13px;font-weight:650}
+.term .s{font-family:var(--mono);font-size:9px;color:var(--ink3)}
+
+#modal{position:absolute;inset:0;z-index:90;display:none;align-items:center;justify-content:center;
+  background:rgba(5,7,11,.82);backdrop-filter:blur(5px)}
+#modal.on{display:flex}
+#mbox{width:620px;max-height:560px;border:1px solid var(--line2);border-radius:14px;overflow:hidden;
+  background:linear-gradient(180deg,var(--panel2),var(--bg2));box-shadow:0 24px 70px rgba(0,0,0,.6);
+  animation:pop .18s cubic-bezier(.22,.9,.3,1)}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+#mhead{padding:18px 24px 15px;border-bottom:1px solid var(--line);position:relative}
+#mhead::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--mc,var(--cy))}
+#mnum{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--ink3)}
+#mtitle{font-size:22px;font-weight:670;letter-spacing:-.015em;margin-top:5px}
+#mwhat{font-size:13.5px;color:var(--ink2);line-height:1.5;margin-top:7px}
+#mbody{padding:16px 24px 20px;overflow:auto}
+.msec{font-family:var(--mono);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);
+  margin-bottom:8px}
+#mstack{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+#mstack .st{font-family:var(--mono);font-size:10.5px;padding:4px 9px;border-radius:6px;
+  border:1px solid var(--line2);color:var(--ink2);background:rgba(255,255,255,.025)}
+#mprd{display:flex;gap:6px;margin-top:12px}
+#mclose{position:absolute;top:16px;right:18px;background:none;border:1px solid var(--line2);color:var(--ink3);
+  width:24px;height:24px;border-radius:6px;cursor:pointer;font-size:13px;line-height:1}
+#mclose:hover{color:var(--ink);border-color:var(--ink3)}
+.hint{font-family:var(--mono);font-size:10.5px;color:var(--ink3)}
+
+/* ---------- slide 5 matrix ---------- */
+.mx{font-size:11.5px}.mx td{padding:6px 10px}
+.mx td:first-child{color:var(--ink);font-weight:620;white-space:nowrap}
+.mx .p{font-family:var(--mono);font-size:9.5px;color:var(--am);white-space:nowrap}
+
+/* ---------- slide 6 stack ---------- */
+.sgrp{border:1px solid var(--line);border-radius:11px;background:var(--bg2);padding:13px 15px;position:relative;overflow:hidden}
+.sgrp::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--accent)}
+.sgrp .h{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px}
+.trow{display:flex;justify-content:space-between;gap:10px;padding:4px 0;font-size:12px;align-items:baseline}
+.trow b{color:var(--ink);font-weight:620}
+.trow span{color:var(--ink3);font-size:11px;text-align:right;font-family:var(--mono)}
+.title-wrap{flex:1;display:flex;flex-direction:column;justify-content:center}
+h1{font-size:60px;line-height:1.05;letter-spacing:-.03em;font-weight:690}
+.rule{height:1px;background:linear-gradient(90deg,var(--cy),var(--vi),transparent);margin:30px 0 26px;width:560px}
+.meta{display:flex;gap:38px;font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.06em}
+.meta b{display:block;color:var(--ink2);font-size:12px;font-weight:600;margin-top:6px;letter-spacing:0}
+@media print{body{overflow:visible}.slide{position:relative;opacity:1;page-break-after:always}}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div id="stage">
+
+
+<section class="slide" data-sect="Opening">
+  <div class="title-wrap">
+    <div class="kicker">GTCR Vendor Management &nbsp;·&nbsp; PRD Part B</div>
+    <h1>GTCR Salesforce assistant<br><span style="color:var(--ink3);font-weight:600">Technical approach</span></h1>
+    <div class="rule"></div>
+    <div class="meta">
+      <div>PREPARED BY<b>Velotio &nbsp;·&nbsp; AI Engineering</b></div>
+      <div>SCOPE<b>Headless entry pipeline &mdash; PRD half B</b></div>
+      <div>DATE<b>August 2026</b></div>
+    </div>
+  </div>
+  <div style="font-size:10.5px;color:var(--ink3);font-family:var(--mono);margin-top:auto">
+    &rarr; to advance &nbsp;·&nbsp; the architecture slide is interactive &mdash; every layer is clickable
+  </div>
+</section>
+
+<section class="slide" data-sect="Pitfalls">
+  <div class="kicker">02 &nbsp;/&nbsp; The pitfalls</div>
+  <h2>Technical approach suggested in the PRD &mdash; and its pitfalls</h2>
+  <p class="sub">Email in, Claude parses it, write to Salesforce. About 200 lines. It genuinely works &mdash; it's what
+    we built for the demo. Here is what it can't do, in the order you'd hit it.</p>
+  <div class="grid g4" style="margin-top:18px;gap:11px">
+    <div class="card" style="--accent:var(--ro)"><h3>1 &nbsp;A failure just vanishes</h3><p>Salesforce is slow, the function times out, the message is gone. Nobody finds out. The person who sent it assumes it worked.</p><div class="fix"><b>needs</b> a queue, retries, and a place failed messages land</div></div>
+    <div class="card" style="--accent:var(--ro)"><h3>2 &nbsp;Retrying makes duplicates</h3><p>Retry the same email and you get two records. Salesforce has no undo and no built-in way to say "this is the same message."</p><div class="fix"><b>needs</b> one stable ID per message, and upsert instead of create</div></div>
+    <div class="card" style="--accent:var(--am)"><h3>3 &nbsp;It guesses, and sounds sure</h3><p>Two people named Aaron. Two vendors starting with "Oli". A function picks one and moves on. Nobody sees that it was a coin flip.</p><div class="fix"><b>needs</b> name matching, a confidence check, and a review queue</div></div>
+    <div class="card" style="--accent:var(--am)"><h3>4 &nbsp;Nobody can check its work</h3><p>Three weeks later a partner asks "why does this record say that?" There is no trace, no original message, no record of which prompt wrote it.</p><div class="fix"><b>needs</b> provenance stamped on every record</div></div>
+    <div class="card" style="--accent:var(--vi)"><h3>5 &nbsp;A bad day can't be cleaned up</h3><p>One prompt tweak writes 60 wrong records over an afternoon. Which 60? There's no way to ask.</p><div class="fix"><b>needs</b> a log tying every record to the version that wrote it</div></div>
+    <div class="card" style="--accent:var(--vi)"><h3>6 &nbsp;The inbox is an open door</h3><p>Anyone can email the address. A vendor's own words get forwarded straight into a prompt that has write access to your CRM.</p><div class="fix"><b>needs</b> trust levels, and limits on what each level can touch</div></div>
+    <div class="card" style="--accent:var(--cy)"><h3>7 &nbsp;Salesforce changes underneath you</h3><p>Someone adds a picklist value. The hardcoded list in the function doesn't know. Writes start failing, quietly.</p><div class="fix"><b>needs</b> the schema read live from Salesforce, not copied</div></div>
+    <div class="card" style="--accent:var(--cy)"><h3>8 &nbsp;You can never change the model</h3><p>A better Claude ships. Is it better <em>for you</em>? The only way to find out is to put it in production and watch.</p><div class="fix"><b>needs</b> a set of real examples with known right answers</div></div>
+  </div>
+  <div style="margin-top:16px;border:1px solid var(--line2);border-radius:10px;padding:13px 18px;
+       background:linear-gradient(90deg,rgba(251,113,133,.07),transparent);display:flex;align-items:center;gap:18px">
+    <span class="mono" style="font-size:11px;letter-spacing:.14em;color:var(--ro)">AND THEN</span>
+    <span style="font-size:15px;color:var(--ink)">You do all eight again for Slack. Then chat. Then the mobile form.
+      <span class="dim" style="font-size:14px">Four copies that each drift at their own pace.</span></span>
+  </div>
+</section>
+
+
+<section class="slide" data-sect="Our pitch">
+  <div class="kicker">03 &nbsp;/&nbsp; The alternative</div>
+  <h2>Our pitch: a mini self-hosted platform</h2>
+  <p class="sub">Same components either way, and it all runs inside GTCR’s own cloud. The difference is that the hard parts are built once, behind a contract,
+    instead of copy-pasted into every channel.</p>
+  <div class="vs" style="margin-top:20px">
+    <div class="vsbox" style="border-color:rgba(251,113,133,.3)">
+      <div class="lbl" style="color:var(--ro)">FOUR FUNCTIONS &mdash; EVERY CHANNEL REBUILDS EVERYTHING</div>
+      <div id="lhs"></div>
+      <div style="margin-top:10px;font-size:11.5px;color:var(--ink3);line-height:1.45">
+        Four copies of parsing, matching, validation and writing.
+        A fix has to land four times, or it isn't fixed.</div>
+    </div>
+    <div class="vsmid">&rarr;</div>
+    <div class="vsbox" style="border-color:rgba(62,207,155,.3)">
+      <div class="lbl" style="color:var(--em)">ONE PLATFORM &mdash; THIN DOORS, ONE BRAIN</div>
+      <div id="rhs"></div>
+      <div style="margin-top:10px;font-size:11.5px;color:var(--ink3);line-height:1.45">
+        Each channel is a thin adapter. Everything risky happens once, in one place, versioned and watched.</div>
+    </div>
+  </div>
+  <div class="grid g3" style="margin-top:18px;gap:11px">
+    <div class="benefit"><span class="ic hle">01</span><h3>A new channel takes a day</h3><p>Slack becomes an adapter, not a rebuild, because matching and validation already exist.</p></div>
+    <div class="benefit"><span class="ic hle">02</span><h3>Every record traces back</h3><p>To the original message, the prompt version, and the model that wrote it. In one click.</p></div>
+    <div class="benefit"><span class="ic hle">03</span><h3>Model upgrades get tested</h3><p>Four minutes against 150 real examples with known answers &mdash; instead of a leap of faith.</p></div>
+    <div class="benefit"><span class="ic hla">04</span><h3>Mistakes are findable</h3><p>And reversible. "Everything written by prompt v13 on Tuesday" is a query, not an archaeology project.</p></div>
+    <div class="benefit"><span class="ic hla">05</span><h3>One place to change a rule</h3><p>A new picklist value, a new validation rule, a new required field. Changed once, live everywhere.</p></div>
+    <div class="benefit"><span class="ic hla">06</span><h3>You can see what it costs</h3><p>Per message, per channel, per person &mdash; so the cost conversation is a number, not a guess.</p></div>
+  </div>
+</section>
+
+<section class="slide" data-sect="Architecture" style="padding:38px 60px 52px">
+  <div style="display:flex;align-items:flex-end;gap:20px;margin-bottom:14px">
+    <div style="flex:1">
+      <div class="kicker" style="margin-bottom:9px">04 &nbsp;/&nbsp; The architecture</div>
+      <h2 style="font-size:31px">Eighteen layers, one core.</h2>
+    </div>
+    <span class="hint">click any layer for what it does, why it's there, and what it's built with</span>
+  </div>
+  <div id="arch" style="align-content:stretch">
+    <div class="rail">
+      <div class="raillbl">STATE</div>
+      <div class="L" data-l="13" style="--c:var(--vi)"><div class="n">13</div><div class="t">Prompt store</div><div class="s">Langfuse, self-hosted</div></div>
+      <div class="L" data-l="14" style="--c:var(--vi)"><div class="n">14</div><div class="t">Memory</div><div class="s">short-term + episodic</div></div>
+      <div class="L" data-l="15" style="--c:var(--vi)"><div class="n">15</div><div class="t">Session &amp; data</div><div class="s">Postgres + Blob</div></div>
+    </div>
+
+    <div class="spine">
+      <div class="L" data-l="1" style="--c:var(--cy)"><div class="n">01</div><div class="t">Inbound channels</div><div class="s">Email &nbsp;·&nbsp; Slack &nbsp;·&nbsp; Chat assistant &nbsp;·&nbsp; Mobile form</div></div>
+      <div class="arrow">&#9662;</div>
+      <div class="band" style="grid-template-columns:repeat(3,1fr)">
+        <div class="L" data-l="2" style="--c:var(--cy)"><div class="n">02</div><div class="t">Ingress &amp; webhooks</div><div class="s">queue · retries · dead letter</div></div>
+        <div class="L" data-l="3" style="--c:var(--cy)"><div class="n">03</div><div class="t">Identity &amp; auth</div><div class="s">Entra ID · JWT Bearer</div></div>
+        <div class="L" data-l="4" style="--c:var(--ro)"><div class="n">04</div><div class="t">Security</div><div class="s">trust tiers · tool scoping</div></div>
+      </div>
+      <div class="arrow">&#9662;</div>
+      <div class="corebox">
+        <div class="corehdr" data-l="5">ORCHESTRATION CORE &mdash; Claude Agents SDK on FastAPI &nbsp;<span style="color:var(--ink3);font-size:8.5px">05 · click</span></div>
+        <div class="chips" style="grid-template-columns:repeat(5,1fr)">
+          <div class="L" data-l="6" style="--c:var(--vi)"><div class="n">06</div><div class="t">Schema skill</div></div>
+          <div class="L" data-l="7" style="--c:var(--vi)"><div class="n">07</div><div class="t">Extraction</div></div>
+          <div class="L" data-l="8" style="--c:var(--vi)"><div class="n">08</div><div class="t">Entity resolution</div></div>
+          <div class="L" data-l="9" style="--c:var(--vi)"><div class="n">09</div><div class="t">Dedup</div></div>
+          <div class="L" data-l="10" style="--c:var(--vi)"><div class="n">10</div><div class="t">Output contract</div></div>
+        </div>
+      </div>
+      <div class="arrow">&#9662;</div>
+      <div class="L" data-l="11" style="--c:var(--em)"><div class="n">11</div><div class="t">Validation &amp; confidence gate</div><div class="s">deterministic checks · auto-commit or send to review</div></div>
+      <div class="arrow">&#9662;</div>
+      <div class="L" data-l="12" style="--c:var(--am)"><div class="n">12</div><div class="t">Tools &amp; capabilities</div><div class="s">custom Salesforce tools · REST + Composite · upsert</div></div>
+      <div class="arrow">&#9662;</div>
+      <div class="term" data-l="0"><div><div class="t">Salesforce</div><div class="s">Account · Contact · Task · Capability · Engagement</div></div><div class="s" style="color:var(--bl)">system of record &rsaquo;</div></div>
+    </div>
+
+    <div class="rail">
+      <div class="raillbl">CONTROL</div>
+      <div class="L" data-l="16" style="--c:var(--em)"><div class="n">16</div><div class="t">Observability</div><div class="s">traces · cost</div></div>
+      <div class="L" data-l="17" style="--c:var(--em)"><div class="n">17</div><div class="t">Evals</div><div class="s">golden examples · CI</div></div>
+      <div class="L" data-l="18" style="--c:var(--am)"><div class="n">18</div><div class="t">Alerts</div><div class="s">thresholds that matter</div></div>
+    </div>
+  </div>
+</section>
+
+
+<section class="slide" data-sect="Justification" style="padding-top:40px">
+  <div class="kicker" style="margin-bottom:8px">05 &nbsp;/&nbsp; Justification</div>
+  <h2 style="font-size:32px">Every layer is there because something in the PRD needs it.</h2>
+  <table class="mx" style="margin-top:14px">
+    <thead><tr><th style="width:19%">Layer</th><th style="width:48%">The problem it solves</th><th style="width:15%">PRD tasks</th><th style="width:18%">Built with</th></tr></thead>
+    <tbody>
+      <tr><td>01 · Inbound channels</td><td>Four ways in that must all mean the same thing to the CRM</td><td class="p">AI-2.1 → 2.5</td><td>Graph, Bolt, Next.js</td></tr>
+      <tr><td>02 · Ingress &amp; webhooks</td><td>Failures don't vanish; retries don't duplicate; messages are parsed before AI sees them</td><td class="p">AI-2.6 · DO-1</td><td>FastAPI, queue, DLQ</td></tr>
+      <tr><td>03 · Identity &amp; auth</td><td>Who sent it, which Salesforce user they are, what they're allowed to write</td><td class="p">SF-4.1, 4.2</td><td>Entra ID, JWT Bearer</td></tr>
+      <tr><td>04 · Security</td><td>Forwarded vendor text can't drive a CRM write it shouldn't</td><td class="p">AI-2.2 · DO-5</td><td>Trust tiers, tool hooks</td></tr>
+      <tr><td>05 · Orchestration core</td><td>One brain behind all four doors; one message can produce several records</td><td class="p">AI-1.1, 1.2, 1.6</td><td>Claude Agents SDK</td></tr>
+      <tr><td>06 · Schema skill</td><td>The model can only use picklist values that actually exist today</td><td class="p">AI-1.3</td><td>Live describe + cache</td></tr>
+      <tr><td>07 · Extraction</td><td>Unstructured text becomes structured fields, with confidence and quoted source</td><td class="p">AI-1.2, 1.4</td><td>Forced tool use</td></tr>
+      <tr><td>08 · Entity resolution</td><td>"OW", "Aaron", "the BCS target" resolve to the right records &mdash; or ask</td><td class="p">AI-1.5</td><td>Matching + alias memory</td></tr>
+      <tr><td>09 · Dedup</td><td>Same message twice, or two people logging one meeting, don't become two records</td><td class="p">AI-3.4 · SF-3.3</td><td>Upsert + similarity check</td></tr>
+      <tr><td>10 · Output contract</td><td>One definition of a valid write, shared with the Salesforce team</td><td class="p">AI-1.4 · J-1</td><td>Pydantic → JSON Schema</td></tr>
+      <tr><td>11 · Validation &amp; gate</td><td>Rule checks that don't depend on the model's own confidence; review queue for the rest</td><td class="p">AI-3.1, 3.2 · SF-3.2</td><td>Rules as data, staging</td></tr>
+      <tr><td>12 · Tools &amp; capabilities</td><td>Safe, narrow Salesforce writes with retries and all-or-nothing batching</td><td class="p">AI-3.3 · SF-4.3</td><td>REST + Composite</td></tr>
+      <tr><td>13 · Prompt store</td><td>Prompts are versioned artifacts; every record knows which one wrote it</td><td class="p">AI-1.7 · SF-4.4</td><td>Langfuse (self-hosted)</td></tr>
+      <tr><td>14 · Memory</td><td>Corrections stick, so matching gets better instead of staying the same</td><td class="p">AI-1.5</td><td>Redis + pgvector</td></tr>
+      <tr><td>15 · Session &amp; data</td><td>The original message is kept, approvals are audited, bad writes can be found again</td><td class="p">DO-3 · SF-4.4</td><td>Postgres + Blob</td></tr>
+      <tr><td>16 · Observability</td><td>One thread from message to record; cost per message visible</td><td class="p">DO-3</td><td>Langfuse + OTel</td></tr>
+      <tr><td>17 · Evals</td><td>Prompt and model changes are tested before they reach the CRM</td><td class="p">AI-1.7 · J-5</td><td>Langfuse datasets, CI</td></tr>
+      <tr><td>18 · Alerts</td><td>Somebody finds out when the review queue stops being cleared</td><td class="p">DO-3</td><td>Langfuse thresholds</td></tr>
+    </tbody>
+  </table>
+</section>
+
+
+<section class="slide" data-sect="Salesforce connector">
+  <div class="kicker">06 &nbsp;/&nbsp; The Salesforce connector</div>
+  <h2>Build our own tools. Salesforce's own MCP can't do unattended writes.</h2>
+  <table style="margin-top:20px">
+    <thead><tr>
+      <th style="width:23%">Option</th><th style="width:20%">Can it run with no human?</th><th style="width:14%">Safe retries<br>(upsert by ID)</th>
+      <th style="width:15%">Write related<br>records atomically</th><th style="width:16%">What it could do if misused</th><th style="width:12%">Verdict</th>
+    </tr></thead>
+    <tbody>
+      <tr class="pick">
+        <td><b>Our own tools</b><br><span class="dim" style="font-size:11px">Agents SDK over REST/Composite</span></td>
+        <td><span class="hle">Yes</span> &mdash; service identity via JWT Bearer</td>
+        <td><span class="hle">Yes</span></td><td><span class="hle">Yes</span> &mdash; all-or-nothing</td>
+        <td>Only what we write</td><td><b class="hle">CHOSEN</b></td>
+      </tr>
+      <tr>
+        <td><b>Salesforce hosted MCP</b><br><span class="dim" style="font-size:11px">sobject-all · Headless 360</span></td>
+        <td><span class="hlr">No</span> &mdash; every call needs a logged-in human</td>
+        <td><span class="hlr">No</span></td><td><span class="hlr">No</span> &mdash; one record per call</td>
+        <td>Limited to that user's rights</td><td>Read side only</td>
+      </tr>
+      <tr>
+        <td><b>Agentforce 360 Agent API</b></td>
+        <td><span class="hle">Yes</span></td>
+        <td colspan="2" style="text-align:center">Not applicable &mdash; it's a chat surface, not a way to write records</td>
+        <td>Limited to agent topics</td><td>Wrong shape</td>
+      </tr>
+      <tr>
+        <td><b>Salesforce CLI MCP</b></td>
+        <td><span class="hlr">No</span> &mdash; needs a developer logged in locally</td>
+        <td><span class="dim">?</span></td><td><span class="hlr">No</span></td>
+        <td><span class="hlr">Deploy code, change permissions</span></td><td>Dev use only</td>
+      </tr>
+      <tr>
+        <td><b>Open-source MCP servers</b><br><span class="dim" style="font-size:11px">community-maintained</span></td>
+        <td><span class="hla">Some</span></td><td><span class="hla">One of them</span></td><td><span class="hlr">No</span></td>
+        <td><span class="hlr">Run arbitrary code, change security settings</span></td><td>No</td>
+      </tr>
+    </tbody>
+  </table>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px">
+    <div class="quote">
+      &ldquo;There's no option to specify a service account&hellip; <em>At this time, there's no plan to allow
+      machine-to-machine flows.</em> The human remains in the loop.&rdquo;
+      <cite>Salesforce &mdash; &ldquo;How to Secure Salesforce Hosted MCP Servers&rdquo;, June 2026</cite>
+    </div>
+    <div class="quote" style="border-color:var(--cy)">
+      &ldquo;For system-to-system integrations without an agentic client, stick to traditional APIs.&rdquo;
+      <cite>Salesforce &mdash; &ldquo;Architecting Secure Agent Connectivity&rdquo;, 22 July 2026</cite>
+    </div>
+  </div>
+  <div style="margin-top:16px;font-size:12.5px;color:var(--ink2);line-height:1.5;border-top:1px solid var(--line);padding-top:14px">
+    <b class="hle">Where MCP does earn its place:</b> the human-facing read side &mdash; a Slack lookup, an analyst asking
+    questions of engagement history. There, per-user login is a feature: Salesforce enforces sharing rules per person and
+    logs it in their own audit trail. We'd use the read-only hosted server for that, and nothing else.
+  </div>
+</section>
+
+
+<section class="slide" data-sect="Technology stack">
+  <div class="kicker">07 &nbsp;/&nbsp; Proposed stack</div>
+  <h2>All of it runs inside GTCR's own cloud.</h2>
+  <p class="sub">Nothing here is a new SaaS subscription or a per-seat licence. The only thing leaving the tenant is the
+    model call itself.</p>
+  <div class="grid g3" style="margin-top:20px;gap:12px">
+    <div class="sgrp" style="--accent:var(--cy)">
+      <div class="h">Agent runtime</div>
+      <div class="trow"><b>Claude Agents SDK</b><span>Python</span></div>
+      <div class="trow"><b>FastAPI + Uvicorn</b><span>orchestration API</span></div>
+      <div class="trow"><b>Docker</b><span>Container Apps / ECS / GKE</span></div>
+      <p style="font-size:11px;color:var(--ink3);line-height:1.45;margin-top:9px">In-process tools, sub-agents and
+        enforcement hooks. Cloud-agnostic — one container, moves anywhere.</p>
+    </div>
+    <div class="sgrp" style="--accent:var(--vi)">
+      <div class="h">Front end &amp; channels</div>
+      <div class="trow"><b>Vercel AI SDK + Next.js</b><span>chat assistant</span></div>
+      <div class="trow"><b>Slack Bolt / Events API</b><span>Block Kit previews</span></div>
+      <div class="trow"><b>Microsoft Graph</b><span>shared mailbox</span></div>
+      <div class="trow"><b>Entra ID (OIDC)</b><span>sign-in</span></div>
+      <p style="font-size:11px;color:var(--ink3);line-height:1.45;margin-top:9px">Streaming UI and confirm-before-write
+        cards come free from the AI SDK — that's the whole reason it's here.</p>
+    </div>
+    <div class="sgrp" style="--accent:var(--em)">
+      <div class="h">Prompts · traces · cost · evals</div>
+      <div class="trow"><b>Langfuse</b><span>self-hosted</span></div>
+      <div class="trow"><b>Postgres + ClickHouse</b><span>its backing store</span></div>
+      <div class="trow"><b>OpenTelemetry</b><span>app traces</span></div>
+      <p style="font-size:11px;color:var(--ink3);line-height:1.45;margin-top:9px">One deployment covers four jobs.
+        Self-hosted so vendor and deal context never leaves the tenant.</p>
+    </div>
+    <div class="sgrp" style="--accent:var(--am)">
+      <div class="h">Contracts &amp; validation</div>
+      <div class="trow"><b>Pydantic v2</b><span>→ JSON Schema</span></div>
+      <div class="trow"><b>Rules as data</b><span>mirrors SF validation</span></div>
+      <p style="font-size:11px;color:var(--ink3);line-height:1.45;margin-top:9px">One definition generates the tool
+        schema, validates the output and builds the Salesforce payload — so the three can't drift apart.</p>
+    </div>
+    <div class="sgrp" style="--accent:var(--vi)">
+      <div class="h">Data &amp; memory</div>
+      <div class="trow"><b>Postgres</b><span>sessions, write ledger</span></div>
+      <div class="trow"><b>pgvector</b><span>episodic memory</span></div>
+      <div class="trow"><b>Redis</b><span>short-term memory, queue</span></div>
+      <div class="trow"><b>Blob / S3</b><span>original messages</span></div>
+    </div>
+    <div class="sgrp" style="--accent:var(--bl)">
+      <div class="h">Salesforce &amp; ops</div>
+      <div class="trow"><b>REST + Composite v67</b><span>OAuth JWT Bearer</span></div>
+      <div class="trow"><b>Hosted MCP (read-only)</b><span>human lookups only</span></div>
+      <div class="trow"><b>GitHub Actions</b><span>evals gate the build</span></div>
+      <div class="trow"><b>Key Vault</b><span>secrets &amp; keys</span></div>
+    </div>
+  </div>
+  <div style="margin-top:16px;border:1px solid var(--line2);border-radius:10px;padding:12px 18px;
+      background:linear-gradient(90deg,rgba(62,207,155,.06),transparent);display:flex;align-items:center;gap:18px">
+    <span class="mono" style="font-size:11px;letter-spacing:.14em;color:var(--em)">RUNNING COST</span>
+    <span style="font-size:14px;color:var(--ink)">Low hundreds of dollars a month in infrastructure, plus Anthropic usage
+      measured in cents per message. <span class="dim">Compare roughly $1K–2.5K/month for the Power Automate path, or
+      $65K–210K a year for Workato or MuleSoft.</span></span>
+  </div>
+</section>
+
+<div id="modal"><div id="mbox">
+  <div id="mhead">
+    <button id="mclose">&times;</button>
+    <div id="mnum"></div><div id="mtitle"></div><div id="mwhat"></div>
+  </div>
+  <div id="mbody">
+    <div class="msec">Why we need it</div>
+    <ul class="b" id="mwhy"></ul>
+    <div id="mstack"></div>
+    <div id="mprd"></div>
+  </div>
+</div></div>
+</div>
+<div id="chrome">
+  <span id="sect">Opening</span><span class="sp"></span>
+  <button class="navbtn" id="prev">&lsaquo;</button><button class="navbtn" id="next">&rsaquo;</button>
+  <span id="num"><b>1</b> / 7</span>
+</div>
+<script>
+/* ---------- slide 2 infographic ---------- */
+const CH=['Email','Slack','Chat','Mobile'];
+const PARTS=[['parse','#FB7185'],['match','#F5B544'],['check','#3ECF9B'],['write','#60A5FA']];
+document.getElementById('lhs').innerHTML=CH.map(c=>
+ `<div class="stackrow"><span class="chn">${c}</span>`+
+ PARTS.map(p=>`<span class="blk" style="background:${p[1]}22;border:1px solid ${p[1]}44">${p[0]}</span>`).join('')+
+ `</div>`).join('');
+document.getElementById('rhs').innerHTML=
+ CH.map(c=>`<div class="stackrow"><span class="chn">${c}</span>`+
+ `<span class="blk" style="background:#2DD4E822;border:1px solid #2DD4E844">adapter</span></div>`).join('')+
+ `<div style="height:7px"></div>`+
+ `<div class="coreblk" style="background:#A78BFA1F;border:1px solid #A78BFA55;color:#C4B5FD">`+
+ PARTS.map(p=>p[0]).join(' &nbsp;·&nbsp; ')+` &mdash; built once</div>`;
+
+/* ---------- layer detail ---------- */
+const L={
+0:{c:'--bl',n:'TARGET',t:'Salesforce',w:'The system of record, owned by the other half of the PRD. Everything upstream exists to make writes into it correct.',
+ y:['Writes go in as one all-or-nothing batch, so you never get an Engagement update with an orphaned Task',
+    'Every write is an upsert keyed on an external ID, so a retry updates instead of duplicating',
+    'Six provenance fields stamped on every AI-touched record, so any record can be traced back',
+    'Read access for humans goes through the hosted MCP server instead, where per-user permissions apply'],
+ s:['REST + Composite API v67','OAuth JWT Bearer','External_Id__c on every object'],p:['SF-4.3','SF-4.4']},
+1:{c:'--cy',n:'LAYER 01',t:'Inbound channels',w:'Four ways for a person to log something, all of which must mean exactly the same thing by the time it reaches Salesforce.',
+ y:['Email is the one people actually use, and the one with the weakest authentication',
+    'Slack is the cheapest place to confirm a write, because people are already there',
+    'The chat assistant is where clarifying questions and corrections happen naturally',
+    'Each one is a thin adapter — they all normalise to the same internal envelope, so none of them re-implements the hard parts'],
+ s:['Microsoft Graph','Slack Events API','Next.js + Vercel AI SDK'],p:['AI-2.1','AI-2.3','AI-2.4','AI-2.5']},
+2:{c:'--cy',n:'LAYER 02',t:'Ingress & webhooks',w:'Accepts the message, checks it, gives it an ID, and puts it on a queue. Nothing is parsed on the webhook itself.',
+ y:['A slow Salesforce or a bad parse can no longer silently lose a message — it retries, then lands in a dead-letter queue someone can look at',
+    'The idempotency key is created here and carried all the way to the Salesforce write, so duplicate deliveries converge on one record',
+    'Email structure — MIME, quoted replies, signatures, forwarded chains — is parsed by ordinary code, not by the model',
+    'Returns in under 200 ms, so Slack and Graph never time out waiting on us'],
+ s:['FastAPI','Redis Streams / SQS','dead-letter queue'],p:['AI-2.6','DO-1']},
+3:{c:'--cy',n:'LAYER 03',t:'Identity & auth',w:'Answers three separate questions: who sent this, what are they allowed to write, and whose memory should we load.',
+ y:['Inbound: the person is authenticated through Entra ID (or Slack signing, or DMARC for email) and mapped to their Salesforce user',
+    'That mapping is what fills in the relationship lead and engagement owner, since every write technically executes as one service account',
+    'Outbound: a single dedicated low-privilege Salesforce integration user, authenticated with JWT Bearer — no shared admin password anywhere',
+    'Worth noting: Salesforce retires the old username-password login in Winter ’27, so JWT is the only path with a future'],
+ s:['Entra ID (OIDC)','OAuth JWT Bearer','least-privilege permission set'],p:['SF-4.1','SF-4.2','AI-2.3']},
+4:{c:'--ro',n:'LAYER 04',t:'Security',w:'Treats the message body as untrusted input, because a forwarded vendor email is literally someone else’s words arriving inside a prompt that can write to your CRM.',
+ y:['Raw text is passed in as clearly-marked untrusted content, never glued into the instructions',
+    'The set of tools an agent gets is calculated from how much we trust the sender — an unknown emailer physically cannot reach a write tool',
+    'Certain fields (deal stage, fees, recommendation) are off-limits to email-sourced writes at any confidence level',
+    'Hooks deny disallowed tool calls in code before they execute — not by asking the model nicely'],
+ s:['trust tiers','PreToolUse hooks','field allowlists'],p:['AI-2.2','DO-5']},
+5:{c:'--vi',n:'LAYER 05',t:'Orchestration core',w:'The only part of the system that reasons. Everything else is ordinary, testable software around it.',
+ y:['Runs the Claude Agents SDK inside our own FastAPI process — tools are local function calls, so there is no extra service to run, no network hop, and no credentials passed to a third-party process',
+    'Sub-agents handle extraction, matching and dedup with their own contexts, so a long candidate list doesn’t crowd out the actual message',
+    'Enforcement hooks and a deliberately small tool set (six to eight) keep behaviour predictable',
+    'Stateless — all state lives in the layers around it, so it scales and restarts cleanly'],
+ s:['Claude Agents SDK (Python)','FastAPI + Uvicorn','Docker'],p:['AI-1.1','AI-1.2','AI-1.6']},
+6:{c:'--vi',n:'LAYER 06',t:'Salesforce schema skill',w:'Reads the live Salesforce schema so the model can only ever produce values that actually exist.',
+ y:['Picklist values become fixed choices in the tool definition — a made-up sentiment value can’t be produced, not merely rejected later',
+    'When the Salesforce team adds a field or a picklist value, nothing in our code changes: the cache picks it up',
+    'Required fields, field lengths and relationships all come from the same source',
+    'Cached and revalidated cheaply, so it never slows down a request'],
+ s:['REST describe','If-Modified-Since caching','UI API picklists'],p:['AI-1.3']},
+7:{c:'--vi',n:'LAYER 07',t:'Extraction',w:'Turns "had the check-in on the ops DD for the BCS target with OW this morning" into structured fields.',
+ y:['The model is forced to produce a structured result rather than prose',
+    'It must report its own confidence, flag which fields were ambiguous, and quote the part of the message it based each field on',
+    'One message can legitimately produce several records — an activity, an engagement update, and a capability sentiment',
+    'The prompt itself is a versioned artifact, so we always know which version produced a given record'],
+ s:['forced tool use','prompt versions from Langfuse'],p:['AI-1.2','AI-1.4','AI-1.6']},
+8:{c:'--vi',n:'LAYER 08',t:'Entity resolution',w:'Works out which real Salesforce records "OW", "Aaron" and "the BCS target" refer to. The highest-consequence part of the system.',
+ y:['Candidates are found by ordinary matching first — normalised names, email domains, known aliases, fuzzy similarity',
+    'The model only ever picks from real candidates or says none fit. It is never asked to produce a record ID, so it cannot invent one',
+    'One clear match proceeds. Several matches asks a question. No match goes to review',
+    'When a person corrects a match, that correction is remembered for them — so the system gets better at exactly the thing it’s most dangerous at'],
+ s:['trigram matching','alias memory','Salesforce matching rules'],p:['AI-1.5','SF-3.3']},
+9:{c:'--vi',n:'LAYER 09',t:'Dedup',w:'Three different problems that all look like duplicates, handled three different ways.',
+ y:['The same message delivered twice: solved structurally — every write is an upsert on a stable ID, never a plain create',
+    'Two people logging the same meeting from different channels: caught by comparing vendor, date, type and attendees before creating an activity',
+    'The same vendor under two names: that’s entity resolution’s job, with Salesforce duplicate rules as a second net',
+    'A likely duplicate proposes a merge rather than silently blocking the write'],
+ s:['upsert by external ID','similarity check','SF duplicate rules'],p:['AI-3.4','SF-3.3']},
+10:{c:'--vi',n:'LAYER 10',t:'Output contract',w:'One definition of what a valid write looks like — shared with the Salesforce team and used in three places.',
+ y:['The same definition generates the tool schema, validates the model’s output, and builds the Salesforce payload, so the three can never drift apart',
+    'Provenance fields are part of the definition, so there is no code path that writes an unstamped record',
+    'Record IDs are a validated type only the resolver can produce — the model cannot fabricate one',
+    'This is the frozen interface between our half of the PRD and the Salesforce half; both teams review one file'],
+ s:['Pydantic v2','generated JSON Schema'],p:['AI-1.4','SF-4.4','J-1']},
+11:{c:'--em',n:'LAYER 11',t:'Validation & confidence gate',w:'Two passes: rules the model is told about up front, and deterministic checks before anything is written.',
+ y:['GTCR’s Salesforce validation rules are mirrored as data and compiled both into the prompt and into a plain code checker — so a write rarely fails at the Salesforce boundary hours later',
+    'Every referenced record is fetched to confirm it exists before the write goes out',
+    'Auto-commit needs all four: high confidence, all required fields, exactly one match per entity, and a trusted channel',
+    'Anything else goes to a staging record with a review task, rather than being written or dropped',
+    'Thresholds start conservative and are tuned from what reviewers actually accept'],
+ s:['rules as data','staging object','review tasks'],p:['AI-3.1','AI-3.2','SF-3.2','SF-4.5']},
+12:{c:'--am',n:'LAYER 12',t:'Tools & capabilities',w:'A short, deliberately narrow list of things the agent is able to do — and nothing else.',
+ y:['Six to eight purpose-built tools: describe, find candidates, get record, upsert activity, composite write, send to review',
+    'No delete tool, no general "run any query" tool, no "execute code" tool — so there is no surface to escalate through',
+    'Writes go out as one all-or-nothing batch with retries and backoff',
+    'This is also the seam where future capabilities plug in — SharePoint documents, calendar context — without touching the core'],
+ s:['custom in-process tools','REST + Composite','allOrNone batching'],p:['AI-3.3','SF-4.1','SF-4.3']},
+13:{c:'--vi',n:'LAYER 13',t:'Prompt store',w:'Prompts stop being strings buried in code and become versioned artifacts you can promote and roll back.',
+ y:['Changing a prompt is a version promotion, not a code deployment — and rolling back is the same move',
+    'Every trace and every record records which prompt version produced it',
+    'Non-engineers can read the prompt that decides what a field means, without a pull request',
+    'Self-hosted, so vendor names and deal context never leave GTCR’s tenant',
+    'The same deployment also does traces, cost and evals — which is what keeps this a small platform'],
+ s:['Langfuse (self-hosted)','Azure Container Apps','Postgres + ClickHouse'],p:['AI-1.7','DO-5']},
+14:{c:'--vi',n:'LAYER 14',t:'Memory',w:'Short-term memory keeps a conversation coherent. Longer-term memory is what makes matching improve over time.',
+ y:['Short-term: what was asked, what was previewed, what the user corrected — so "no, it was Aaron" works without starting over',
+    'Longer-term: per-person facts like "for Harshil, OW means Oliver Wyman", learned from real corrections',
+    'Retrieved by the authenticated person, never by anything the message body claims',
+    'Only written from confirmed human actions — an approval, a correction — so untrusted text can’t poison it'],
+ s:['Redis','Postgres + pgvector'],p:['AI-1.5']},
+15:{c:'--vi',n:'LAYER 15',t:'Session & data',w:'Salesforce is the system of record. This is the record of what happened on the way there.',
+ y:['The original message is kept exactly as received, so any record can be checked against its source',
+    'Conversation state for chat and Slack, plus a timestamped record of who approved what',
+    'A ledger of every parse: which prompt, which model, which records it wrote',
+    'That ledger is the only reason a bad batch can be found and corrected — Salesforce has no undo'],
+ s:['Postgres','Blob / S3'],p:['DO-3','SF-4.4']},
+16:{c:'--em',n:'LAYER 16',t:'Observability',w:'Every run produces a trace. The trace is what lets you answer questions weeks later.',
+ y:['One thread ties the inbound message, the parse, and the Salesforce write together',
+    'Cost per message, broken down by channel and by person',
+    '"Why does this record say that?" becomes a lookup instead of an investigation',
+    'Because prompts live in the same tool, version tagging needs no extra plumbing'],
+ s:['Langfuse','OpenTelemetry'],p:['DO-3']},
+17:{c:'--em',n:'LAYER 17',t:'Evals',w:'A set of real messages with known correct answers, run automatically whenever a prompt or model changes.',
+ y:['Around 150 real examples across all four channels — the messy forward, the ambiguous name, the one that should have been rejected',
+    'Grown for free: every correction a reviewer makes is a candidate new example',
+    'Two numbers that matter more than accuracy: how often it writes something wrong confidently, and how often it sends something obvious to review',
+    'This is what makes moving to a new Claude model a four-minute test run instead of a leap of faith',
+    'Runs in CI, so a regression fails the build rather than reaching the CRM'],
+ s:['Langfuse datasets','GitHub Actions'],p:['AI-1.7','J-5']},
+18:{c:'--am',n:'LAYER 18',t:'Alerts',w:'Signals that map to real failures in this specific system, rather than generic error rates.',
+ y:['Auto-commit rate drops below 60% — usually a schema or prompt regression',
+    'Review queue has items older than 48 hours — nobody is clearing it, which is the failure mode that quietly kills adoption',
+    'Cost per message triples — usually a retry loop',
+    'Matching suddenly gets ambiguous for one vendor — usually a duplicate account was created in Salesforce'],
+ s:['Langfuse thresholds','email / Slack notifications'],p:['DO-3']}
+};
+const M=document.getElementById('modal');
+function open_(id){
+  const d=L[id]; if(!d) return;
+  document.getElementById('mhead').style.setProperty('--mc',`var(${d.c})`);
+  document.getElementById('mnum').textContent=d.n;
+  document.getElementById('mtitle').textContent=d.t;
+  document.getElementById('mwhat').textContent=d.w;
+  const why=document.getElementById('mwhy');
+  why.style.setProperty('--accent',`var(${d.c})`);
+  why.innerHTML=d.y.map(x=>`<li>${x}</li>`).join('');
+  document.getElementById('mstack').innerHTML=
+    '<span class="msec" style="width:100%;margin-bottom:2px">Built with</span>'+
+    d.s.map(x=>`<span class="st">${x}</span>`).join('');
+  document.getElementById('mprd').innerHTML=d.p.map(x=>`<span class="tag prd">${x}</span>`).join('');
+  document.getElementById('mbody').scrollTop=0;
+  M.classList.add('on');
+}
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-l]');
+  if(el){open_(el.dataset.l);return}
+  if(e.target===M) M.classList.remove('on');
+});
+document.getElementById('mclose').onclick=()=>M.classList.remove('on');
+
+/* ---------- deck ---------- */
+const slides=[...document.querySelectorAll('.slide')];
+const bar=document.getElementById('bar'),numEl=document.getElementById('num'),sectEl=document.getElementById('sect');
+let i=0;
+function go(n,f){
+  n=Math.max(0,Math.min(slides.length-1,n)); if(n===i&&!f)return;
+  M.classList.remove('on');
+  slides[i].classList.remove('on'); i=n; slides[i].classList.add('on');
+  bar.style.width=((i+1)/slides.length*100)+'%';
+  numEl.innerHTML=`<b>${i+1}</b> / ${slides.length}`;
+  sectEl.textContent=slides[i].dataset.sect||'';
+}
+document.getElementById('next').onclick=()=>go(i+1);
+document.getElementById('prev').onclick=()=>go(i-1);
+addEventListener('keydown',e=>{
+  const k=e.key;
+  if(k==='Escape'){M.classList.remove('on');return}
+  if(M.classList.contains('on'))return;
+  if(k==='ArrowRight'||k==='ArrowDown'||k===' '||k==='PageDown'){go(i+1);e.preventDefault()}
+  else if(k==='ArrowLeft'||k==='ArrowUp'||k==='PageUp'){go(i-1);e.preventDefault()}
+  else if(k==='Home')go(0); else if(k==='End')go(slides.length-1);
+  else if(k==='f')document.documentElement.requestFullscreen?.();
+  else if(/^[1-7]$/.test(k))go(+k-1);
+});
+let tx=0;
+addEventListener('touchstart',e=>tx=e.changedTouches[0].clientX,{passive:true});
+addEventListener('touchend',e=>{const d=e.changedTouches[0].clientX-tx;
+  if(!M.classList.contains('on')&&Math.abs(d)>60)go(i+(d<0?1:-1))},{passive:true});
+const stage=document.getElementById('stage');
+function fit(){stage.style.transform=`scale(${Math.min(innerWidth/1280,innerHeight/720)})`}
+addEventListener('resize',fit);fit();go(0,true);
+</script>
+</body>
+</html>
