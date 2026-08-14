@@ -417,6 +417,277 @@
     return h;
   };
 
+  /* ---------------- backlog census ---------------- */
+  views.backlog = function () {
+    var B = D.backlog;
+    if (!B) return '<div class="empty">No backlog census loaded.</div>';
+    var t = B.totals || {};
+
+    var h = '<div class="page-head"><h2>Backlog Census</h2><p>' + esc(B.intro || "") + "</p></div>";
+    h += asOfLine(B.asOf || "13 August 2026");
+
+    // provenance: how the scan was done — this is what buys confidence in the numbers
+    if (B.method && B.method.length) {
+      h += '<div class="method-strip">' + B.method.map(function (m, i) {
+        return '<div class="method-step"><div class="ms-n">STEP ' + (i + 1) + '</div><div class="ms-t">' + esc(m.title) + '</div><div class="ms-d">' + esc(m.detail) + "</div></div>";
+      }).join("") + "</div>";
+    }
+
+    h += '<div class="stat-grid">' + (B.headline || []).map(function (c) {
+      return '<div class="stat"><div class="num ' + esc(c.tone || "") + '">' + esc(c.value) + '</div><div class="lbl">' + esc(c.label) + "</div></div>";
+    }).join("") + "</div>";
+
+    // the funnel: nominal count down to the real queue
+    if (B.funnel && B.funnel.length) {
+      var f0 = B.funnel[0].count || 1;
+      h += '<div class="panel"><h3>From 16,129 items to the real queue</h3>';
+      h += '<p class="topic-summary">Each step removes a class of item that is counted as backlog but cannot be planned as backlog. Every number below is a filter you can re-run yourself.</p>';
+      h += '<div class="funnel">' + B.funnel.map(function (s, i) {
+        var pct = (s.count / f0) * 100;
+        return '<div class="fn-row"><div class="fn-stage">' + esc(s.stage) + '</div>' +
+          '<div class="fn-track"><div class="fn-bar" style="width:' + pct + '%;opacity:' + (1 - i * 0.16) + '"></div>' +
+          '<span class="fn-n">' + fmt(s.count) + "</span></div>" +
+          '<div class="fn-note">' + mdInline(s.note) + "</div></div>";
+      }).join("") + "</div></div>";
+    }
+
+    // triage split — the nominal-vs-actionable story
+    if (B.triage && B.triage.length) {
+      var trTotal = B.triage.reduce(function (a, x) { return a + x.count; }, 0) || 1;
+      h += '<div class="panel"><h3>Nominal backlog vs. actionable backlog</h3>';
+      h += '<p class="topic-summary">' + esc(B.triageIntro || "") + "</p>";
+      h += '<div class="soundings"><div class="soundings-bar">';
+      B.triage.forEach(function (x) {
+        h += '<div class="soundings-seg" style="flex:' + x.count + ';background:' + esc(x.color) + '" title="' + esc(x.bucket) + ": " + x.count + '"><span class="snd-n">' + fmt(x.count) + "</span></div>";
+      });
+      h += "</div></div>";
+      h += '<div class="seg-legend">' + B.triage.map(function (x) {
+        return '<div class="seg-card"><div class="sc-top"><span class="sc-n" style="color:' + esc(x.color) + '">' + fmt(x.count) + '</span><span class="sc-l">' + esc(x.bucket) + " · " + Math.round((x.count / trTotal) * 100) + '%</span></div><div class="sc-r">' + esc(x.rule) + "</div></div>";
+      }).join("") + "</div></div>";
+    }
+
+    // arrivals vs closures
+    if (B.throughput && B.throughput.length) {
+      h += '<div class="panel"><h3>Arrivals vs. closures, by month</h3>';
+      h += '<p class="topic-summary">' + esc(B.throughputNote || "") + "</p>";
+      h += colChart(B.throughput, "created", "closed");
+      h += '<div class="chart-legend"><span><i style="background:var(--buoy)"></i>Created</span><span><i style="background:var(--depth)"></i>Closed</span></div>';
+      if (B.burndown) h += '<div class="callout"><h4>Burn-down arithmetic</h4><p>' + esc(B.burndown) + "</p></div>";
+      h += "</div>";
+    }
+
+    h += '<div class="two-col">';
+    if (B.aging) h += '<div class="panel"><h3>Age of the live backlog</h3><p class="topic-summary" style="margin:-4px 0 10px">By creation date, oldest bucket last. Age at this scale is not a queue — it is a decision that was never taken.</p>' + seqBars(B.aging) + "</div>";
+    if (B.byType) h += '<div class="panel"><h3>Live backlog by type</h3>' + barChart(kvObj(B.byType)) + "</div>";
+    h += "</div>";
+
+    h += '<div class="two-col">';
+    if (B.staleness) h += '<div class="panel"><h3>Time since last touch</h3><p class="topic-summary" style="margin:-4px 0 10px">How long since anyone changed the item at all.</p>' + seqBars(B.staleness) + "</div>";
+    if (B.byState) h += '<div class="panel"><h3>Open items by state</h3>' + barChart(kvObj(B.byState)) + "</div>";
+    h += "</div>";
+
+    // area path -> module map
+    if (B.areas && B.areas.length) {
+      h += '<div class="panel"><h3>Where the work sits — ADO area path mapped to platform module</h3>';
+      h += '<p class="topic-summary">Every area path with material open volume, reconciled against the component catalog from the codebase survey. This is the join that makes the backlog actionable.</p>';
+      h += '<table class="grid"><thead><tr><th>Area path</th><th>Platform module</th><th>Status</th><th>Open</th><th>Closed 6m</th><th>Read</th></tr></thead><tbody>';
+      h += B.areas.map(function (a) {
+        return "<tr><td><b>" + esc(a.area) + "</b></td><td>" + esc(a.module || "—") + "</td><td>" + (a.status ? statusBadge(a.status) : "—") +
+          '</td><td class="mono-n">' + fmt(a.open) + '</td><td class="mono-n">' + fmt(a.closed6m) + "</td><td>" + esc(a.note || "") + "</td></tr>";
+      }).join("") + "</tbody></table></div>";
+    }
+
+    // business-risk themes
+    if (B.themes && B.themes.length) {
+      h += '<div class="panel"><h3>Business-risk themes in the open backlog</h3>';
+      h += '<p class="topic-summary">Title-level classification of open work against the risk categories that carry revenue, legal or data-accuracy exposure.</p>';
+      h += '<table class="grid"><thead><tr><th>Theme</th><th>Open items</th><th>Why it matters</th><th>Representative items</th></tr></thead><tbody>';
+      h += B.themes.map(function (x) {
+        return "<tr><td><b>" + esc(x.theme) + '</b></td><td class="mono-n">' + fmt(x.count) + "</td><td>" + esc(x.why || "") + "</td><td>" +
+          (x.examples || []).map(function (e) { return '<div class="evidence">' + esc(e) + "</div>"; }).join("") + "</td></tr>";
+      }).join("") + "</tbody></table></div>";
+    }
+
+    h += '<div class="two-col">';
+    if (B.ownership) {
+      h += '<div class="panel"><h3>Delivery concentration</h3><p class="topic-summary">' + esc(B.ownership.note || "") + "</p>";
+      h += '<table class="grid"><thead><tr><th>Contributor</th><th>Closed (6m)</th><th>Share</th></tr></thead><tbody>' +
+        (B.ownership.top || []).map(function (p) {
+          return "<tr><td>" + esc(p.name) + '</td><td class="mono-n">' + fmt(p.closed) + '</td><td class="mono-n">' + esc(p.share) + "</td></tr>";
+        }).join("") + "</tbody></table></div>";
+    }
+    if (B.hygiene) {
+      h += '<div class="panel"><h3>Backlog hygiene</h3><p class="topic-summary">Fields that determine whether an item can be planned without going back to its author.</p>';
+      h += '<table class="grid"><thead><tr><th>Signal</th><th>Count</th><th>Of open</th></tr></thead><tbody>' +
+        B.hygiene.map(function (x) {
+          return "<tr><td>" + esc(x.metric) + '</td><td class="mono-n">' + fmt(x.value) + '</td><td class="mono-n">' + esc(x.pct || "") + "</td></tr>";
+        }).join("") + "</tbody></table></div>";
+    }
+    h += "</div>";
+
+    if (B.findings && B.findings.length) {
+      h += '<div class="panel"><h3>What the census concludes</h3>' + B.findings.map(function (f) {
+        return '<div class="finding sev-' + esc(f.severity || "low") + '"><div class="f-rail"></div><div class="f-body"><h5>' + esc(f.title) +
+          '</h5><p>' + mdInline(f.detail) + "</p></div></div>";
+      }).join("") + "</div>";
+    }
+
+    if (B.framework) {
+      h += '<div class="panel"><h3>Prioritisation framework we will apply</h3><div class="md">' + renderMarkdown(B.framework) + "</div></div>";
+    }
+    if (B.caveats) {
+      h += '<div class="callout warn"><h4>Limits of this census</h4><p>' + esc(B.caveats) + "</p></div>";
+    }
+    return h;
+  };
+
+  /* ---------------- transition plan ---------------- */
+  views.transition = function () {
+    var T = D.transition;
+    if (!T) return '<div class="empty">No transition plan loaded.</div>';
+
+    var h = '<div class="page-head"><h2>Transition Plan — 8 Weeks</h2><p>' + esc(T.intro || "") + "</p></div>";
+    h += asOfLine((D.backlog && D.backlog.asOf) || "13 August 2026");
+
+    if (T.headline) {
+      h += '<div class="stat-grid">' + T.headline.map(function (c) {
+        return '<div class="stat"><div class="num ' + esc(c.tone || "") + '">' + esc(c.value) + '</div><div class="lbl">' + esc(c.label) + "</div></div>";
+      }).join("") + "</div>";
+    }
+
+    if (T.axis) {
+      h += '<div class="panel"><h3>The transition axis — and why</h3>';
+      h += '<div class="callout"><h4>' + esc(T.axis.choice) + "</h4><p>" + esc(T.axis.rationale) + "</p></div>";
+      if (T.axis.rejected && T.axis.rejected.length) {
+        h += '<table class="grid"><thead><tr><th>Alternative considered</th><th>Why we did not take it</th></tr></thead><tbody>' +
+          T.axis.rejected.map(function (r) { return "<tr><td><b>" + esc(r.option) + "</b></td><td>" + esc(r.why) + "</td></tr>"; }).join("") +
+          "</tbody></table>";
+      }
+      h += "</div>";
+    }
+
+    // wave gantt
+    if (T.waves && T.waves.length) {
+      h += '<div class="panel"><h3>Wave structure</h3>';
+      h += '<p class="topic-summary">Waves are sequenced by production risk &times; backlog volume &times; knowledge concentration — the domains that can hurt the business fastest transition first, while the incumbent team is still fully available.</p>';
+      h += '<div class="gantt"><div class="gantt-head"><div>Wave</div>' +
+        [1,2,3,4,5,6,7,8].map(function (n) { return "<div>W" + n + "</div>"; }).join("") + "</div>";
+      T.waves.forEach(function (w) {
+        var left = ((w.startWeek - 1) / 8) * 100;
+        var width = ((w.endWeek - w.startWeek + 1) / 8) * 100;
+        h += '<div class="gantt-row"><div class="g-name"><b>' + esc(w.name) + "</b><span>" + esc(w.domains.length + " domains") + "</span></div>" +
+          '<div class="gantt-track"><div class="gantt-bar" style="left:' + left + "%;width:" + width + "%;background:" + esc(w.color) + '">' +
+          esc(w.label || "") + "</div></div></div>";
+      });
+      h += "</div>";
+      h += '<table class="grid" style="margin-top:18px"><thead><tr><th>Wave</th><th>Weeks</th><th>Domains in scope</th><th>ADO area paths</th><th>Why here</th></tr></thead><tbody>';
+      h += T.waves.map(function (w) {
+        return "<tr><td><b>" + esc(w.name) + "</b></td><td>W" + w.startWeek + "–W" + w.endWeek + "</td><td>" +
+          '<div class="pill-list">' + w.domains.map(function (d) { return '<span class="pill">' + esc(d) + "</span>"; }).join("") + "</div></td><td>" +
+          (w.areaPaths || []).map(function (a) { return '<div class="evidence">' + esc(a) + "</div>"; }).join("") + "</td><td>" + esc(w.rationale) + "</td></tr>";
+      }).join("") + "</tbody></table></div>";
+    }
+
+    // weeks
+    if (T.weeks && T.weeks.length) {
+      h += '<div class="page-head" style="margin-top:26px"><h2>Week by week</h2><p>Each week has one objective, a named ask of the incumbent team, an artefact that outlives the week, and an exit criterion that is either met or not. Click to expand.</p></div>';
+      h += '<div class="week-list">' + T.weeks.map(function (w, i) {
+        return '<div class="wk' + (i === 0 ? " open" : "") + '" data-wk="' + i + '">' +
+          '<div class="wk-head"><span class="wk-n">W' + w.n + '</span><span class="wk-obj">' + esc(w.objective) + '</span><span class="wk-wave">' + esc(w.wave || "") + '</span><span class="wk-chev">&#9656;</span></div>' +
+          '<div class="wk-body">' +
+            wkBlock("Velotio activities", w.velotio, "") +
+            wkBlock("Ask of the incumbent team", w.incumbent, "ask") +
+            wkBlock("Artefacts produced", w.artefacts, "") +
+            wkBlock("Exit criteria", w.exit, "exit") +
+          "</div></div>";
+      }).join("") + "</div>";
+      setTimeout(wireWeeks, 0);
+    }
+
+    // workstreams
+    if (T.workstreams && T.workstreams.length) {
+      h += '<div class="page-head" style="margin-top:26px"><h2>Parallel workstreams</h2><p>Four tracks run continuously across all eight weeks, independent of which wave is cutting over.</p></div>';
+      h += '<div class="lanes">' + T.workstreams.map(function (s, i) {
+        return '<div class="lane"><div class="ln-n">WS' + (i + 1) + '</div><h4>' + esc(s.name) + "</h4><p>" + esc(s.purpose) + "</p><ul>" +
+          (s.beats || []).map(function (b) { return "<li>" + mdInline(b) + "</li>"; }).join("") + "</ul></div>";
+      }).join("") + "</div>";
+    }
+
+    // ramp
+    if (T.ramp && T.ramp.length) {
+      h += '<div class="panel"><h3>Ramp model</h3><p class="topic-summary">' + esc(T.rampNote || "") + "</p>";
+      h += '<table class="grid"><thead><tr><th>Role</th><th>Location</th>' + [1,2,3,4,5,6,7,8].map(function (n) { return "<th>W" + n + "</th>"; }).join("") + "<th>Focus</th></tr></thead><tbody>";
+      h += T.ramp.map(function (r) {
+        return "<tr><td><b>" + esc(r.role) + "</b></td><td>" + esc(r.location) + "</td>" +
+          r.byWeek.map(function (n) { return '<td class="mono-n">' + (n || "—") + "</td>"; }).join("") + "<td>" + esc(r.focus) + "</td></tr>";
+      }).join("") + "</tbody></table>";
+      if (T.rampTotal) h += '<p class="chart-note">' + esc(T.rampTotal) + "</p>";
+      h += "</div>";
+    }
+
+    // metrics
+    if (T.metrics && T.metrics.length) {
+      h += '<div class="panel"><h3>Success metrics</h3><p class="topic-summary">Baselines are taken from the backlog census, not from aspiration. Every target is measurable in Azure DevOps or Azure Monitor on the date given.</p>';
+      h += '<table class="grid"><thead><tr><th>Metric</th><th>Baseline today</th><th>Target</th><th>Measured by</th></tr></thead><tbody>' +
+        T.metrics.map(function (m) {
+          return '<tr class="metric-row"><td><b>' + esc(m.metric) + '</b></td><td class="base">' + esc(m.baseline) + '</td><td class="tgt">' + esc(m.target) + "</td><td>" + esc(m.when) + "</td></tr>";
+        }).join("") + "</tbody></table></div>";
+    }
+
+    // risks
+    if (T.risks && T.risks.length) {
+      h += '<div class="panel"><h3>Transition risks</h3>';
+      h += '<table class="grid"><thead><tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead><tbody>' +
+        T.risks.map(function (r) {
+          return "<tr><td><b>" + esc(r.risk) + '</b></td><td class="lik-' + esc((r.likelihood||"").toLowerCase()) + '">' + esc(r.likelihood) +
+            '</td><td class="imp-' + esc((r.impact||"").toLowerCase()) + '">' + esc(r.impact) + "</td><td>" + esc(r.mitigation) + "</td></tr>";
+        }).join("") + "</tbody></table></div>";
+    }
+
+    h += '<div class="two-col">';
+    if (T.dod) h += '<div class="panel"><h3>Definition of done — "we own it"</h3><ul class="md">' + T.dod.map(function (x) { return "<li>" + mdInline(x) + "</li>"; }).join("") + "</ul></div>";
+    if (T.outOfScope) h += '<div class="panel"><h3>Explicitly out of scope for the 8 weeks</h3><ul class="md">' + T.outOfScope.map(function (x) { return "<li>" + mdInline(x) + "</li>"; }).join("") + "</ul></div>";
+    h += "</div>";
+
+    return h;
+  };
+
+  function wkBlock(title, items, cls) {
+    items = arr(items).filter(Boolean);
+    if (!items.length) return "";
+    return '<div class="wk-block ' + cls + '"><h6>' + esc(title) + "</h6><ul>" + items.map(function (x) { return "<li>" + mdInline(x) + "</li>"; }).join("") + "</ul></div>";
+  }
+  function wireWeeks() {
+    Array.prototype.forEach.call(document.querySelectorAll(".wk-head"), function (head) {
+      head.addEventListener("click", function () { head.parentNode.classList.toggle("open"); });
+    });
+  }
+  function kvObj(list) { var o = {}; (list || []).forEach(function (x) { o[x.label || x.bucket || x.name] = x.count; }); return o; }
+  // bars that keep the given order (age / staleness buckets are sequential, not ranked)
+  function seqBars(list) {
+    var max = Math.max.apply(null, list.map(function (x) { return x.count; }).concat([1]));
+    return list.map(function (x) {
+      return '<div class="bar-row"><div class="name">' + esc(x.label) + '</div><div class="bar-track"><div class="bar-fill" style="width:' +
+        Math.round((x.count / max) * 100) + '%"></div></div><div class="val">' + fmt(x.count) + "</div></div>";
+    }).join("");
+  }
+  function asOfLine(d) {
+    return '<div class="asof"><span class="dot"></span>Backlog data as of <b>' + esc(d) + '</b> · Azure DevOps project <code>NeXT</code> · 16,129 work items</div>';
+  }
+  function colChart(rows, ka, kb) {
+    var max = Math.max.apply(null, rows.map(function (r) { return Math.max(r[ka] || 0, r[kb] || 0); }).concat([1]));
+    var plot = rows.map(function (r) {
+      return '<div class="cc-month" title="' + esc(r.month) + ": " + (r[ka] || 0) + " created, " + (r[kb] || 0) + ' closed">' +
+        '<div class="cc-bar a" style="height:' + ((r[ka] || 0) / max * 100) + '%"></div>' +
+        '<div class="cc-bar b" style="height:' + ((r[kb] || 0) / max * 100) + '%"></div></div>';
+    }).join("");
+    var axis = rows.map(function (r, i) {
+      var lbl = (rows.length > 14 && i % 2) ? "" : String(r.month || "").slice(2);
+      return '<div class="cc-lbl">' + esc(lbl) + "</div>";
+    }).join("");
+    return '<div class="colchart"><div class="cc-plot">' + plot + '</div><div class="cc-axis">' + axis + "</div></div>";
+  }
+
   /* ---------------- helpers for views ---------------- */
   function topicPage(key, title, extraMono) {
     var t = findTopic(key) || {};
