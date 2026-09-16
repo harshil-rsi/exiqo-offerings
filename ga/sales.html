@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>G&A Partners | AI Sales Workflow PRD</title>
+<style>
+:root {
+  --red:#C60C30; --navy:#23394A; --grey:#6B6F70; --lgrey:#A8ACAE;
+  --fog:#F5F7F9; --rule:#E2E8ED; --white:#FFFFFF;
+  --pos:#2A8F60; --c2:#0088CE; --amber:#FF9E1B;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:var(--navy);background:var(--fog);font-size:13px;line-height:1.5;}
+
+/* HEADER */
+.hdr{background:var(--navy);padding:0 48px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
+.logo-area{padding:12px 0;display:flex;align-items:center;}
+.hdr-right{display:flex;align-items:center;gap:10px;}
+.hdr-badge{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:3px;background:rgba(198,12,48,.3);color:rgba(255,255,255,.8);border:1px solid rgba(198,12,48,.4);}
+
+/* TAB NAV */
+.tab-nav{background:var(--navy);display:flex;padding:0 48px;border-bottom:1px solid rgba(255,255,255,.08);overflow-x:auto;}
+.tab-nav::-webkit-scrollbar{height:0;}
+.tab-btn{padding:11px 18px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.4);border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:color .15s;flex-shrink:0;text-decoration:none;display:inline-block;}
+.tab-btn:hover{color:rgba(255,255,255,.75);}
+.tab-panel{display:none;}
+.tab-panel:target{display:block;}
+body:not(:has(.tab-panel:target)) #tab-index{display:block;}
+body:not(:has(.tab-panel:target)) .tab-btn[href="#tab-index"],
+body:has(#tab-index:target) .tab-btn[href="#tab-index"],
+body:has(#tab-context:target) .tab-btn[href="#tab-context"],
+body:has(#tab-flow:target) .tab-btn[href="#tab-flow"],
+body:has(#tab-deepdive:target) .tab-btn[href="#tab-deepdive"],
+body:has(#tab-impact:target) .tab-btn[href="#tab-impact"],
+body:has(#tab-systems:target) .tab-btn[href="#tab-systems"],
+body:has(#tab-glossary:target) .tab-btn[href="#tab-glossary"],
+body:has(#tab-submission:target) .tab-btn[href="#tab-submission"]{color:#fff;border-bottom-color:var(--red);}
+
+/* PAGE */
+.page{max-width:1060px;margin:0 auto;padding:36px 48px 60px;}
+.pg-eye{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--red);font-weight:700;margin-bottom:5px;}
+.pg-h1{font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-.4px;margin-bottom:8px;line-height:1.2;}
+.pg-sub{font-size:12px;color:var(--grey);margin-bottom:24px;max-width:700px;line-height:1.7;}
+.section-title{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--rule);margin-top:28px;}
+.divider{border:none;border-top:1px solid var(--rule);margin:24px 0;}
+
+/* CARDS */
+.card{background:var(--white);border:1px solid var(--rule);border-radius:8px;padding:18px 20px;margin-bottom:12px;box-shadow:0 1px 4px rgba(35,57,74,.05);}
+.card-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px;}
+.card-sub{font-size:11px;color:var(--grey);line-height:1.65;}
+.card.accent-red{border-left:4px solid var(--red);border-radius:0 8px 8px 0;}
+.card.accent-blue{border-left:4px solid var(--c2);border-radius:0 8px 8px 0;}
+.card.accent-green{border-left:4px solid var(--pos);border-radius:0 8px 8px 0;}
+.card.accent-amber{border-left:4px solid var(--amber);border-radius:0 8px 8px 0;}
+.card.accent-navy{border-left:4px solid var(--navy);border-radius:0 8px 8px 0;}
+
+/* CALLOUTS */
+.callout{border-radius:0 6px 6px 0;padding:12px 18px;font-size:11px;line-height:1.65;margin-bottom:16px;}
+.callout.info{border-left:4px solid var(--c2);background:#EBF4FB;color:#1a4f72;}
+.callout.warn{border-left:4px solid var(--amber);background:#FEF9EE;color:#5c3c00;}
+.callout.success{border-left:4px solid var(--pos);background:#E9F5EF;color:#1a4a2e;}
+.callout strong{font-weight:700;}
+
+/* TABLES */
+.tbl{width:100%;border-collapse:collapse;background:var(--white);border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin-bottom:18px;box-shadow:0 1px 5px rgba(35,57,74,.06);}
+.tbl thead th{background:var(--red);color:rgba(255,255,255,.9);padding:9px 14px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-align:left;border-right:1px solid rgba(255,255,255,.1);}
+.tbl thead th:last-child{border-right:none;}
+.tbl tbody td{padding:9px 14px;border-bottom:1px solid var(--rule);font-size:11px;color:var(--navy);vertical-align:top;}
+.tbl tbody tr:last-child td{border-bottom:none;}
+.tbl tbody tr:nth-child(even) td{background:#F8FAFB;}
+.tbl .subhead td{background:#EDF1F5;font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#3a5068;}
+
+/* BULLET LISTS IN TABLES */
+.tbl-bullets{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:5px;}
+.tbl-bullets li{font-size:11px;color:var(--navy);line-height:1.5;padding-left:12px;position:relative;}
+.tbl-bullets li::before{content:"";position:absolute;left:1px;top:6px;width:5px;height:5px;border-radius:50%;background:var(--lgrey);}
+.tbl-bullets-pain li::before{background:var(--red);opacity:.7;}
+.tbl-bullets-opp li{color:#1a5c38;}
+.tbl-bullets-opp li::before{background:var(--pos);}
+.tbl-bullets-metric li::before{background:var(--c2);}
+
+/* METRIC TILES */
+.metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px;}
+.metric-tile{background:var(--white);border:1px solid var(--rule);border-radius:6px;padding:14px 16px;border-top:3px solid var(--navy);}
+.metric-tile.c2{border-top-color:var(--c2);}
+.metric-tile.cr{border-top-color:var(--red);}
+.metric-tile.cg{border-top-color:var(--pos);}
+.metric-tile.ca{border-top-color:var(--amber);}
+.metric-val{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-.5px;line-height:1;margin-bottom:4px;}
+.metric-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--lgrey);}
+
+/* INDEX CARDS */
+.index-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:24px;}
+.index-card{background:var(--white);border:1px solid var(--rule);border-radius:10px;padding:20px 22px;display:flex;gap:16px;align-items:flex-start;box-shadow:0 1px 5px rgba(35,57,74,.06);cursor:pointer;transition:box-shadow .15s;color:inherit;text-decoration:none;}
+.index-card:hover{box-shadow:0 3px 12px rgba(35,57,74,.12);}
+.index-num{width:36px;height:36px;border-radius:50%;background:var(--red);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.index-body h3{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px;}
+.index-body p{font-size:11px;color:var(--grey);line-height:1.6;}
+
+/* BUSINESS IMPACT */
+.tier-table{width:100%;border-collapse:collapse;margin-bottom:24px;}
+.tier-table th{background:var(--navy);color:#fff;padding:10px 16px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-align:center;border-right:1px solid rgba(255,255,255,.1);}
+.tier-table td{padding:12px 16px;border-bottom:1px solid var(--rule);font-size:12px;text-align:center;vertical-align:middle;}
+.tier-table tr:last-child td{border-bottom:none;}
+.tier-badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;}
+.tier-now{background:#FEF3E2;color:#7a4800;}
+.tier-target{background:#E6F4EC;color:#1a5c38;}
+.tier-uplift{background:#EBF4FB;color:#1a4f72;font-weight:800;font-size:14px;}
+.arrow-up{color:var(--pos);font-size:18px;font-weight:800;}
+
+/* GLOSSARY */
+.gloss-item{display:flex;gap:20px;padding:10px 0;border-bottom:1px solid var(--rule);align-items:baseline;}
+.gloss-item:last-child{border-bottom:none;}
+.gloss-term{font-size:12px;font-weight:700;color:var(--navy);min-width:140px;flex-shrink:0;}
+.gloss-def{font-size:11px;color:var(--grey);line-height:1.6;}
+
+/* SUBMIT */
+.submit-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--rule);}
+.submit-item:last-child{border-bottom:none;}
+.submit-num{width:28px;height:28px;border-radius:50%;background:var(--red);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.submit-body h4{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:3px;}
+.submit-body p{font-size:11px;color:var(--grey);line-height:1.6;}
+
+/* PROCESS FLOW (from GA_Sales_Process_Flow.html) */
+.swimlane-container{overflow-x:auto;padding-bottom:16px;}
+.swimlane-inner{min-width:1200px;}
+.phase-bar{display:grid;grid-template-columns:110px repeat(7,1fr);gap:0;}
+.phase-cell{padding:8px 10px;font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;text-align:center;border-right:1px solid rgba(255,255,255,.18);}
+.phase-cell:last-child{border-right:none;}
+.phase-cell.lbl{background:var(--navy);color:rgba(255,255,255,.4);font-size:8px;border-right:1px solid rgba(255,255,255,.1);}
+.phase-1{background:#C60C30;color:#fff;}
+.phase-2{background:#23394A;color:#fff;}
+.phase-3{background:#0088CE;color:#fff;}
+.phase-4{background:#2A8F60;color:#fff;}
+.phase-5{background:#FF9E1B;color:#fff;}
+.phase-6{background:#7B4FD6;color:#fff;}
+.phase-7{background:#49C5B1;color:var(--navy);}
+.lane-row{display:grid;grid-template-columns:110px repeat(7,1fr);gap:0;border-bottom:1px solid var(--rule);background:var(--white);}
+.lane-row:last-child{border-bottom:none;border-radius:0 0 8px 8px;}
+.lane-row:first-child{border-top:1px solid var(--rule);border-radius:8px 8px 0 0;}
+.lane-label{padding:12px 10px;font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;text-align:center;border-right:1px solid var(--rule);line-height:1.4;}
+.lane-label.l1{background:#3d5a70;}
+.lane-label.l2{background:#2e4a5f;}
+.lane-label.l3{background:#1f3a50;}
+.lane-label.l4{background:#152d40;}
+.lane-cell{padding:10px 8px;border-right:1px solid var(--rule);vertical-align:top;display:flex;flex-direction:column;gap:6px;justify-content:flex-start;min-height:80px;}
+.lane-cell:last-child{border-right:none;}
+.lane-cell.empty{background:var(--fog);}
+.lane-cell.shaded{background:#f8fafc;}
+.node{border-radius:5px;padding:7px 9px;font-size:10px;font-weight:600;color:#fff;line-height:1.35;position:relative;cursor:default;}
+.node .sys-tag{font-size:8px;font-weight:700;letter-spacing:.3px;margin-top:4px;opacity:.85;display:flex;align-items:center;gap:3px;}
+.node .sys-tag::before{content:'⬡';font-size:8px;}
+.node.orange{background:#E8931A;}
+.node.blue{background:#2980C8;}
+.node.navy{background:var(--navy);}
+.node.teal{background:#2eab95;}
+.node.purple{background:#6B3FBE;}
+.node.green{background:#238a55;}
+.node.red{background:var(--red);}
+.diamond-wrap{display:flex;align-items:center;justify-content:center;padding:4px 0;}
+.diamond{width:62px;height:62px;background:#FFF8E1;border:2px solid #DAA520;transform:rotate(45deg);display:flex;align-items:center;justify-content:center;border-radius:4px;flex-shrink:0;}
+.diamond-inner{transform:rotate(-45deg);font-size:8px;font-weight:700;color:#7a5010;text-align:center;line-height:1.25;width:72px;}
+.start-node{width:44px;height:44px;background:#27ae60;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;letter-spacing:.3px;text-transform:uppercase;margin:0 auto;}
+.legend{display:flex;align-items:center;gap:22px;margin-bottom:28px;padding:10px 16px;background:var(--white);border:1px solid var(--rule);border-radius:6px;flex-wrap:wrap;}
+.leg-item{display:flex;align-items:center;gap:7px;font-size:10px;font-weight:600;color:var(--grey);letter-spacing:.3px;}
+.leg-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+.leg-decision{width:14px;height:14px;background:#FFF3CD;border:1.5px solid #DAA520;transform:rotate(45deg);flex-shrink:0;border-radius:2px;}
+.sys-strip{display:grid;grid-template-columns:100px repeat(8,1fr);gap:0;margin-top:16px;background:var(--white);border:1px solid var(--rule);border-radius:8px;overflow:hidden;}
+.sys-strip-label{padding:10px;font-size:8px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.8);background:var(--navy);display:flex;align-items:center;justify-content:center;text-align:center;border-right:1px solid rgba(255,255,255,.1);}
+.sys-strip-cell{padding:8px 8px;border-right:1px solid var(--rule);display:flex;flex-direction:column;gap:4px;}
+.sys-strip-cell:last-child{border-right:none;}
+.sys-badge{font-size:9px;font-weight:700;padding:3px 7px;border-radius:3px;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;line-height:1.3;}
+.sb-orange{background:#FEF3E2;color:#8a4e00;border:1px solid #F5A62350;}
+.sb-blue{background:#E6F2FC;color:#005a8e;border:1px solid #0088CE40;}
+.sb-navy{background:#EDF1F5;color:var(--navy);border:1px solid #23394A30;}
+.sb-teal{background:#E6F7F4;color:#1a7a68;border:1px solid #49C5B140;}
+.sb-purple{background:#F0EAF8;color:#4a2fab;border:1px solid #7B4FD640;}
+.sb-green{background:#E6F4EC;color:#1a6b3c;border:1px solid #2A8F6040;}
+.sb-grey{background:var(--fog);color:var(--grey);border:1px solid var(--rule);}
+
+/* FOOTER */
+.foot{border-top:1px solid var(--rule);padding-top:14px;display:flex;justify-content:space-between;font-size:10px;color:var(--lgrey);margin-top:36px;}
+
+/* ── PROCESS FLOW NODE COLORS ── */
+.node.pf-ba  { background:#FFF8F0; color:#5a3200; border-left:3px solid #F5A623; }
+.node.pf-sdr { background:#F0FAF8; color:#1a6b5e; border-left:3px solid #4EC5B0; }
+.node.pf-isr { background:#F0F7FF; color:#0a3d6e; border-left:3px solid #5BA8E0; }
+.node.pf-rsa { background:#F7F3FD; color:#4a2fab; border-left:3px solid #9B7FD4; }
+.node.orange { background:#FFF8F0; color:#5a3200; border-left:3px solid #F5A623; }
+.node.blue   { background:#F0F7FF; color:#0a3d6e; border-left:3px solid #5BA8E0; }
+.node.teal   { background:#F0FAF8; color:#1a6b5e; border-left:3px solid #4EC5B0; }
+.node.purple { background:#F7F3FD; color:#4a2fab; border-left:3px solid #9B7FD4; }
+.node.navy   { background:#F4F6F8; color:var(--navy); border-left:3px solid #7A93A8; }
+.node.green  { background:#F2FAF5; color:#1a5c38; border-left:3px solid #5BAF80; }
+.node.red    { background:#FDECEA; color:#8a000a; border-left:3px solid var(--red); }
+
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="logo-area">
+    <img src="ga-logo.jpg" alt="G&A Partners" style="height:48px;display:block;">
+  </div>
+  <div class="hdr-right">
+    <span class="hdr-badge">Confidential · Partners Only</span>
+  </div>
+</div>
+
+<!-- TAB NAV -->
+<div class="tab-nav">
+  <a class="tab-btn" href="#tab-index">01 · Overview</a>
+  <a class="tab-btn" href="#tab-context">02 · Business Context</a>
+  <a class="tab-btn" href="#tab-flow">03 · Process Flow</a>
+  <a class="tab-btn" href="#tab-deepdive">04 · Process Deep Dive</a>
+  <a class="tab-btn" href="#tab-impact">05 · Business Impact</a>
+  <a class="tab-btn" href="#tab-systems">06 · Systems &amp; Technical</a>
+  <a class="tab-btn" href="#tab-glossary">07 · Glossary</a>
+  <a class="tab-btn" href="#tab-submission">08 · Submission</a>
+</div>
+
+<!-- ══ TAB 1: INDEX ══ -->
+<div id="tab-index" class="tab-panel">
+<div class="page">
+  <div class="pg-eye">Partner Evaluation Package · May 2026</div>
+  <div class="pg-h1">AI-Enabled Sales Workflow<br>Product Requirements Document</div>
+  <div class="pg-sub">G&amp;A Partners is evaluating strategic AI development partners to design and build an AI-enabled sales workflow. This document provides everything a partner needs to understand the opportunity, the current state, and what a winning response looks like. Navigate using the tabs above.</div>
+
+    <div class="section-title">What's Inside</div>
+  <div class="index-grid">
+    <a class="index-card" href="#tab-index">
+      <div class="index-num">01</div>
+      <div class="index-body">
+        <h3>Overview</h3>
+        <p>Key contents of this document, scope and timeline for the partner evaluation, and the point of contact for all questions and submissions.</p>
+      </div>
+    </a>
+    <a class="index-card" href="#tab-context">
+      <div class="index-num">02</div>
+      <div class="index-body">
+        <h3>Business Context</h3>
+        <p>What G&amp;A Partners is, the three product lines, the sales organization, and key performance metrics. Read this first.</p>
+      </div>
+    </a>
+    <a class="index-card" href="#tab-flow">
+      <div class="index-num">03</div>
+      <div class="index-body">
+        <h3>Process Flow</h3>
+        <p>A visual swimlane diagram of the full end-to-end sales process across functional roles — from lead sourcing through closed-won handoff to onboarding. Current state with systems labeled.</p>
+      </div>
+    </a>
+    <a class="index-card" href="#tab-deepdive">
+      <div class="index-num">04</div>
+      <div class="index-body">
+        <h3>Process Deep Dive</h3>
+        <p>Stage-by-stage breakdown: what happens today, where the pain is, and what needs to change. This is where partners should spend most of their time.</p>
+      </div>
+    </a>
+    <a class="index-card" href="#tab-impact">
+      <div class="index-num">05</div>
+      <div class="index-body">
+        <h3>Business Impact</h3>
+        <p>What we expect partners to automate so that we can reduce the time spent by salespeople across each step of the process.</p>
+      </div>
+    </a>
+    <a class="index-card" href="#tab-systems">
+      <div class="index-num">06</div>
+      <div class="index-body">
+        <h3>Systems &amp; Technical</h3>
+        <p>Full inventory of systems in scope, integration status, and API considerations. For the partner's technical team.</p>
+      </div>
+    </a>
+    <a class="index-card" href="#tab-glossary">
+      <div class="index-num">07</div>
+      <div class="index-body">
+        <h3>Glossary</h3>
+        <p>Definitions of all PEO industry terms, G&amp;A-specific acronyms, and sales process terminology used throughout this document.</p>
+      </div>
+    </a>
+    <a class="index-card" href="#tab-submission">
+      <div class="index-num">08</div>
+      <div class="index-body">
+        <h3>Submission Guide</h3>
+        <p>What we are looking for from partners, how we expect to evaluate and qualify partners, and what a winning response looks like.</p>
+      </div>
+    </a>
+  </div>
+
+  <div class="section-title">Scope &amp; Timeline</div>
+  <table class="tbl" style="margin-bottom:22px;">
+    <thead><tr><th>Milestone</th><th>Date</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><strong>PRD Shared</strong></td><td>May 29, 2026</td><td>This document distributed to select partners</td></tr>
+      <tr><td><strong>Partner Response Deadline</strong></td><td>June 10, 2026</td><td>Approach, architecture, cost, demo/POC, relevant experience</td></tr>
+      <tr><td><strong>Partner Presentations</strong></td><td>TBD</td><td>Live Q&amp;A and demo walk-through with G&amp;A leadership</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">Point of Contact</div>
+  <div class="card">
+    <div class="card-title">Engagement Lead</div>
+    <div class="card-sub">All questions and submissions should be directed to:<br><br><strong>Tilak Sagireddy</strong><br>tsagireddy@alixpartners.com</div>
+  </div>
+
+  <div class="foot">
+    <span>G&amp;A Partners · AI Sales Workflow PRD · Confidential</span>
+    <span>Preliminary — Subject to Change · TBD</span>
+  </div>
+</div>
+</div>
+
+<!-- ══ TAB 2: BUSINESS CONTEXT ══ -->
+<div id="tab-context" class="tab-panel">
+<div class="page">
+  <div class="pg-eye">Business Context</div>
+  <div class="pg-h1">G&A Partners — Business Overview</div>
+  <div class="pg-sub">A concise summary of G&amp;A Partners' business, sales organization, and performance context. Read this before reviewing the process and technical sections.</div>
+
+  <div class="section-title">What G&amp;A Partners Does</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:4px;">
+    <div class="card">
+      <div class="card-title">The Business</div>
+      <div class="card-sub">G&amp;A Partners is a leading Professional Employer Organization (PEO) serving worksite employees (WSEs) across the United States. We co-employ clients' employees — administering payroll, benefits, HR, workers' comp, and risk management on their behalf. Revenue is driven by WSE count × per-employee-per-month (PEPM) fee, plus arbitrage on benefits and workers' comp programs.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Three Product Lines</div>
+      <div class="card-sub">
+        <strong>PEO</strong> — Full co-employment. Client uses G&amp;A master health plan and/or WC program. Highest PEPM and margin. Majority of revenue.<br><br>
+        <strong>ASO</strong> — Administrative services only. Client retains own insurance. Lower PEPM, more admin overhead.<br><br>
+        <strong>HCM (iSolved)</strong> — Standalone payroll/HR software. Separate tech stack and team. Out of scope for Phase 1.
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">2025 Performance</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px;">
+    <div class="metric-tile cr"><div class="metric-val">$26.6M</div><div class="metric-lbl">Gross Margin Closed</div></div>
+    <div class="metric-tile c2"><div class="metric-val">932</div><div class="metric-lbl">Deals Closed</div></div>
+    <div class="metric-tile cg"><div class="metric-val">$28K</div><div class="metric-lbl">Average GM Per Deal</div></div>
+  </div>
+
+  <div class="section-title">2026 Goal</div>
+  <div class="metric-tile cr" style="max-width:240px;margin-bottom:22px;"><div class="metric-val">$32.5M</div><div class="metric-lbl">Gross Margin Target</div></div>
+
+  <div class="section-title">2026 Sales Team</div>
+  <div style="background:var(--navy);border-radius:8px;padding:10px 18px;margin-bottom:4px;">
+    <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:10px;">2026 SALES TEAM COVERAGE — 143 PROFESSIONALS · 20 SUB REGIONS · 10 OPEN POSITIONS</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0;">
+      <div style="border-right:1px solid rgba(255,255,255,.1);padding:8px 14px 8px 0;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px;">TOTAL HEADCOUNT</div>
+        <div style="font-size:28px;font-weight:800;color:#fff;line-height:1;">143</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:4px;">Filed sales professionals</div>
+      </div>
+      <div style="border-right:1px solid rgba(255,255,255,.1);padding:8px 14px;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px;">BUSINESS ADVISORS</div>
+        <div style="font-size:28px;font-weight:800;color:#fff;line-height:1;">91</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:4px;">+ 6 Sr. BAs</div>
+      </div>
+      <div style="border-right:1px solid rgba(255,255,255,.1);padding:8px 14px;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px;">HCM CONSULTANTS</div>
+        <div style="font-size:28px;font-weight:800;color:#fff;line-height:1;">10</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:4px;">Dedicated HCM team</div>
+      </div>
+      <div style="border-right:1px solid rgba(255,255,255,.1);padding:8px 14px;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px;">RSDs / VPs / CRO</div>
+        <div style="font-size:28px;font-weight:800;color:#fff;line-height:1;">26</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:4px;">17 RSD + 8 VP + 1 CRO</div>
+      </div>
+      <div style="padding:8px 14px;">
+        <div style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px;">OPEN POSITIONS</div>
+        <div style="font-size:28px;font-weight:800;color:#fff;line-height:1;">10</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:4px;">Not shown on map</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:14px;margin-bottom:22px;">
+    <div class="card">
+      <div class="card-title" style="font-size:12px;">Business Advisors — High Volume</div>
+      <div class="card-sub">Focus on clients with 20–500+ worksite employees. Own the full sales cycle. Receive a significant volume of leads from brokers and referral partners — where they spend most of their time. Less time spent on outbound prospecting.</div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="font-size:12px;">Business Advisors — Low Volume</div>
+      <div class="card-sub">Focus on clients with 20–500+ worksite employees. Own the full sales cycle. Spend most of their time on prospecting and working through the full sales process — from sourcing leads through close.</div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="font-size:12px;">Inside Sales Reps (ISRs)</div>
+      <div class="card-sub">Focus on clients with 1–25 worksite employees. Own the full sales cycle.</div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="font-size:12px;">SDRs</div>
+      <div class="card-sub">Lead prospecting — setting initial meetings for BAs through cold calling and email sequences.</div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="font-size:12px;">Regional Sales Admins (RSAs)</div>
+      <div class="card-sub">Help BAs with manual work — document routing, CRM data entry, and administrative support.</div>
+    </div>
+  </div>
+
+  <div class="section-title">What We Are Looking For</div>
+  <div class="pg-sub" style="margin-bottom:14px;">We are looking for solutions across three areas:</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:22px;">
+    <div class="card accent-red">
+      <div class="card-title">Better leads in</div>
+      <div class="card-sub">Higher-quality prospecting powered by intent data so BAs focus on accounts that are most likely to convert.</div>
+    </div>
+    <div class="card accent-blue">
+      <div class="card-title">Cut admin from the sales process</div>
+      <div class="card-sub">BAs spend a significant portion of their time on admin activities, document prep, and CRM entry. Automating these steps frees reps to focus on selling.</div>
+    </div>
+    <div class="card accent-green">
+      <div class="card-title">Elevate the post-sale experience</div>
+      <div class="card-sub">A structured onboarding handoff that accelerates the onboarding for the clients.</div>
+    </div>
+  </div>
+
+  <div class="callout warn"><strong>A note to partners:</strong> Do not be constrained by the systems listed in this document. The current stack is documented as context, not as a constraint. If you believe a different architecture, platform, or toolset better meets the business requirements described in the subsequent sections, that is a fair and encouraged response. We are evaluating the best solution to the problem — not the most compatible one with what we already have.</div>
+
+  <div class="foot">
+    <span>G&amp;A Partners · AI Sales Workflow PRD · Confidential</span>
+    <span>Preliminary — Subject to Change · TBD</span>
+  </div>
+</div>
+</div>
+
+<!-- ══ TAB 3: PROCESS FLOW ══ -->
+<div id="tab-flow" class="tab-panel">
+<div class="page" style="max-width:100%;padding:28px 32px 60px;">
+  <div class="pg-eye">Process Flow · Visual Overview</div>
+  <div class="pg-h1">End-to-End Sales Process — Current State</div>
+  <div class="pg-sub">Three swimlanes by sales role across six phases. The Process Deep Dive (Tab 04) goes deeper on each phase with pain points, metrics, and automation opportunities.</div>
+
+  <div class="legend" style="margin-bottom:20px;">
+    <div class="leg-item"><div class="leg-dot" style="background:#27ae60;border-radius:50%;width:14px;height:14px;"></div>Start / End</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#F0F4F8;border:1px solid #7A93A8;"></div>Activity (role shown by swimlane)</div>
+    <div class="leg-item"><div class="leg-decision"></div>Decision Gate</div>
+  </div>
+
+  <div class="swimlane-container">
+  <div class="swimlane-inner" style="min-width:1100px;">
+
+  <!-- 6-PHASE HEADER -->
+  <div style="display:grid;grid-template-columns:100px repeat(6,1fr);gap:0;margin-bottom:0;">
+    <div class="phase-cell lbl">Role</div>
+    <div class="phase-cell" style="background:#C60C30;color:#fff;">1 · Prospecting</div>
+    <div class="phase-cell" style="background:#23394A;color:#fff;">2 · Qualification</div>
+    <div class="phase-cell" style="background:#0088CE;color:#fff;">3 · Pricing</div>
+    <div class="phase-cell" style="background:#2A8F60;color:#fff;">4 · Research &amp; Proposal</div>
+    <div class="phase-cell" style="background:#7B4FD6;color:#fff;">5 · Demo &amp; Closing</div>
+    <div class="phase-cell" style="background:#49C5B1;color:#fff;">6 · Handoff</div>
+  </div>
+
+  <!-- BA ROW -->
+  <div style="display:grid;grid-template-columns:100px repeat(6,1fr);gap:0;border-bottom:1px solid var(--rule);background:var(--white);">
+    <div class="lane-label l1" style="background:#2e4a5f;">Business<br>Advisors</div>
+    <div class="lane-cell">
+      <div class="start-node" style="margin:0 auto 8px;width:36px;height:36px;font-size:8px;">Start</div>
+      <div class="node pf-ba">Work 600 Assigned Accounts<div class="sys-tag">Salesforce · ZoomInfo</div></div>
+      <div class="node pf-ba">Contact Captured in Salesforce<div class="sys-tag">Salesforce</div></div>
+      <div class="node pf-ba">Initiate Outreach Sequence<div class="sys-tag">Outreach.io</div></div>
+    </div>
+    <div class="lane-cell">
+      <div class="node pf-ba">Initial Meeting<div class="sys-tag">Terret AI · Outlook</div></div>
+      <div class="node pf-ba">Request Client Data<div class="sys-tag">Email</div></div>
+      <div class="node pf-ba">Create Opportunity in SF<div class="sys-tag">Salesforce → ClientSpace</div></div>
+    </div>
+    <div class="lane-cell">
+      <div class="node pf-ba">Upload to ClientSpace (WC + PEPM)<div class="sys-tag">ClientSpace</div></div>
+      <div class="diamond-wrap"><div class="diamond"><div class="diamond-inner">Medical Quote Needed?</div></div></div>
+      <div class="node pf-rsa" style="font-size:9px;">Clean &amp; Normalize Census<div class="sys-tag">RSA / Offshore · Excel</div></div>
+      <div class="node pf-rsa" style="font-size:9px;">Upload to Milliman HERO<div class="sys-tag">RSA · HERO · Gradient · State-Specific</div></div>
+      <div class="diamond-wrap"><div class="diamond"><div class="diamond-inner">Master Plan Approved?</div></div></div>
+      <div class="node pf-ba" style="font-size:9px;">If Declined → BA Reaches Out to GAB<div class="sys-tag">Email · Benefiter · Alliant</div></div>
+    </div>
+    <div class="lane-cell">
+      <div class="node pf-ba">Research Company<div class="sys-tag">ZoomInfo · Web · AI</div></div>
+      <div class="node pf-ba">Build Proposal + Cost &amp; Benefits Comparison<div class="sys-tag">PandaDoc · AI (ad-hoc)</div></div>
+    </div>
+    <div class="lane-cell">
+      <div class="node pf-ba">Product Demo + Q&amp;A<div class="sys-tag">Manual</div></div>
+      <div class="node pf-ba">Negotiate + Sign CSA<div class="sys-tag">PandaDoc · DocuSign</div></div>
+    </div>
+    <div class="lane-cell">
+      <div class="node pf-ba">Handoff to Payroll &amp; Benefits Ops<div class="sys-tag">Email · ClientSpace</div></div>
+      <div style="display:flex;justify-content:center;padding-top:6px;">
+        <div class="start-node" style="background:var(--red);width:52px;height:52px;font-size:9px;">Closed<br>Won</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RSA SUB-ROW -->
+  <div style="display:grid;grid-template-columns:100px repeat(6,1fr);gap:0;border-bottom:1px solid var(--rule);background:#fafbfc;">
+    <div class="lane-label" style="background:#4a3570;font-size:8px;">RSA /<br>Offshore</div>
+    <div class="lane-cell empty shaded"></div>
+    <div class="lane-cell empty shaded"></div>
+    <div class="lane-cell">
+      <div class="node pf-rsa">Build Rate Comparison Table<div class="sys-tag">Excel · Offshore team</div></div>
+    </div>
+    <div class="lane-cell empty shaded"></div>
+    <div class="lane-cell empty shaded"></div>
+    <div class="lane-cell empty shaded"></div>
+  </div>
+
+  <!-- SDR ROW -->
+  <div style="display:grid;grid-template-columns:100px repeat(6,1fr);gap:0;border-bottom:1px solid var(--rule);background:var(--white);">
+    <div class="lane-label l2" style="background:#1a6b55;">SDRs</div>
+    <div class="lane-cell">
+      <div class="node pf-sdr">Work SDRQ + Pull from 5500 Report<div class="sys-tag">Salesforce (SDRQ) · 5500</div></div>
+      <div class="node pf-sdr">Audit Account: ZoomInfo + LinkedIn<div class="sys-tag">ZoomInfo · LinkedIn</div></div>
+      <div class="node pf-sdr">Add Contacts to Outreach Sequence<div class="sys-tag">Outreach.io</div></div>
+      <div class="node pf-sdr">Parallel Dial via Orum<div class="sys-tag">Orum (4 simultaneous)</div></div>
+    </div>
+    <div class="lane-cell">
+      <div class="node pf-sdr">Meeting Set → Open Opportunity in SF<div class="sys-tag">Salesforce</div></div>
+      <div class="node pf-sdr">Warm Handoff to BA<div class="sys-tag">Email · Salesforce</div></div>
+    </div>
+    <div class="lane-cell empty shaded"></div>
+    <div class="lane-cell empty shaded"></div>
+    <div class="lane-cell empty shaded"></div>
+    <div class="lane-cell empty shaded"></div>
+  </div>
+
+  <!-- ISR ROW -->
+  <div style="display:grid;grid-template-columns:100px repeat(6,1fr);gap:0;border-radius:0 0 8px 8px;background:var(--white);">
+    <div class="lane-label l1" style="background:#1a4a7a;">ISRs</div>
+    <div class="lane-cell">
+      <div class="node pf-isr">Work Assigned Accounts + Audit Contacts<div class="sys-tag">Salesforce · ZoomInfo</div></div>
+      <div class="node pf-isr">Sequence + Parallel Dial via Orum<div class="sys-tag">Outreach.io · Orum</div></div>
+    </div>
+    <div class="lane-cell">
+      <div class="node pf-isr">Initial Meeting<div class="sys-tag">Terret AI · Outlook</div></div>
+      <div class="node pf-isr">Create Opportunity in SF<div class="sys-tag">Salesforce → ClientSpace</div></div>
+    </div>
+    <div class="lane-cell">
+      <div class="node pf-isr">Upload Data + Get Pricing<div class="sys-tag">ClientSpace</div></div>
+    </div>
+    <div class="lane-cell">
+      <div class="node pf-isr">Proposal + Comparison<div class="sys-tag">PandaDoc · AI (ad-hoc)</div></div>
+    </div>
+    <div class="lane-cell">
+      <div class="node pf-isr">Demo + Sign CSA<div class="sys-tag">PandaDoc · DocuSign</div></div>
+    </div>
+    <div class="lane-cell">
+      <div class="node pf-isr">Handoff to Ops<div class="sys-tag">Email · ClientSpace</div></div>
+    </div>
+  </div>
+
+  </div><!-- /swimlane-inner -->
+  </div><!-- /swimlane-container -->
+
+  <!-- SYSTEMS STRIP — 6 columns -->
+  <div style="margin-top:16px;">
+  <div class="sys-strip" style="display:grid;grid-template-columns:100px repeat(6,1fr);gap:0;">
+    <div class="sys-strip-label">Key Systems</div>
+    <div class="sys-strip-cell"><span class="sys-badge sb-navy">Salesforce</span><span class="sys-badge sb-navy">ZoomInfo</span><span class="sys-badge sb-navy">6sense</span><span class="sys-badge sb-navy">Outreach.io</span><span class="sys-badge sb-navy">Orum</span><span class="sys-badge sb-navy">5500 Report</span></div>
+    <div class="sys-strip-cell"><span class="sys-badge sb-navy">Salesforce</span><span class="sys-badge sb-navy">ClientSpace</span><span class="sys-badge sb-navy">Terret AI</span></div>
+    <div class="sys-strip-cell"><span class="sys-badge sb-navy">ClientSpace</span><span class="sys-badge sb-navy">HERO / Gradient</span><span class="sys-badge sb-navy">State-Specific</span></div>
+    <div class="sys-strip-cell"><span class="sys-badge sb-navy">ZoomInfo</span><span class="sys-badge sb-navy">PandaDoc</span><span class="sys-badge sb-navy">AI (ad-hoc)</span></div>
+    <div class="sys-strip-cell"><span class="sys-badge sb-navy">PandaDoc</span><span class="sys-badge sb-navy">DocuSign</span></div>
+    <div class="sys-strip-cell"><span class="sys-badge sb-navy">ClientSpace</span><span class="sys-badge sb-navy">PrismHR</span></div>
+  </div>
+  </div>
+
+  <!-- CROSS-REFERENCE -->
+
+  <div class="foot" style="margin-top:24px;">
+    <span>G&amp;A Partners · AI Sales Workflow PRD · Confidential</span>
+    <span>Preliminary — Subject to Change · TBD</span>
+  </div>
+</div>
+</div>
+
+<!-- ══ TAB 4: PROCESS DEEP DIVE ══ -->
+<div id="tab-deepdive" class="tab-panel">
+<div class="page">
+  <div class="pg-eye">Process Deep Dive</div>
+  <div class="pg-h1">How AI Can Help Improve the Sales Process</div>
+  <div class="pg-sub">Six phases from the Process Flow. Each step has its key automation priorities — the problem today, current state, and what an AI solution must deliver. Phases map directly to the swimlane diagram in Tab 03.</div>
+
+
+  <!-- ─── PHASE 1: PROSPECTING ─── -->
+  <div class="section-title" style="border-color:#C60C30;color:#C60C30;">Step 1 — Prospecting</div>
+
+  <div style="background:var(--white);border:1px solid var(--rule);border-radius:8px;margin-bottom:12px;overflow:hidden;">
+    <div style="display:grid;grid-template-columns:44px 1fr;gap:0;">
+      <div style="background:var(--navy);display:flex;align-items:center;justify-content:center;padding:16px 0;">
+        <div style="width:26px;height:26px;border-radius:50%;background:var(--red);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;">1</div>
+      </div>
+      <div style="padding:14px 18px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:3px;">
+          <div style="font-size:14px;font-weight:700;color:var(--navy);">Contact Cleaning & Validation</div>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;background:#C60C3022;color:#C60C30;border-radius:3px;border:1px solid #C60C3044;">Step 1</span>
+        </div>
+        <div style="font-size:11px;color:var(--grey);margin-bottom:10px;">60–70% of SDR time spent here. The biggest time drain across all three roles.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--c2);margin-bottom:6px;">Current State</div>
+            <ul class="tbl-bullets tbl-bullets-pain"><li>SDRs spend 24 hrs/week auditing accounts — cross-referencing ZoomInfo + LinkedIn</li><li>Mass-loading contacts without auditing: ~80% are invalid (wrong person, fax, left company)</li><li>BAs have Outreach for cold calling but it is not as efficient as Orum — and they do not have access to Orum</li></ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:6px;">Current Challenges</div>
+            <ul class="tbl-bullets"><li>2–3 min per account manually. 15,000 SDR accounts × 2 min = impossible</li><li>If done fast: terrible data. If done carefully: no time left to call</li><li>BAs have no Orum ($300/seat) — no incentive to do this manually</li></ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--pos);margin-bottom:6px;">AI / Automation Target</div>
+            <ul class="tbl-bullets tbl-bullets-opp"><li>AI agent scrubs every account: ZoomInfo + LinkedIn validation, finds 2–3 correct contacts, flags stale data</li><li>SDRs: 24 hrs/week data prep → near zero. 35+ hrs/week calling</li><li>All 600 BA accounts auto-cleaned and sequenced without BA effort</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="background:var(--white);border:1px solid var(--rule);border-radius:8px;margin-bottom:12px;overflow:hidden;">
+    <div style="display:grid;grid-template-columns:44px 1fr;gap:0;">
+      <div style="background:var(--navy);display:flex;align-items:center;justify-content:center;padding:16px 0;">
+        <div style="width:26px;height:26px;border-radius:50%;background:var(--red);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;">2</div>
+      </div>
+      <div style="padding:14px 18px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:3px;">
+          <div style="font-size:14px;font-weight:700;color:var(--navy);">Rules-Based Outreach Sequencing</div>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;background:#C60C3022;color:#C60C30;border-radius:3px;border:1px solid #C60C3044;">Step 1</span>
+        </div>
+        <div style="font-size:11px;color:var(--grey);margin-bottom:10px;">Every email today is manual and generic. Bulk-send is killing deliverability.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--c2);margin-bottom:6px;">Current State</div>
+            <ul class="tbl-bullets tbl-bullets-pain"><li>No rules routing contacts to the right sequence — every rep decides manually</li><li>Outreach bulk-send (top of hour, tracking pixels, opt-out links) triggering spam filters</li><li>Email response rates have plummeted significantly in the last few months — suspected spam filter issue</li></ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:6px;">Current Challenges</div>
+            <ul class="tbl-bullets"><li>Templates locked — reps cannot personalize. Generic emails go to all contacts the same way</li><li>Emails sent from Outreach domain, not gnapartners.com — further hurts deliverability</li><li>Renewal date, competitor, and intent signal all available but not used to auto-route</li></ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--pos);margin-bottom:6px;">AI / Automation Target</div>
+            <ul class="tbl-bullets tbl-bullets-opp"><li>Rules-based auto-sequencing: renewal date + competitor + intent score determines which sequence</li><li>AI writes personalized first line per contact using intent topics and company context</li><li>Emails sent from gnapartners.com via Outlook — not Outreach bulk-send</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="background:var(--white);border:1px solid var(--rule);border-radius:8px;margin-bottom:12px;overflow:hidden;">
+    <div style="display:grid;grid-template-columns:44px 1fr;gap:0;">
+      <div style="background:var(--navy);display:flex;align-items:center;justify-content:center;padding:16px 0;">
+        <div style="width:26px;height:26px;border-radius:50%;background:var(--red);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;">3</div>
+      </div>
+      <div style="padding:14px 18px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:3px;">
+          <div style="font-size:14px;font-weight:700;color:var(--navy);">Intent-Driven Call Prioritization</div>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;background:#C60C3022;color:#C60C30;border-radius:3px;border:1px solid #C60C3044;">Step 1</span>
+        </div>
+        <div style="font-size:11px;color:var(--grey);margin-bottom:10px;">Who to call today should come from data, not gut feel.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--c2);margin-bottom:6px;">Current State</div>
+            <ul class="tbl-bullets tbl-bullets-pain"><li>SDRs have some filtering on hot deals vs. rest — there is categorization, but the opportunity is to fully automate priority ranking</li><li>BAs make near-zero outbound calls — few BAs make cold calls as there is no incentive when referral pipeline is sufficient</li><li>High-intent ZoomInfo signals not auto-piped into Salesforce or assigned to a rep</li></ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:6px;">Current Challenges</div>
+            <ul class="tbl-bullets"><li>SDRs manually partition queue: hot number → PEO accounts → others. Takes 30+ min/day</li><li>BAs: most rely entirely on referral channels. Outbound is reactive at best</li><li>No alert when a company crosses an intent threshold — it just sits in the database</li></ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--pos);margin-bottom:6px;">AI / Automation Target</div>
+            <ul class="tbl-bullets tbl-bullets-opp"><li>Daily pre-built call queue per rep in Orum — sorted by intent score, renewal proximity, competitor flag</li><li>High-intent ZoomInfo signal → auto-assigned to rep by region and availability in Salesforce</li><li>BA top-10 prioritized list. Remaining calls auto-routed to SDR on BA's behalf</li><li>Opportunity to have an AI agent make outbound calls directly on behalf of BAs — surfacing only qualified live conversations for rep follow-up</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ─── PHASE 2: QUALIFICATION ─── -->
+  <div class="section-title" style="border-color:#23394A;color:#23394A;margin-top:24px;">Step 2 — Qualification</div>
+
+  <div style="background:var(--white);border:1px solid var(--rule);border-radius:8px;margin-bottom:12px;overflow:hidden;">
+    <div style="display:grid;grid-template-columns:44px 1fr;gap:0;">
+      <div style="background:var(--navy);display:flex;align-items:center;justify-content:center;padding:16px 0;">
+        <div style="width:26px;height:26px;border-radius:50%;background:var(--red);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;">4</div>
+      </div>
+      <div style="padding:14px 18px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:3px;">
+          <div style="font-size:14px;font-weight:700;color:var(--navy);">Data Request & Document Collection</div>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;background:#23394A22;color:#23394A;border-radius:3px;border:1px solid #23394A44;">Step 2</span>
+        </div>
+        <div style="font-size:11px;color:var(--grey);margin-bottom:10px;">Every deal requires a manual email asking for census, WC dec pages, invoices. No tracking, no follow-up automation.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--c2);margin-bottom:6px;">Current State</div>
+            <ul class="tbl-bullets tbl-bullets-pain"><li>No standard data request template — written fresh each time by each rep</li><li>No tracking of what has been received vs. what is outstanding</li><li>Follow-up emails for missing docs also manual — deals stall waiting</li></ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:6px;">Current Challenges</div>
+            <ul class="tbl-bullets"><li>BA or RSA manually emails prospect after initial meeting requesting: census, WC dec pages, current invoices, FEIN</li><li>3–7 day average delay waiting for docs. No visibility to sales leadership on where each deal is</li><li>Data arrives in varying formats — PDF, Excel, CSV — requiring manual handling before it can be used</li></ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--pos);margin-bottom:6px;">AI / Automation Target</div>
+            <ul class="tbl-bullets tbl-bullets-opp"><li>Auto-trigger standardized data request email on opportunity creation in Salesforce</li><li>Smart doc tracker: flags what's received vs. outstanding; auto-sends follow-up at 48hr and 96hr if incomplete</li><li>BA only notified when full package received or manual escalation needed</li><li>Create a self-service portal where prospects upload all required documents directly — AI scans for completeness and sends periodic reminders until the package is complete</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="background:var(--white);border:1px solid var(--rule);border-radius:8px;margin-bottom:12px;overflow:hidden;">
+    <div style="display:grid;grid-template-columns:44px 1fr;gap:0;">
+      <div style="background:var(--navy);display:flex;align-items:center;justify-content:center;padding:16px 0;">
+        <div style="width:26px;height:26px;border-radius:50%;background:var(--red);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;">5</div>
+      </div>
+      <div style="padding:14px 18px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:3px;">
+          <div style="font-size:14px;font-weight:700;color:var(--navy);">Opportunity Creation & CRM Logging</div>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;background:#23394A22;color:#23394A;border-radius:3px;border:1px solid #23394A44;">Step 2</span>
+        </div>
+        <div style="font-size:11px;color:var(--grey);margin-bottom:10px;">Meeting set → opportunity creation → CRM update is entirely manual. High-volume reps skip it.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--c2);margin-bottom:6px;">Current State</div>
+            <ul class="tbl-bullets tbl-bullets-pain"><li>BA manually creates opportunity in Salesforce after every meeting — fields typed from scratch</li><li>Salesforce → ClientSpace integration exists but requires multiple manual steps to complete</li><li>Activities not logged in Salesforce don't count toward KPI points — high-volume reps stop logging</li></ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:6px;">Current Challenges</div>
+            <ul class="tbl-bullets"><li>Terret AI records some meetings but summaries not pushed to Salesforce — BA types notes manually</li><li>CRM logging estimated at &lt;50% compliance for high-volume BAs</li><li>SDR → BA handoff via email — context quality varies by rep</li></ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--pos);margin-bottom:6px;">AI / Automation Target</div>
+            <ul class="tbl-bullets tbl-bullets-opp"><li>Terret AI summary auto-pushed to Salesforce opportunity + ClientSpace simultaneously</li><li>Auto-create pre-populated opportunity from call data — BA confirms rather than types</li><li>AI generates structured SDR→BA handoff brief with prospect context, intent data, and renewal date</li>
+<li>AI sends a follow-up email with next best action based on the call transcript — similar to what is already done for data requests</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ─── PHASE 3: PRICING ─── -->
+  <div class="section-title" style="border-color:#0088CE;color:#0088CE;margin-top:24px;">Step 3 — Pricing</div>
+
+  <div style="background:var(--white);border:1px solid var(--rule);border-radius:8px;margin-bottom:12px;overflow:hidden;">
+    <div style="display:grid;grid-template-columns:44px 1fr;gap:0;">
+      <div style="background:var(--navy);display:flex;align-items:center;justify-content:center;padding:16px 0;">
+        <div style="width:26px;height:26px;border-radius:50%;background:var(--red);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;">6</div>
+      </div>
+      <div style="padding:14px 18px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:3px;">
+          <div style="font-size:14px;font-weight:700;color:var(--navy);">Census Cleaning & Underwriting Submission</div>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;background:#0088CE22;color:#0088CE;border-radius:3px;border:1px solid #0088CE44;">Step 3</span>
+        </div>
+        <div style="font-size:11px;color:var(--grey);margin-bottom:10px;">1–2 hours of manual work per deal before a single rate is returned.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--c2);margin-bottom:6px;">Current State</div>
+            <ul class="tbl-bullets tbl-bullets-pain"><li>Census arrives in varying formats — RSA manually cleans, normalizes, fills gaps</li><li>HERO / Gradient / state-specific platforms require separate manual upload after census is clean</li><li>If prospect declined from master plan: separate manual email per carrier for open market rates</li></ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:6px;">Current Challenges</div>
+            <ul class="tbl-bullets"><li>RSA cleans census in Excel: normalize headers, fix date formats, remove duplicates — 1–2 hrs/deal</li><li>BA or RSA manually enters data into underwriting platform (HERO, Gradient, or state-specific)</li><li>HERO decline = BA manually emails GAB separately per carrier (not one consolidated request)</li></ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--pos);margin-bottom:6px;">AI / Automation Target</div>
+            <ul class="tbl-bullets tbl-bullets-opp"><li>AI extracts and normalizes census from any format (PDF/Excel/CSV) — flags anomalies for review only</li><li>AI pre-fills underwriting platform from clean census — BA approves before submission</li><li>HERO decline auto-triggers consolidated open market request to GAB — all carriers in one action</li><li>AI scans BA inboxes automatically, detects incoming census and insurance documents, extracts and cleans the data, and pre-fills both the underwriting platform and ClientSpace — without the BA touching the files</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="background:var(--white);border:1px solid var(--rule);border-radius:8px;margin-bottom:12px;overflow:hidden;">
+    <div style="display:grid;grid-template-columns:44px 1fr;gap:0;">
+      <div style="background:var(--navy);display:flex;align-items:center;justify-content:center;padding:16px 0;">
+        <div style="width:26px;height:26px;border-radius:50%;background:var(--red);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;">7</div>
+      </div>
+      <div style="padding:14px 18px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:3px;">
+          <div style="font-size:14px;font-weight:700;color:var(--navy);">Admin Pricing in ClientSpace</div>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;background:#0088CE22;color:#0088CE;border-radius:3px;border:1px solid #0088CE44;">Step 3</span>
+        </div>
+        <div style="font-size:11px;color:var(--grey);margin-bottom:10px;">25+ minutes of manual data entry per deal — biggest single CRM time sink in the sales process.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--c2);margin-bottom:6px;">Current State</div>
+            <ul class="tbl-bullets tbl-bullets-pain"><li>BA enters deal parameters into ClientSpace manually: PEPM, SUTA, WC — every deal, every time</li><li>Triggers approval chain: credit check, risk review, VP approval</li><li>Approval chain: credit check, risk review, VP approval</li></ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:6px;">Current Challenges</div>
+            <ul class="tbl-bullets"><li>25+ minutes manual entry per proposal — high-volume BAs report this as their most avoided task</li><li>Approval chain status only visible to operations — BA must ask someone to find out</li><li>Pricing exceptions require separate escalation with no auto-routing</li></ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--pos);margin-bottom:6px;">AI / Automation Target</div>
+            <ul class="tbl-bullets tbl-bullets-opp"><li>Pre-populate ClientSpace from Salesforce opportunity data — BA confirms only deltas</li><li>Real-time approval status visible to BA: 'Credit check: complete. Risk review: Day 2'</li><li>Auto-escalate pricing exceptions with deal context pre-filled — no BA action to initiate</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ─── PHASE 4: RESEARCH & PROPOSAL ─── -->
+  <div class="section-title" style="border-color:#2A8F60;color:#2A8F60;margin-top:24px;">Step 4 — Research &amp; Proposal</div>
+
+  <div style="background:var(--white);border:1px solid var(--rule);border-radius:8px;margin-bottom:12px;overflow:hidden;">
+    <div style="display:grid;grid-template-columns:44px 1fr;gap:0;">
+      <div style="background:var(--navy);display:flex;align-items:center;justify-content:center;padding:16px 0;">
+        <div style="width:26px;height:26px;border-radius:50%;background:var(--red);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;">8</div>
+      </div>
+      <div style="padding:14px 18px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:3px;">
+          <div style="font-size:14px;font-weight:700;color:var(--navy);">Company Research & Proposal Assembly</div>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;background:#2A8F6022;color:#2A8F60;border-radius:3px;border:1px solid #2A8F6044;">Step 4</span>
+        </div>
+        <div style="font-size:11px;color:var(--grey);margin-bottom:10px;">Top BAs do this in 15 min with AI. Average BA takes 2.5 hours manually.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--c2);margin-bottom:6px;">Current State</div>
+            <ul class="tbl-bullets tbl-bullets-pain"><li>Average BA builds proposal manually: rates + cost comparison + benefits grid + narrative → Word/PandaDoc</li><li>No shared prompts, no standard output — proposal quality varies entirely by rep</li></ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:6px;">Current Challenges</div>
+            <ul class="tbl-bullets"><li>Top BAs use AI for four tasks: (1) G&A-branded call review, (2) competitor cost comparison, (3) benefits plan comparison, (4) RFP data scrub</li><li>Average BA does none of these — 2–2.5 hrs per proposal</li><li>RSA builds comparison table manually in Excel — wrong ~70% of the time per BA interviews</li></ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--pos);margin-bottom:6px;">AI / Automation Target</div>
+            <ul class="tbl-bullets tbl-bullets-opp"><li>AI assembles proposal from call summary + rates + competitor invoice → populated PandaDoc template</li><li>Target: proposal-ready draft in under 30 minutes for every rep</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ─── PHASE 5: DEMO & CLOSING ─── -->
+  <div class="section-title" style="border-color:#7B4FD6;color:#7B4FD6;margin-top:24px;">Step 5 — Demo &amp; Closing</div>
+
+  <div style="background:var(--white);border:1px solid var(--rule);border-radius:8px;margin-bottom:12px;overflow:hidden;">
+    <div style="display:grid;grid-template-columns:44px 1fr;gap:0;">
+      <div style="background:var(--navy);display:flex;align-items:center;justify-content:center;padding:16px 0;">
+        <div style="width:26px;height:26px;border-radius:50%;background:var(--red);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;">9</div>
+      </div>
+      <div style="padding:14px 18px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:3px;">
+          <div style="font-size:14px;font-weight:700;color:var(--navy);">Demo Scheduling & Live Q&A Support</div>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;background:#7B4FD622;color:#7B4FD6;border-radius:3px;border:1px solid #7B4FD644;">Step 5</span>
+        </div>
+        <div style="font-size:11px;color:var(--grey);margin-bottom:10px;">Manual scheduling adds 2–3 days. BAs answer questions from memory — hard questions lose deals.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--c2);margin-bottom:6px;">Current State</div>
+            <ul class="tbl-bullets tbl-bullets-pain"><li>Tech demo scheduled manually via email — adds 2–3 days to deal cycle</li><li>BAs answer prospect questions from memory during demo — no real-time knowledge base support</li><li>Post-demo follow-up email written manually — no standard format</li></ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:6px;">Current Challenges</div>
+            <ul class="tbl-bullets"><li>One BA built a Q&amp;A doc in AI covering ~80% of common questions — not standardized</li><li>No auto-scheduling link — every demo requires back-and-forth email coordination</li><li>No AI assist during live calls to surface answers from G&amp;A knowledge base</li></ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--pos);margin-bottom:6px;">AI / Automation Target</div>
+            <ul class="tbl-bullets tbl-bullets-opp"><li>Auto-scheduling link triggered on prospect demo request — no back-and-forth</li><li>AI Q&amp;A assistant surfaces answers from SalesHood knowledge base during live demo</li><li>Post-demo recap + next steps auto-generated for BA one-click send</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="background:var(--white);border:1px solid var(--rule);border-radius:8px;margin-bottom:12px;overflow:hidden;">
+    <div style="display:grid;grid-template-columns:44px 1fr;gap:0;">
+      <div style="background:var(--navy);display:flex;align-items:center;justify-content:center;padding:16px 0;">
+        <div style="width:26px;height:26px;border-radius:50%;background:var(--red);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;">10</div>
+      </div>
+      <div style="padding:14px 18px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:3px;">
+          <div style="font-size:14px;font-weight:700;color:var(--navy);">Contract Execution & Closed-Won Handoff</div>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;background:#7B4FD622;color:#7B4FD6;border-radius:3px;border:1px solid #7B4FD644;">Step 5</span>
+        </div>
+        <div style="font-size:11px;color:var(--grey);margin-bottom:10px;">Post-signature handoff is fully manual — the only step with zero automation today.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--c2);margin-bottom:6px;">Current State</div>
+            <ul class="tbl-bullets tbl-bullets-pain"><li>BA manually uploads documents to ClientSpace after CSA signed</li><li>BA manually emails onboarding director with deal context — no structured trigger</li><li>Deal stall: no alert when a deal goes cold in late stage</li></ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:6px;">Current Challenges</div>
+            <ul class="tbl-bullets"><li>DocuSign completion requires BA to: package docs, upload to ClientSpace, email onboarding PM</li><li>No deal stall visibility — BA has no alert when deal is inactive for 5+ days</li></ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--pos);margin-bottom:6px;">AI / Automation Target</div>
+            <ul class="tbl-bullets tbl-bullets-opp"><li>DocuSign completion webhook: auto-package docs → ClientSpace upload → onboarding task → PM notification</li><li>BA receives confirmation — zero manual action required after signature</li><li>Deal stall alert: no activity in late-stage deal for 5+ days triggers BA notification</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ─── PHASE 6: HANDOFF ─── -->
+  <div class="section-title" style="border-color:#49C5B1;color:#1a7a68;margin-top:24px;">Step 6 — Handoff &amp; Post-Sale</div>
+
+  <div style="background:var(--white);border:1px solid var(--rule);border-radius:8px;margin-bottom:12px;overflow:hidden;">
+    <div style="display:grid;grid-template-columns:44px 1fr;gap:0;">
+      <div style="background:var(--navy);display:flex;align-items:center;justify-content:center;padding:16px 0;">
+        <div style="width:26px;height:26px;border-radius:50%;background:var(--red);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;">11</div>
+      </div>
+      <div style="padding:14px 18px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:3px;">
+          <div style="font-size:14px;font-weight:700;color:var(--navy);">Onboarding Handoff</div>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;background:#49C5B122;color:#49C5B1;border-radius:3px;border:1px solid #49C5B144;">Step 6</span>
+        </div>
+        <div style="font-size:11px;color:var(--grey);margin-bottom:10px;">Manual email with varying context. Delay in handoff = delay in revenue recognition.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--c2);margin-bottom:6px;">Current State</div>
+            <ul class="tbl-bullets tbl-bullets-pain"><li>BA emails onboarding director manually after CSA signed — deal context often incomplete</li><li>No structured data package transfers from sales to operations</li><li>Delay in onboarding start costs revenue recognition time</li></ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:6px;">Current Challenges</div>
+            <ul class="tbl-bullets"><li>PM assigned manually from team of 4 implementation specialists</li><li>No auto-trigger — handoff only happens when BA remembers to send the email</li><li>Handoff delay estimated at 1–3 days post-signature</li></ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--pos);margin-bottom:6px;">AI / Automation Target</div>
+            <ul class="tbl-bullets tbl-bullets-opp"><li>DocuSign webhook auto-triggers structured onboarding brief to ClientSpace and PM</li><li>Client welcome email sent immediately after signing — zero BA action</li><li>Handoff delay: 1–3 days → &lt;5 minutes</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="background:var(--white);border:1px solid var(--rule);border-radius:8px;margin-bottom:12px;overflow:hidden;">
+    <div style="display:grid;grid-template-columns:44px 1fr;gap:0;">
+      <div style="background:var(--navy);display:flex;align-items:center;justify-content:center;padding:16px 0;">
+        <div style="width:26px;height:26px;border-radius:50%;background:var(--red);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;">12</div>
+      </div>
+      <div style="padding:14px 18px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:3px;">
+          <div style="font-size:14px;font-weight:700;color:var(--navy);">Loss Intelligence & Referral Loop</div>
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;background:#49C5B122;color:#49C5B1;border-radius:3px;border:1px solid #49C5B144;">Step 6</span>
+        </div>
+        <div style="font-size:11px;color:var(--grey);margin-bottom:10px;">Best lead channel (41% close rate) is the least automated. Loss reasons are unreliable.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--c2);margin-bottom:6px;">Current State</div>
+            <ul class="tbl-bullets tbl-bullets-pain"><li>BA self-reports loss reason in ClientSpace dropdown — subjective and often inaccurate</li><li>No transcript analysis, no pattern detection, no feedback into training content</li><li>Referral asks not triggered by client signals — entirely manual and ad-hoc</li></ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:6px;">Current Challenges</div>
+            <ul class="tbl-bullets"><li>Loss reason accuracy estimated at &lt;50% — CSO confirmed top reps may not give genuine reasons</li><li>147 referral leads in 2025 at 41% close rate — best channel but manually managed</li><li>No signal-triggered outreach to happy clients at key milestones</li></ul>
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--pos);margin-bottom:6px;">AI / Automation Target</div>
+            <ul class="tbl-bullets tbl-bullets-opp"><li>Terret AI transcript analysis on Closed Lost → structured tags → pattern dashboard for leadership</li><li>Auto-trigger referral ask at 6-month client anniversary and NPS promoter response</li><li>Loss patterns fed back into SalesHood training content quarterly</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <span>G&amp;A Partners · AI Sales Workflow PRD · Confidential</span>
+    <span>Preliminary — Subject to Change · TBD</span>
+  </div>
+</div>
+</div>
+
+<!-- ══ TAB 5: BUSINESS IMPACT ══ -->
+<div id="tab-impact" class="tab-panel">
+<div class="page">
+  <div class="pg-eye">Business Impact · Time Analysis</div>
+  <div class="pg-h1">Where Time Is Spent Today — and Where We Want to Automate</div>
+  <div class="pg-sub">The table below shows estimated hours per week per role on each activity.</div>
+
+  <div class="callout info" style="margin-bottom:20px;">It would be great if partners could focus on two demos — <strong>one on Prospecting</strong> and <strong>one on Research &amp; Proposal Assembly</strong>.</div>
+
+  <style>
+    .ti-tbl { width:100%; border-collapse:collapse; background:var(--white); border:1px solid var(--rule); border-radius:8px; overflow:hidden; box-shadow:0 1px 5px rgba(35,57,74,.06); margin-bottom:22px; }
+    .ti-tbl th { background:var(--red); color:#fff; padding:9px 12px; font-size:10px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; text-align:center; border-right:1px solid rgba(255,255,255,.15); }
+    .ti-tbl th.left { text-align:left; }
+    .ti-tbl th:last-child { border-right:none; }
+    .ti-tbl td { padding:9px 12px; border-bottom:1px solid var(--rule); font-size:11px; color:var(--navy); border-right:1px solid var(--rule); vertical-align:top; }
+    .ti-tbl td:last-child { border-right:none; }
+    .ti-tbl tr:last-child td { border-bottom:none; }
+    .ti-tbl .sec-row td { background:#EDF1F5; font-size:9px; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; color:#3a5068; padding:6px 12px; border-right:none; }
+    .ti-tbl .tot-row td { background:var(--navy); color:#fff; font-weight:800; font-size:12px; border-right:1px solid rgba(255,255,255,.1); vertical-align:middle; }
+    .ti-tbl .tot-row td:last-child { border-right:none; }
+    .num { text-align:center; font-weight:800; font-size:13px; }
+    .num-red  { color:var(--red); }
+    .num-amb  { color:#CC7700; }
+    .num-grey { color:var(--lgrey); }
+    .num-nav  { color:var(--navy); }
+    .dash     { color:var(--lgrey); font-size:11px; text-align:center; }
+    .goal-cell { font-size:10.5px; color:var(--grey); line-height:1.6; }
+    .goal-cell strong { color:var(--navy); }
+  </style>
+
+  <table class="ti-tbl">
+    <thead>
+      <tr>
+        <th class="left" style="width:3%;">#</th>
+        <th class="left" style="width:12%;">Task</th>
+        <th style="width:7%;">BAs<br>High Vol<br><span style="font-weight:400;font-size:8px;opacity:.8;">hrs/wk</span></th>
+        <th style="width:7%;">BAs<br>Low Vol<br><span style="font-weight:400;font-size:8px;opacity:.8;">hrs/wk</span></th>
+        <th style="width:6%;">SDRs<br><span style="font-weight:400;font-size:8px;opacity:.8;">hrs/wk</span></th>
+        <th style="width:6%;">ISRs<br><span style="font-weight:400;font-size:8px;opacity:.8;">hrs/wk</span></th>
+        <th style="width:7%;text-align:center;">Priority</th>
+        <th class="left" style="width:52%;">Automation Goal</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="sec-row"><td colspan="8" style="border-right:none;">Prospecting</td></tr>
+      <tr>
+        <td style="font-weight:700;">1</td>
+        <td><strong>Contact Scrubbing &amp; Outreach Sequencing</strong></td>
+        <td class="num num-amb">2</td>
+        <td class="num num-red">12</td>
+        <td class="num num-red">20</td>
+        <td class="num num-red">15</td>
+        <td style="text-align:center;"><span class="pri-high">High</span></td>
+        <td class="goal-cell">We want to <strong>fully automate contact scrubbing and outreach sequencing</strong> so there is zero time spent by BAs, SDRs, or ISRs on this activity. The AI agent should scrub accounts using ZoomInfo + LinkedIn validation, identify the right contacts, and auto-sequence personalized tailored emails sent directly from the G&A Partners domain — no rep action required.</td>
+      </tr>
+      <tr style="background:#F8FAFB;">
+        <td style="font-weight:700;">2</td>
+        <td><strong>Cold Calling</strong></td>
+        <td class="num num-grey">1</td>
+        <td class="num num-red">10</td>
+        <td class="num num-red">12</td>
+        <td class="num num-red">10</td>
+        <td style="text-align:center;"><span class="pri-high">High</span></td>
+        <td class="goal-cell">We want to explore an <strong>AI-ranked daily call queue</strong> that surfaces the highest-priority accounts first. Beyond prioritization, we are interested in whether a <strong>Voice AI agent can make live outbound calls</strong> directly — only routing qualified, interested prospects to a human rep for follow-up.</td>
+      </tr>
+      <tr class="sec-row"><td colspan="8" style="border-right:none;">Qualification</td></tr>
+      <tr>
+        <td style="font-weight:700;">3</td>
+        <td><strong>Data Requests &amp; Follow-ups</strong></td>
+        <td class="num num-amb">4</td>
+        <td class="num num-grey">1</td>
+        <td class="dash">—</td>
+        <td class="num num-grey">1</td>
+        <td style="text-align:center;"><span class="pri-low">Low</span></td>
+        <td class="goal-cell">Today we spend <strong>at least 30 minutes per opportunity</strong> chasing clients for data requests. We want a <strong>self-service portal</strong> where the client can upload all required documents directly. AI scans for completeness and sends automatic reminders on a schedule until the full package is received — so we never have to chase a client for documents again.</td>
+      </tr>
+      <tr style="background:#F8FAFB;">
+        <td style="font-weight:700;">4</td>
+        <td><strong>CRM Activity Logging (Post-Call)</strong></td>
+        <td class="num num-amb">4</td>
+        <td class="num num-grey">1</td>
+        <td class="num num-grey">2</td>
+        <td class="num num-grey">1</td>
+        <td style="text-align:center;"><span class="pri-med">Medium</span></td>
+        <td class="goal-cell">Today we spend <strong>15–20 minutes per call</strong> manually summarizing notes from the conversation. We want AI to fully capture the call transcript via Terret AI and automatically populate CRM notes, next steps, and next best actions — so the rep only reviews and confirms rather than types from scratch.</td>
+      </tr>
+      <tr class="sec-row"><td colspan="8" style="border-right:none;">Pricing</td></tr>
+      <tr>
+        <td style="font-weight:700;">5</td>
+        <td><strong>Census Cleaning &amp; Data Entry to HERO</strong></td>
+        <td class="num num-amb">4</td>
+        <td class="num num-grey">1</td>
+        <td class="dash">—</td>
+        <td class="num num-grey">1</td>
+        <td style="text-align:center;"><span class="pri-med">Medium</span></td>
+        <td class="goal-cell">Today a BA manually goes through their email, finds quote requests with attached census documents, and spends <strong>at least 30 minutes</strong> cleaning the data and uploading it to HERO. We want AI to scan BA inboxes automatically, detect incoming documents, extract and clean the census, and upload directly to HERO — bringing the BA's time down to <strong>5 minutes just for reviewing the data in HERO</strong> before it is submitted.</td>
+      </tr>
+      <tr style="background:#F8FAFB;">
+        <td style="font-weight:700;">6</td>
+        <td><strong>ClientSpace Data Entry for Pricing</strong></td>
+        <td class="num num-grey">3</td>
+        <td class="num num-grey">1</td>
+        <td class="dash">—</td>
+        <td class="num num-grey">1</td>
+        <td style="text-align:center;"><span class="pri-med">Medium</span></td>
+        <td class="goal-cell">There is significant manual data entry in ClientSpace for every deal — today we spend <strong>approximately 25 minutes per deal</strong> on this. We want to pre-populate all pricing fields from the Salesforce opportunity data automatically, bringing the BA's time down to <strong>5 minutes per deal for confirmation only</strong>.</td>
+      </tr>
+      <tr class="sec-row"><td colspan="8" style="border-right:none;">Research &amp; Proposal</td></tr>
+      <tr>
+        <td style="font-weight:700;">7</td>
+        <td><strong>Research &amp; Proposal Assembly (Cost + Benefits Comparison)</strong></td>
+        <td class="num num-red">16</td>
+        <td class="num num-amb">4</td>
+        <td class="dash">—</td>
+        <td class="num num-amb">4</td>
+        <td style="text-align:center;"><span class="pri-high">High</span></td>
+        <td class="goal-cell">Today we spend <strong>approximately 120 minutes (2–2.5 hours) per opportunity</strong> just building the proposal, cost comparison, and benefits comparison. We want AI to assemble the full proposal — pulling company research, comparing against the prospect's current plan, building the cost comparison from the competitor invoice — and have a <strong>proposal-ready draft in under 30 minutes</strong> with a clear talk track for the BA to present.</td>
+      </tr>
+      <tr class="sec-row"><td colspan="8" style="border-right:none;">Handoff</td></tr>
+      <tr>
+        <td style="font-weight:700;">8</td>
+        <td><strong>Post-Signature Handoff to Onboarding</strong></td>
+        <td class="num num-amb">6</td>
+        <td class="num num-grey">2</td>
+        <td class="dash">—</td>
+        <td class="num num-grey">2</td>
+        <td style="text-align:center;"><span class="pri-med">Medium</span></td>
+        <td class="goal-cell">Today we spend <strong>30–45 minutes per deal</strong> on post-signature onboarding formalities. We want to make this <strong>under 5 minutes</strong> by automatically sending the client a link to upload all required documents and a scheduling link to book their first call with the onboarding team — all triggered immediately when the contract is signed, with no BA action required.</td>
+      </tr>
+      <tr class="sec-row"><td colspan="8" style="border-right:none;">Other</td></tr>
+      <tr>
+        <td style="font-weight:700;">9</td>
+        <td><strong>Training; Meetings — Internal &amp; External Networking</strong></td>
+        <td class="num num-grey">10</td>
+        <td class="num num-grey">9</td>
+        <td class="num num-grey">6</td>
+        <td class="num num-grey">6</td>
+        <td style="text-align:center;"><span class="pri-low">Low</span></td>
+        <td class="goal-cell">Part of standard business operations. No automation target.</td>
+      </tr>
+      <tr class="tot-row">
+        <td colspan="2" style="text-align:left;">Total Hours / Week</td>
+        <td class="num" style="color:#fff;">50</td>
+        <td class="num" style="color:#fff;">40</td>
+        <td class="num" style="color:#fff;">40</td>
+        <td class="num" style="color:#fff;">40</td>
+        <td colspan="2" style="text-align:left;font-size:10px;color:rgba(255,255,255,.6);padding-left:12px;">8 opportunities/week (High Vol) &nbsp;·&nbsp; 2 opportunities/week (Low Vol)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px;">
+    <div class="card accent-red">
+      <div class="card-title">🎯 Demo Priority #1 — Prospecting</div>
+      <div class="card-sub">SDRs spend 21 hrs/week and low-volume BAs spend 12 hrs/week on contact scrubbing and outreach before a single call is made. We want to see AI-driven account scrubbing, contact validation, and auto-sequencing of personalized emails from the G&A Partners domain. Voice AI for live outbound calls also welcome.</div>
+    </div>
+    <div class="card accent-green">
+      <div class="card-title">🎯 Demo Priority #2 — Research &amp; Proposal</div>
+      <div class="card-sub">High-volume BAs spend 16 hrs/week — 120 minutes per opportunity — on proposal assembly. A working demo of AI pulling a competitor invoice comparison and assembling a proposal with company research, delivered in under 30 minutes, would directly demonstrate the highest-impact automation in the selling process.</div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>G&amp;A Partners · AI Sales Workflow PRD · Confidential</span>
+    <span>Preliminary — Subject to Change · TBD</span>
+  </div>
+</div>
+</div>
+
+
+<!-- ══ TAB 6: SYSTEMS & TECHNICAL ══ -->
+<div id="tab-systems" class="tab-panel">
+<div class="page">
+  <div class="pg-eye">Systems &amp; Technical Reference</div>
+  <div class="pg-h1">Systems Inventory &amp; Integration Requirements</div>
+  <div class="pg-sub">Full inventory of systems currently in scope, their integration status, and API considerations. For the partner's technical team.</div>
+
+  <div class="callout info" style="margin-bottom:16px;">Below is the current state of systems and integrations at G&amp;A Partners. <strong>Please do not feel constrained by the existing systems or architecture.</strong> We are open to all ideas — feel free to propose the architecture that makes the most sense to meet the business requirements.</div>
+
+  <div class="section-title">Systems in Scope</div>
+  <table class="tbl" style="margin-bottom:22px;">
+    <thead><tr><th>System</th><th>Purpose</th><th>Stage</th><th>Current Integration Status</th></tr></thead>
+    <tbody>
+      <tr class="subhead"><td colspan="4">PROSPECTING</td></tr>
+      <tr><td><strong>ZoomInfo</strong></td><td>Lead database, intent signals, contact data, company summaries</td><td>Prospecting</td><td>Connected to Salesforce. Intent topic data not flowing as a Salesforce filterable field.</td></tr>
+      <tr><td><strong>6sense</strong></td><td>ABM intent signals, buying stage, account prioritization</td><td>Prospecting</td><td>Connected to Salesforce. A daily email digest is sent to BAs highlighting prioritized accounts with high intent scores based on 6sense signals.</td></tr>
+      <tr><td><strong>Outreach.io</strong></td><td>Email sequencing, cold calling, prospect engagement</td><td>Prospecting</td><td>Connected to Salesforce. Email sequences pre-built — BAs cannot edit template content but can use Salesforce custom fields via liquid syntax merge tags.</td></tr>
+      <tr><td><strong>Orum</strong></td><td>Auto-dialer for SDR and ISR cold calling — parallel dial up to 4 contacts simultaneously</td><td>Prospecting</td><td>Connected to Salesforce.</td></tr>
+      <tr class="subhead"><td colspan="4">CRM &amp; OPPORTUNITY MANAGEMENT</td></tr>
+      <tr><td><strong>Salesforce</strong></td><td>Primary CRM — opportunity tracking, account management, pipeline visibility</td><td>All stages</td><td>Central hub. Connected to Outreach.io and ClientSpace.</td></tr>
+      <tr><td><strong>ClientSpace</strong></td><td>PEO-specific CRM — pricing (PEPM, SUTA, WC), case management, onboarding trigger</td><td>Pricing through close</td><td>Connected to Salesforce. Manual steps still required despite the integration existing.</td></tr>
+      <tr class="subhead"><td colspan="4">MEETING INTELLIGENCE</td></tr>
+      <tr><td><strong>Terret AI</strong></td><td>Meeting recording, transcription, summaries, next steps</td><td>Qualification onwards</td><td>Used by some BAs. Not currently connected to Salesforce — summaries not auto-pushed to CRM.</td></tr>
+      <tr class="subhead"><td colspan="4">UNDERWRITING &amp; PRICING</td></tr>
+      <tr><td><strong>Milliman HERO / Gradient / State-Specific Platforms</strong></td><td>Medical underwriting submission portal — varies by state</td><td>Pricing</td><td>Manual — no API connection. RSA or BA manually enters data after census is cleaned.</td></tr>
+      <tr class="subhead"><td colspan="4">PROPOSAL &amp; CONTRACT</td></tr>
+      <tr><td><strong>PandaDoc</strong></td><td>Proposal creation and contract execution (CSA)</td><td>Proposal to close</td><td>Transitioning from Word templates. DocuSign used for e-signature.</td></tr>
+      <tr><td><strong>DocuSign</strong></td><td>E-signature for CSA execution</td><td>Closing</td><td>Standard integration. CSA signing currently does not auto-trigger onboarding.</td></tr>
+      <tr class="subhead"><td colspan="4">AI LAYER (CURRENT)</td></tr>
+      <tr><td><strong>Claude / AI (ad-hoc)</strong></td><td>Used by a small number of BAs for research, cost comparisons, proposal drafting, data scrubbing</td><td>Proposal</td><td>Individual accounts only. No shared prompts, no integrations, no standardization across the team.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="foot">
+    <span>G&amp;A Partners · AI Sales Workflow PRD · Confidential</span>
+    <span>Preliminary — Subject to Change · TBD</span>
+  </div>
+</div>
+</div>
+
+<!-- ══ TAB 7: GLOSSARY ══ -->
+<div id="tab-glossary" class="tab-panel">
+<div class="page">
+  <div class="pg-eye">Glossary</div>
+  <div class="pg-h1">Terms &amp; Definitions</div>
+  <div class="pg-sub">Definitions of all industry terms, G&amp;A-specific acronyms, and sales process terminology used throughout this document. Partners unfamiliar with PEO industry terminology should read this before reviewing Tabs 03–05.</div>
+
+  <div class="section-title">PEO Industry Terms</div>
+  <div class="card" style="margin-bottom:16px;">
+    <div class="gloss-item"><div class="gloss-term">PEO</div><div class="gloss-def">Professional Employer Organization. A company that co-employs a client's workforce, taking on employer responsibilities for payroll, benefits, HR compliance, and workers' comp. The client retains day-to-day operational control of employees.</div></div>
+    <div class="gloss-item"><div class="gloss-term">ASO</div><div class="gloss-def">Administrative Services Organization. Similar to PEO but without co-employment — the client remains the employer of record and retains their own insurance policies. G&amp;A provides admin services only.</div></div>
+    <div class="gloss-item"><div class="gloss-term">HCM</div><div class="gloss-def">Human Capital Management. G&amp;A's standalone payroll/HR software product built on iSolved. Separate tech stack and team from the PEO/ASO business. Out of scope for Phase 1.</div></div>
+    <div class="gloss-item"><div class="gloss-term">WSE</div><div class="gloss-def">Worksite Employee. An employee at a client company who is co-employed by G&amp;A under a PEO arrangement. WSE count × PEPM = the revenue driver for PEO contracts.</div></div>
+    <div class="gloss-item"><div class="gloss-term">PEPM</div><div class="gloss-def">Per Employee Per Month. The administrative fee G&amp;A charges clients per worksite employee per month. Higher when client uses G&amp;A's master health and WC programs; lower when client retains own coverage.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Master Plan</div><div class="gloss-def">G&amp;A's master health insurance plan. When clients join the master plan, G&amp;A earns benefits arbitrage. Medical underwriting via Milliman HERO is required before a prospect can join.</div></div>
+    <div class="gloss-item"><div class="gloss-term">WC</div><div class="gloss-def">Workers' Compensation insurance. G&amp;A offers master WC programs through TMI and Zurich. Clients joining the master WC program contribute to G&amp;A's margin.</div></div>
+    <div class="gloss-item"><div class="gloss-term">SUTA</div><div class="gloss-def">State Unemployment Tax Act. G&amp;A manages SUTA filings and rates for PEO clients. SUTA margin is a revenue component factored into ClientSpace pricing.</div></div>
+    <div class="gloss-item"><div class="gloss-term">GM / Gross Margin</div><div class="gloss-def">The primary revenue metric at G&amp;A — net margin after paying client payroll, benefits, and direct service costs. Sales targets and comp plans are denominated in annualized GM.</div></div>
+  </div>
+
+  <div class="section-title">G&amp;A Sales Process Terms</div>
+  <div class="card" style="margin-bottom:16px;">
+    <div class="gloss-item"><div class="gloss-term">BA</div><div class="gloss-def">Business Advisor. G&amp;A's primary sales role. BAs own the full sales cycle for accounts with 20+ WSEs. Compensated on annualized GM closed.</div></div>
+    <div class="gloss-item"><div class="gloss-term">ISR</div><div class="gloss-def">Inside Sales Representative. Handles smaller accounts (1–25 WSEs). Owns the full sales cycle for smaller deals through outbound calling and digital inbound leads.</div></div>
+    <div class="gloss-item"><div class="gloss-term">SDR</div><div class="gloss-def">Sales Development Representative. Focuses exclusively on setting initial meetings for BAs through cold calling (Orum) and Outreach.io sequences. Does not carry a closing quota.</div></div>
+    <div class="gloss-item"><div class="gloss-term">RSA</div><div class="gloss-def">Regional Sales Admin. Supports BAs with document routing, CRM data entry, and census cleaning. Role significantly impacted by the proposed automation.</div></div>
+    <div class="gloss-item"><div class="gloss-term">IM</div><div class="gloss-def">Initial Meeting. The first formal call or meeting between a BA and a qualified prospect. Setting 4 IMs per week is the primary lag KPI for BAs (25 KPI points each).</div></div>
+    <div class="gloss-item"><div class="gloss-term">CSA</div><div class="gloss-def">Client Service Agreement. The master contract between G&amp;A and a new client. Signing the CSA is the final step to Closed Won, executed via PandaDoc and DocuSign.</div></div>
+    <div class="gloss-item"><div class="gloss-term">KPI Points</div><div class="gloss-def">A weighted activity scoring system for BA productivity. Minimum 200 points per week. Proposals = 100 pts, IMs = 25 pts, cold calls = 1 pt, sequenced emails = 1 pt (capped at 100/week). All activity must be logged in Salesforce to count.</div></div>
+    <div class="gloss-item"><div class="gloss-term">SDRQ</div><div class="gloss-def">SDR Queue. A centralized Salesforce account (~15,000 accounts) shared across all SDRs. Created to preserve account context when SDRs turn over. SDRs work accounts in round-robin, prioritizing by renewal date and intent signals.</div></div>
+    <div class="gloss-item"><div class="gloss-term">5500 Report</div><div class="gloss-def">A database of public insurance filings that G&amp;A uses to identify companies renewing with a known competitor in the next 120 days — a primary source for the SDRQ.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Project 35</div><div class="gloss-def">G&amp;A's internal initiative to reach 35% operating margin by 2027, backed by TPG (G&amp;A's private equity owner). AI investment in sales is a direct lever toward this goal.</div></div>
+  </div>
+
+  <div class="section-title">Systems &amp; Technology Terms</div>
+  <div class="card">
+    <div class="gloss-item"><div class="gloss-term">ClientSpace</div><div class="gloss-def">G&amp;A's PEO-specific CRM platform. Used for opportunity management, deal pricing (PEPM, SUTA, WC), case management, and onboarding triggers. Connected to Salesforce.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Milliman HERO</div><div class="gloss-def">The underwriting submission portal used to request medical rates from Milliman. Census data is submitted through HERO to obtain master health plan quotes. Varies by state — some states use Gradient or other platforms.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Terret AI</div><div class="gloss-def">AI meeting intelligence tool. Records and transcribes sales calls, generates meeting summaries and recommended next steps. Currently used by some BAs but not integrated with Salesforce.</div></div>
+    <div class="gloss-item"><div class="gloss-term">6sense</div><div class="gloss-def">ABM platform that tracks intent signals and assigns buying stage scores to accounts. Connected to Salesforce — sends a daily email digest to BAs with prioritized high-intent accounts.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Outreach.io</div><div class="gloss-def">Sales engagement platform for email sequencing and cold calling. Sequences are pre-built — BAs cannot edit template content but AI-generated personalization can be inserted via Salesforce custom fields using liquid syntax merge tags.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Orum</div><div class="gloss-def">Auto-dialer used by SDRs and ISRs for high-volume cold calling. Can dial up to 4 contacts simultaneously, auto-leave voicemails, and navigate phone trees. Connected to Salesforce. $300/seat/month — BAs do not have access.</div></div>
+    <div class="gloss-item"><div class="gloss-term">Liquid Syntax</div><div class="gloss-def">Outreach.io's templating language for dynamic field insertion into locked email templates (e.g. &#123;&#123;account.custom_field&#125;&#125;). Enables AI-generated personalized content to be inserted into Outreach sequences without requiring template editing access.</div></div>
+  </div>
+
+  <div class="foot">
+    <span>G&amp;A Partners · AI Sales Workflow PRD · Confidential</span>
+    <span>Preliminary — Subject to Change · TBD</span>
+  </div>
+</div>
+</div>
+
+<!-- ══ TAB 8: SUBMISSION ══ -->
+<div id="tab-submission" class="tab-panel">
+<div class="page">
+  <div class="pg-eye">Submission Guide</div>
+  <div class="pg-h1">What We Need From You</div>
+  <div class="pg-sub">Your response must address all six items below. Quality over length — a specific response beats a comprehensive generic one. Any format plus a working demo.</div>
+
+  <div class="card" style="margin-bottom:22px;">
+    <div class="submit-item">
+      <div class="submit-num">1</div>
+      <div class="submit-body">
+        <h4>Proposed Approach &amp; Workplan</h4>
+        <p>What is your phasing? Which capabilities do you tackle first and why? What does the first 30–60–90 days look like? Be specific about sequencing decisions — we want to understand your judgment, not just your capability list.</p>
+      </div>
+    </div>
+    <div class="submit-item">
+      <div class="submit-num">2</div>
+      <div class="submit-body">
+        <h4>Architecture &amp; Technical Design</h4>
+        <p>How do you architect this solution? What AI models and frameworks? How do you handle the integrations between different systems to enable automation? Include a system diagram.</p>
+      </div>
+    </div>
+    <div class="submit-item">
+      <div class="submit-num">3</div>
+      <div class="submit-body">
+        <h4>Effort, Timeline &amp; Cost</h4>
+        <p>Build cost by phase, ongoing infrastructure and token cost, proposed pricing model. Include G&amp;A-side resource requirements. Be specific about assumptions.</p>
+      </div>
+    </div>
+    <div class="submit-item">
+      <div class="submit-num">4</div>
+      <div class="submit-body">
+        <h4>Token &amp; Data Cost Management</h4>
+        <p>Expected LLM token cost per deal and per month at scale (100+ BAs). How do you minimize cost without degrading quality? How do you handle PII in LLM calls — census data, competitor invoices, employee records?</p>
+      </div>
+    </div>
+    <div class="submit-item">
+      <div class="submit-num">5</div>
+      <div class="submit-body">
+        <h4>Working Demo / POC</h4>
+        <p><strong>(A)</strong> AI agent scrubs accounts in Salesforce using ZoomInfo + LinkedIn validation, then auto-sequences tailored emails specific to each prospect sent from the G&amp;A Partners domain.<br><br>
+        <strong>(B)</strong> Comparison of quotes with the prospect's current plans and putting together a proposal document with company research.<br><br>
+        Video recording of a live demo is accepted if a live session is not possible before the deadline.</p>
+      </div>
+    </div>
+    <div class="submit-item">
+      <div class="submit-num">6</div>
+      <div class="submit-body">
+        <h4>Relevant Experience</h4>
+        <p>2–3 specific examples of AI-enabled workflow solutions built for B2B services companies — ideally HR, benefits, insurance, or financial services. For each: problem, solution, systems integrated, measurable outcome. Include the team that would work on this engagement.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Evaluation Criteria</div>
+  <table class="tbl" style="margin-bottom:22px;">
+    <thead><tr><th>Criterion</th><th style="width:80px;text-align:center;">Weight</th><th>What We Are Looking For</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Working POC / Demo Quality</strong></td><td style="text-align:center;font-weight:700;color:var(--red);">30%</td><td>Does it work? Does it show real orchestration across the identified systems?</td></tr>
+      <tr><td><strong>Architecture Credibility</strong></td><td style="text-align:center;font-weight:700;color:var(--red);">25%</td><td>Is the design realistic given our context? Are integrations specifically addressed?</td></tr>
+      <tr><td><strong>Relevant Experience</strong></td><td style="text-align:center;font-weight:700;color:var(--red);">20%</td><td>Have you built this for a comparable company? With similar fragmented system constraints?</td></tr>
+      <tr><td><strong>Cost Realism &amp; Token Strategy</strong></td><td style="text-align:center;font-weight:700;color:var(--red);">15%</td><td>Is the build cost credible? Is run-rate manageable? Is PII handling addressed explicitly?</td></tr>
+      <tr><td><strong>Speed to Value</strong></td><td style="text-align:center;font-weight:700;color:var(--red);">10%</td><td>What can be delivered and working for the team in 30–60 days?</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout success"><strong>Submit to:</strong> tsagireddy@alixpartners.com &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Deadline:</strong> June 10, 2026</div>
+
+  <div class="foot">
+    <span>G&amp;A Partners · AI Sales Workflow PRD · Confidential</span>
+    <span>Preliminary — Subject to Change · TBD</span>
+  </div>
+</div>
+</div>
+
+</body>
+</html>
