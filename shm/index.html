@@ -55,6 +55,9 @@
     <g id="i-backlog" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
       <path d="M3 20V9.5M8.33 20V4M13.67 20v-7.5M19 20V7"/><path d="M2 20h20"/>
     </g>
+    <g id="i-delivery" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 18h18"/><path d="M5 18v-4M10 18v-7M15 18v-5M20 18V8"/><path d="M4 9.5 9 5l4 3.5L19.5 3"/><path d="M16 3h3.5v3.5"/>
+    </g>
     <g id="i-transition" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
       <path d="M3 6h9a3.5 3.5 0 0 1 0 7H7a3.5 3.5 0 0 0 0 7h11"/><path d="M15.5 16.5 19 20l-3.5 3.5" transform="translate(0,-3.5)"/><circle cx="3" cy="6" r="1.4"/>
     </g>
@@ -88,8 +91,14 @@
       <div class="sep">Analysis</div>
       <button data-view="analyses"><svg class="ico"><use href="#i-analyses"/></svg><span>Deep Dives</span></button>
       <button data-view="risks"><svg class="ico"><use href="#i-risks"/></svg><span>Risk Register</span></button>
+      <div class="sep">Deep Dive</div>
+      <button data-view="monoservices"><svg class="ico"><use href="#i-modules"/></svg><span>Inside the Monolith</span></button>
+      <button data-view="anatomy"><svg class="ico"><use href="#i-architecture"/></svg><span>Service Anatomy</span></button>
+      <button data-view="dataflows"><svg class="ico"><use href="#i-analyses"/></svg><span>Data Flows</span></button>
+      <button data-view="clients"><svg class="ico"><use href="#i-integrations"/></svg><span>Clients &amp; Edges</span></button>
       <div class="sep">Takeover</div>
       <button data-view="backlog"><svg class="ico"><use href="#i-backlog"/></svg><span>Backlog Census</span></button>
+      <button data-view="delivery"><svg class="ico"><use href="#i-delivery"/></svg><span>Delivery &amp; Releases</span></button>
       <button data-view="transition"><svg class="ico"><use href="#i-transition"/></svg><span>Transition Plan</span></button>
     </nav>
 
@@ -126,8 +135,11 @@
 <div class="drawer-backdrop" id="backdrop"></div>
 <div class="drawer" id="drawer"></div>
 
+<link rel="stylesheet" href="deepdive.css">
 <script src="data.js"></script>
+<script src="deepdive-data.js"></script>
 <script src="diagram.js"></script>
 <script src="app.js"></script>
+<script src="deepdive.js"></script>
 </body>
 </html>

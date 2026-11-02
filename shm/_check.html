@@ -1,0 +1,23 @@
+<body><iframe id="f" style="width:1500px;height:900px;border:0"></iframe>
+<script>
+var views=['overview','architecture','components','modules','migration','techstack','infrastructure','data','security','integrations','analyses','risks','backlog','transition','monoservices','anatomy','dataflows','clients'];
+var errs=[], i=0, f=document.getElementById('f');
+window.addEventListener('message',function(){},false);
+function next(){
+  if(i>=views.length){ document.title = errs.length? ('ERRORS: '+errs.join(' | ')) : ('ALL '+views.length+' VIEWS OK'); return; }
+  var v=views[i++];
+  f.src='/index.html#'+v;
+  f.onload=function(){
+    var w=f.contentWindow;
+    w.onerror=function(m){errs.push(v+': '+m);};
+    setTimeout(function(){
+      try{
+        var main=f.contentDocument.getElementById('main');
+        if(!main || main.textContent.trim().length<80) errs.push(v+': empty');
+      }catch(e){errs.push(v+': '+e.message);}
+      next();
+    },700);
+  };
+}
+next();
+</script></body>

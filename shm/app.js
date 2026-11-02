@@ -426,6 +426,21 @@
     var h = '<div class="page-head"><h2>Backlog Census</h2><p>' + esc(B.intro || "") + "</p></div>";
     h += asOfLine(B.asOf || "13 August 2026");
 
+    // refresh note (26 Oct 2026) — the census below stays as the 13 Aug baseline
+    if (B.refresh) {
+      var R = B.refresh;
+      h += '<div class="panel refresh-panel"><h3>Refresh as of ' + esc(R.asOf) + ' <span class="tag-new">Refresh</span></h3>';
+      h += '<p class="topic-summary">' + esc(R.note) + "</p>";
+      h += tblWrap('<table class="grid"><thead><tr><th>Measure</th><th>13 Aug (census)</th><th>' + esc(R.asOf.replace(/ 2026$/, "")) + '</th><th>Change</th></tr></thead><tbody>' +
+        (R.deltas || []).map(function (x) {
+          return "<tr><td>" + esc(x.metric) + '</td><td class="mono-n">' + esc(x.baseline) + '</td><td class="mono-n"><b>' + esc(x.now) + '</b></td><td class="mono-n">' + esc(x.change) + "</td></tr>";
+        }).join("") + "</tbody></table>");
+      if (R.points) h += '<ul class="md">' + R.points.map(function (p) { return "<li>" + mdInline(p) + "</li>"; }).join("") + "</ul>";
+      h += '<p class="chart-note">Jump to: <a href="#backlog" data-jump="aging-refresh">severity &amp; priority aging</a> · <a href="#backlog" data-jump="curated-refresh">curated, impact-ranked backlog</a> · <a href="#delivery" data-goview="delivery">delivery &amp; releases</a></p>';
+      h += "</div>";
+      setTimeout(wireJumps, 0);
+    }
+
     // provenance: how the scan was done — this is what buys confidence in the numbers
     if (B.method && B.method.length) {
       h += '<div class="method-strip">' + B.method.map(function (m, i) {
@@ -538,8 +553,331 @@
     if (B.caveats) {
       h += '<div class="callout warn"><h4>Limits of this census</h4><p>' + esc(B.caveats) + "</p></div>";
     }
+    if (B.agingRefresh) h += agingRefreshSection(B.agingRefresh);
+    if (B.curated) h += curatedSection(B.curated);
     return h;
   };
+
+  /* ---------------- backlog refresh (26 Oct 2026): severity / priority aging ---------------- */
+  function agingRefreshSection(A) {
+    var h = '<div class="section-divider" id="aging-refresh"><span class="tag-new">Refresh · 26 Oct 2026</span><h2>Severity &amp; priority aging</h2></div>';
+    h += '<div class="callout"><h4>Two backlogs behind one median</h4><p>' + esc(A.finding) + "</p></div>";
+    h += '<div class="panel"><h3>Bugs by severity × age (live bugs, n = 414)</h3><p class="topic-summary">The higher the severity, the younger the item — severity orders the backlog as it should.</p>' + heatTable("Severity", A.columns, A.severity, "magenta") + "</div>";
+    h += '<div class="panel"><h3>All live items by priority × age (n = 2,025)</h3><p class="topic-summary">The median ages of P2, P3 and P4 fall within about 65 days of one another: a priority view mostly re-sorts the overall average.</p>' + heatTable("Priority", A.columns, A.priority, "depth") + "</div>";
+    h += '<div class="two-col">';
+    h += '<div class="panel"><h3>Why severity, not priority</h3><p class="topic-summary">Priority is close to a constant; severity is deliberately set on two in five bugs and orders aging as it should.</p>' +
+      '<table class="grid"><tbody>' + A.signal.map(function (x) { return "<tr><td>" + esc(x.metric) + '</td><td class="mono-n"><b>' + esc(x.value) + "</b></td></tr>"; }).join("") + "</tbody></table></div>";
+    if (A.vitality) {
+      h += '<div class="panel"><h3>Old but active, or old and abandoned?</h3><p class="topic-summary">' + esc(A.vitality.note) + "</p>";
+      h += tblWrap('<table class="grid"><thead><tr><th></th><th>Total</th>' + A.vitality.categories.map(function (c) { return "<th>" + esc(c) + "</th>"; }).join("") + "</tr></thead><tbody>" +
+        A.vitality.rows.map(function (r) {
+          return "<tr><td><b>" + esc(r.key) + '</b></td><td class="mono-n">' + fmt(r.total) + "</td>" + r.cells.map(function (c, i) {
+            return '<td class="mono-n' + (i === 3 ? " hot" : "") + '">' + fmt(c) + "</td>";
+          }).join("") + "</tr>";
+        }).join("") + "</tbody></table>");
+      h += "</div>";
+    }
+    h += "</div>";
+
+    if (A.sla && A.sla.length) {
+      h += '<div class="panel"><h3>Proposed severity SLA — and where the backlog stands against it</h3><p class="topic-summary">' + esc(A.slaNote) + "</p>";
+      h += tblWrap('<table class="grid"><thead><tr><th>Severity</th><th>Target</th><th>Open now</th><th>Breaching</th><th>&gt; 2× target</th><th>Breaching &amp; unassigned</th><th>Met historically (12m)</th></tr></thead><tbody>' +
+        A.sla.map(function (s) {
+          return "<tr><td><b>" + esc(s.severity) + "</b></td><td>" + esc(s.target) + '</td><td class="mono-n">' + fmt(s.open) + '</td><td class="mono-n' + (s.breaching ? " hot" : "") + '">' + fmt(s.breaching) +
+            (s.pct != null ? " (" + Math.round(s.pct) + "%)" : "") + '</td><td class="mono-n">' + fmt(s.over2x) + '</td><td class="mono-n">' + fmt(s.unassigned) + '</td><td class="mono-n">' + (s.met != null ? Math.round(s.met) + "%" : "—") + "</td></tr>";
+        }).join("") + "</tbody></table>");
+      h += "</div>";
+    }
+
+    if (A.breaches && A.breaches.length) {
+      h += '<div class="panel"><h3>The ' + A.breaches.length + ' Sev-2 bugs past the 30-day target</h3><p class="topic-summary">Oldest first. Titles paraphrased; location codes and names removed. Items marked <span class="pill pill-money">money</span> touch billing, payments or posting — each needs a fix date or a recorded downgrade.</p>';
+      h += tblWrap('<table class="grid"><thead><tr><th>ID</th><th>Title</th><th>State</th><th>Age (d)</th><th>Days in state</th><th>Squad</th><th>Assigned</th></tr></thead><tbody>' +
+        A.breaches.map(function (b) {
+          return '<tr><td class="mono-n">#' + b.id + "</td><td>" + esc(b.title) + (b.money ? ' <span class="pill pill-money">money</span>' : "") + "</td><td>" + esc(b.state) +
+            '</td><td class="mono-n">' + fmt(b.age) + '</td><td class="mono-n">' + fmt(b.inState) + "</td><td>" + esc(b.squad) + "</td><td>" + yesNo(b.assigned) + "</td></tr>";
+        }).join("") + "</tbody></table>");
+      h += "</div>";
+    }
+
+    h += '<div class="two-col">';
+    if (A.resolution && A.resolution.length) {
+      h += '<div class="panel"><h3>How fast bugs actually get fixed (closed, last 12 months)</h3><p class="topic-summary">Once work starts it moves quickly; the delay is in getting a bug started. Sev-1 sample is small (27).</p>';
+      h += tblWrap('<table class="grid"><thead><tr><th>Severity</th><th>Closed</th><th>Median</th><th>p90</th><th>≤ 7d</th><th>≤ 30d</th><th>Active → closed</th></tr></thead><tbody>' +
+        A.resolution.map(function (r) {
+          return "<tr><td><b>" + esc(r.key) + '</b></td><td class="mono-n">' + fmt(r.closed) + '</td><td class="mono-n">' + r.median + ' d</td><td class="mono-n">' + r.p90 + ' d</td><td class="mono-n">' +
+            Math.round(r.within7d) + '%</td><td class="mono-n">' + Math.round(r.within30d) + '%</td><td class="mono-n">' + r.activeMedian + " d</td></tr>";
+        }).join("") + "</tbody></table>");
+      h += "</div>";
+    }
+    h += '<div class="panel"><h3>The working slice: last 90 days + in progress</h3><p class="topic-summary">' + esc(A.workingSlice) + '</p><div class="callout warn"><h4>Stale work in progress</h4><p>' + esc(A.staleWip) + "</p></div></div>";
+    h += "</div>";
+    return h;
+  }
+
+  /* ---------------- backlog refresh (26 Oct 2026): curated, impact-ranked backlog ---------------- */
+  function curatedSection(C) {
+    var h = '<div class="section-divider" id="curated-refresh"><span class="tag-new">Refresh · 26 Oct 2026</span><h2>Curated, impact-ranked backlog <span class="draft-pill">Draft</span></h2></div>';
+    h += '<div class="callout warn"><h4>Draft for product-team validation</h4><p>' + esc(C.status) + "</p></div>";
+    h += '<p class="topic-summary">' + esc(C.finding) + "</p>";
+    h += '<div class="stat-grid">' + C.headline.map(function (c) {
+      return '<div class="stat"><div class="num ' + esc(c.tone || "") + '">' + esc(c.value) + '</div><div class="lbl">' + esc(c.label) + "</div></div>";
+    }).join("") + "</div>";
+
+    var total = C.dispositions.reduce(function (a, x) { return a + x.count; }, 0) || 1;
+    h += '<div class="panel"><h3>Four dispositions, applied in strict order</h3>';
+    h += '<div class="soundings"><div class="soundings-bar">' + C.dispositions.map(function (x) {
+      return '<div class="soundings-seg" style="flex:' + x.count + ";background:" + esc(C.dispositionColors[x.disposition] || "#93a6a4") + '" title="' + esc(x.disposition) + ": " + x.count + '"><span class="snd-n">' + fmt(x.count) + "</span></div>";
+    }).join("") + "</div></div>";
+    h += tblWrap('<table class="grid"><thead><tr><th>Disposition</th><th>Items</th><th>Share</th><th>Bugs</th><th>Money-touching</th><th>Median age (d)</th><th>Avg score</th></tr></thead><tbody>' +
+      C.dispositions.map(function (x) {
+        return '<tr><td><b style="color:' + esc(C.dispositionColors[x.disposition] || "inherit") + '">' + esc(x.disposition) + '</b></td><td class="mono-n">' + fmt(x.count) + '</td><td class="mono-n">' + Math.round(x.count / total * 100) + '%</td><td class="mono-n">' +
+          fmt(x.bugs) + '</td><td class="mono-n">' + fmt(x.money) + '</td><td class="mono-n">' + fmt(x.age) + '</td><td class="mono-n">' + x.score + "</td></tr>";
+      }).join("") + "</tbody></table>");
+    h += '<p class="chart-note">' + esc(C.rebaselineNote) + "</p></div>";
+
+    h += '<div class="panel"><h3>By transition wave</h3><p class="topic-summary">The revenue path holds 136 of the 152 Do-now items — confirming that the money path moves while the incumbent is fully available.</p>';
+    h += tblWrap('<table class="grid"><thead><tr><th>Wave</th><th>Live</th><th>Do now</th><th>Do this quarter</th><th>Re-baseline</th><th>Archive</th></tr></thead><tbody>' +
+      C.waves.map(function (w) {
+        return "<tr><td><b>" + esc(w.wave) + '</b></td><td class="mono-n">' + fmt(w.total) + '</td><td class="mono-n' + (w.doNow > 50 ? " hot" : "") + '">' + fmt(w.doNow) + '</td><td class="mono-n">' + fmt(w.quarter) +
+          '</td><td class="mono-n">' + fmt(w.rebaseline) + '</td><td class="mono-n">' + fmt(w.archive) + "</td></tr>";
+      }).join("") + "</tbody></table>");
+    h += "</div>";
+
+    h += '<div class="panel"><h3>Top 25 impact-ranked items</h3><p class="topic-summary">' + esc(C.topNote) + "</p>";
+    h += tblWrap('<table class="grid top-items"><thead><tr><th>#</th><th>ID</th><th>Item</th><th>Type</th><th>Sev/Pri</th><th>Age (d)</th><th>State</th><th>Area</th><th>Score</th></tr></thead><tbody>' +
+      C.top.map(function (t) {
+        return '<tr><td class="mono-n">' + t.rank + '</td><td class="mono-n">#' + t.id + "</td><td><b>" + esc(t.title) + '</b><div class="why">' + esc(t.why) + "</div></td><td>" + esc(t.type) +
+          '</td><td class="mono-n">' + esc(t.sevpri) + '</td><td class="mono-n">' + fmt(t.age) + "</td><td>" + esc(t.state) + "</td><td><code>" + esc(t.area) + '</code></td><td class="mono-n"><b>' + t.score.toFixed(1) + "</b></td></tr>";
+      }).join("") + "</tbody></table>");
+    h += "</div>";
+
+    h += '<div class="panel"><h3>Where effort is going vs. where risk is</h3><ul class="md">' + C.focus.map(function (f) { return "<li>" + mdInline(f) + "</li>"; }).join("") + "</ul></div>";
+
+    h += '<div class="panel"><h3>Stale-backlog triage: 677 archive candidates, 15 decisions</h3><p class="topic-summary"><b>Rule.</b> ' + esc(C.archiveRule) + "</p>";
+    h += tblWrap('<table class="grid"><thead><tr><th>Cluster</th><th>Items</th><th>Defects</th><th>Median age (y)</th><th>Suggested decision</th></tr></thead><tbody>' +
+      C.clusters.map(function (c) {
+        return '<tr><td><span class="mono-n" style="color:var(--depth)">' + esc(c.id) + "</span> " + esc(c.name) + '</td><td class="mono-n">' + fmt(c.count) + '</td><td class="mono-n">' + fmt(c.bugs) + '</td><td class="mono-n">' + c.age.toFixed(1) + "</td><td>" + esc(c.decision) + "</td></tr>";
+      }).join("") + "</tbody></table>");
+    var S = C.saving;
+    h += '<div class="callout"><h4>What AI-assisted triage saves — ' + esc(S.saved) + "</h4><p>" + fmt(S.manualDecisions) + " item-by-item decisions (~" + S.manualHours + " product-owner hours) become " + S.clusterDecisions + " cluster decisions (~" + S.aiHours + " hours). " + esc(S.note) + "</p></div>";
+    h += "</div>";
+
+    h += '<div class="panel"><h3>What this means for the transition</h3><ol class="md">' + C.implications.map(function (x) { return "<li>" + mdInline(x) + "</li>"; }).join("") + "</ol></div>";
+    return h;
+  }
+
+  /* ---------------- delivery & releases (26 Oct 2026) ---------------- */
+  var deliveryMeasure = "closed";
+  views.delivery = function () {
+    var V = D.delivery;
+    if (!V) return '<div class="empty">No delivery analysis loaded.</div>';
+    var h = '<div class="page-head"><h2>Delivery &amp; Releases</h2><p>' + esc(V.intro) + "</p></div>";
+    h += '<div class="asof"><span class="dot"></span>Data as of <b>' + esc(V.asOf) + '</b> · Azure DevOps project <code>NeXT</code> · 13,934 work items · 4,488 PRs · 1,684 builds</div>';
+
+    // what was asked
+    h += '<div class="panel"><h3>What was asked</h3><p class="topic-summary">Five follow-up asks from the 20 and 27 August client sessions. Three are answered on this page; two live in the refreshed Backlog Census.</p>';
+    h += tblWrap('<table class="grid"><thead><tr><th>#</th><th>Ask</th><th>Raised by</th><th>Answered in</th></tr></thead><tbody>' +
+      V.asks.map(function (a) {
+        var link = a.view === "delivery" ? esc(a.where) : '<a href="#backlog" data-goview="backlog">' + esc(a.where) + "</a>";
+        return '<tr><td class="mono-n">' + a.n + "</td><td><b>" + esc(a.ask) + "</b></td><td>" + esc(a.by) + "</td><td>" + link + "</td></tr>";
+      }).join("") + "</tbody></table>");
+    h += "</div>";
+
+    h += '<div class="callout"><h4>The headline</h4><p>' + esc(V.finding) + "</p></div>";
+    h += '<div class="stat-grid">' + V.headline.map(function (c) {
+      return '<div class="stat"><div class="num ' + esc(c.tone || "") + '">' + esc(c.value) + '</div><div class="lbl">' + esc(c.label) + "</div></div>";
+    }).join("") + "</div>";
+
+    // pipeline access
+    h += '<div class="two-col">';
+    h += '<div class="panel"><h3>Pipeline access — confirmed</h3>';
+    h += tblWrap('<table class="grid"><thead><tr><th>Capability</th><th>Access</th><th>Notes</th></tr></thead><tbody>' +
+      V.access.map(function (a) {
+        var cls = a.access === "yes" ? "acc-yes" : a.access === "no" ? "acc-no" : "acc-part";
+        var lbl = a.access === "yes" ? "Yes" : a.access === "no" ? "No" : "Partial";
+        return "<tr><td><b>" + esc(a.capability) + '</b></td><td><span class="acc ' + cls + '">' + lbl + "</span></td><td>" + esc(a.note) + "</td></tr>";
+      }).join("") + "</tbody></table>");
+    h += '<div class="callout warn"><h4>Build layer readable; release layer is not</h4><p>' + esc(V.accessVerdict) + "</p></div></div>";
+    h += '<div class="panel"><h3>Pipeline estate</h3>' + seqBars(V.estate) + '<p class="chart-note">24% of builds in the last 12 months were queued manually. Build success over the last 30 days is 98.7% — CI is not the bottleneck.</p>';
+    h += '<h3 style="margin-top:22px">Where the time goes</h3><p class="topic-summary" style="margin:-4px 0 10px">Median days, request to production. Segments do not sum exactly to the total.</p>' + flowBars(V.flow) + "</div>";
+    h += "</div>";
+
+    // release cadence
+    h += '<div class="panel"><h3>Release cadence — cut to ship, by train</h3><p class="topic-summary">Each bar runs from the first to the last activity on a release branch (the inferred cut and ship dates). The number is the count of develop PRs in the batch.</p>';
+    h += releaseTimeline(V.monolith, V.services);
+    h += '<ul class="md">' + V.cadenceNotes.map(function (x) { return "<li>" + mdInline(x) + "</li>"; }).join("") + "</ul>";
+    h += tblWrap('<table class="grid"><thead><tr><th>Monolith release</th><th>Cut</th><th>Ship (proxy)</th><th>Stabilisation (d)</th><th>Days since prev.</th><th>Develop PRs</th><th>Fix PRs on branch</th><th>Median PR-to-ship (d)</th></tr></thead><tbody>' +
+      V.monolith.map(function (r) {
+        return "<tr><td><b>" + esc(r.release) + "</b></td><td>" + esc(r.cut || "—") + "</td><td>" + esc(r.ship) + '</td><td class="mono-n' + (r.stab > 60 ? " hot" : "") + '">' + fmt(r.stab) + '</td><td class="mono-n">' + fmt(r.gap) +
+          '</td><td class="mono-n' + (r.prs > 120 ? " hot" : "") + '">' + fmt(r.prs) + '</td><td class="mono-n">' + fmt(r.fixPrs) + '</td><td class="mono-n">' + fmt(r.lead) + "</td></tr>";
+      }).join("") + "</tbody></table>");
+    h += '<p class="chart-note">4.12 first shipped on 8 Dec 2025; its branch saw a second burst of activity in early February, which is when the branch-activity proxy dates it.</p></div>';
+
+    // velocity vs incidents
+    h += '<div class="panel" id="velocity-panel"><h3>Shipping velocity vs. production incidents, by month</h3>';
+    h += '<p class="topic-summary">' + esc(V.incidentDefinition) + "</p>";
+    h += '<div class="seg-toggle" role="group" aria-label="Velocity measure">' + [["closed", "Items closed"], ["prs", "PRs merged"], ["releases", "Release events"]].map(function (m) {
+      return '<button type="button" data-measure="' + m[0] + '" class="' + (deliveryMeasure === m[0] ? "on" : "") + '">' + m[1] + "</button>";
+    }).join("") + "</div>";
+    h += '<div id="dualchart-host">' + dualChart(V.monthly, deliveryMeasure, "incidents") + "</div>";
+    h += '<div class="chart-legend"><span><i style="background:var(--depth)"></i><span id="dc-bar-lbl">' + measureLabel(deliveryMeasure) + '</span></span><span><i style="background:var(--magenta)"></i>Production-signal items</span><span><i style="background:var(--depth);opacity:.4"></i>Oct 2026 is partial (to the 26th)</span></div>';
+    h += '<p class="chart-note">Each series is scaled to its own maximum; compare shapes, not heights.</p></div>';
+
+    // incident types
+    h += '<div class="panel"><h3>Production-signal items by outage type</h3><p class="topic-summary">248 items in 13 months. One type per item, first-matching keyword rule. Darker cells mean more items that month.</p>';
+    h += typeHeat(V.monthly, V.typeOrder, V.types) + "</div>";
+
+    // correlation findings
+    h += '<div class="panel"><h3>What the correlation work shows</h3>' + V.findings.map(function (f) {
+      return '<div class="finding sev-' + esc(f.severity) + '"><div class="f-rail"></div><div class="f-body"><h5>' + esc(f.title) + "</h5><p>" + mdInline(f.detail) + "</p></div></div>";
+    }).join("") + "</div>";
+
+    h += '<div class="panel"><h3>Batch size vs. what followed — monolith releases</h3>';
+    h += tblWrap('<table class="grid"><thead><tr><th>Release</th><th>Shipped</th><th>Develop PRs</th><th>Prod signal, 14 days</th><th>Prod signal, 30 days</th><th>Hotfixes ≤ 30 days</th></tr></thead><tbody>' +
+      V.batch.map(function (b) {
+        return "<tr><td><b>" + esc(b.release) + "</b></td><td>" + esc(b.ship) + '</td><td class="mono-n' + (b.prs > 120 ? " hot" : "") + '">' + fmt(b.prs) + '</td><td class="mono-n' + (b.inc14 > 20 ? " hot" : "") + '">' + fmt(b.inc14) +
+          '</td><td class="mono-n">' + fmt(b.inc30) + (b.partial ? "*" : "") + '</td><td class="mono-n">' + fmt(b.hotfixes) + "</td></tr>";
+      }).join("") + "</tbody></table>");
+    h += '<p class="chart-note">*Only 20 days had elapsed at the snapshot, so the 4.16 30-day figure is a lower bound. Pearson 0.81, Spearman 0.48 (n = 8); 0.22 without 4.16.</p></div>';
+
+    h += '<div class="callout warn"><h4>Read these results with care</h4><p>' + esc(V.caveat) + "</p></div>";
+    h += '<div class="panel"><h3>What it means</h3><ol class="md">' + V.velocityImplications.map(function (x) { return "<li>" + mdInline(x) + "</li>"; }).join("") + "</ol></div>";
+
+    // root causes
+    h += '<div class="section-divider"><h2>Why releases take so long and cost so much</h2></div>';
+    h += '<p class="topic-summary">Ten root causes, ranked by business impact. ' + esc(V.reinforce) + "</p>";
+    h += '<div class="rc-grid">' + V.rootCauses.map(function (r) {
+      return '<details class="rc-card"' + (r.rank <= 3 ? " open" : "") + '><summary><span class="rc-rank">' + r.rank + '</span><span class="rc-title">' + esc(r.title) + '</span><span class="rc-pills"><span class="dim-pill dim-' + esc(r.dimKey) + '">' + esc(r.dimension) +
+        '</span><span class="lvl-pill">Impact: <b>' + esc(r.impact) + '</b></span><span class="lvl-pill conf-' + esc(r.confidence) + '">Confidence: <b>' + esc(r.confidence) + "</b></span></span></summary>" +
+        '<div class="rc-body"><p class="rc-sum">' + esc(r.summary) + '</p><h6>Evidence</h6><ul>' + r.evidence.map(function (e) { return "<li>" + mdInline(e) + "</li>"; }).join("") + "</ul>" +
+        '<h6>Business consequence</h6><p>' + esc(r.consequence) + '</p><h6>Lever</h6><p>' + esc(r.lever) + "</p>" +
+        (r.confidenceNote ? '<p class="chart-note">' + esc(r.confidenceNote) + "</p>" : "") + "</div></details>";
+    }).join("") + "</div>";
+
+    // business case
+    h += '<div class="callout biz-case"><h4>The business case for change</h4><p>' + esc(V.businessCase) + "</p></div>";
+    h += '<div class="panel"><h3>The levers, and what they change</h3>';
+    h += tblWrap('<table class="grid"><thead><tr><th>Lever</th><th>Addresses</th><th>What changes</th></tr></thead><tbody>' +
+      V.levers.map(function (l) { return "<tr><td><b>" + esc(l.lever) + '</b></td><td class="mono-n" style="text-align:left">' + esc(l.addresses) + "</td><td>" + esc(l.change) + "</td></tr>"; }).join("") + "</tbody></table>");
+    h += "</div>";
+    h += '<div class="panel"><h3>Data that would raise confidence</h3>';
+    h += tblWrap('<table class="grid"><thead><tr><th>Gap</th><th>What closes it</th></tr></thead><tbody>' +
+      V.dataGaps.map(function (g) { return "<tr><td><b>" + esc(g.gap) + "</b></td><td>" + esc(g.ask) + "</td></tr>"; }).join("") + "</tbody></table>");
+    h += "</div>";
+
+    setTimeout(wireDelivery, 0);
+    return h;
+  };
+
+  function measureLabel(k) { return { closed: "Items closed", prs: "PRs merged", releases: "Release events" }[k] || k; }
+  function wireDelivery() {
+    var panel = document.getElementById("velocity-panel");
+    if (!panel || !D.delivery) return;
+    Array.prototype.forEach.call(panel.querySelectorAll("[data-measure]"), function (b) {
+      b.addEventListener("click", function () {
+        deliveryMeasure = b.getAttribute("data-measure");
+        Array.prototype.forEach.call(panel.querySelectorAll("[data-measure]"), function (x) { x.classList.toggle("on", x === b); });
+        document.getElementById("dualchart-host").innerHTML = dualChart(D.delivery.monthly, deliveryMeasure, "incidents");
+        document.getElementById("dc-bar-lbl").textContent = measureLabel(deliveryMeasure);
+      });
+    });
+    wireJumps();
+  }
+  function wireJumps() {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-goview]"), function (a) {
+      if (a._wired) return; a._wired = true;
+      a.addEventListener("click", function (e) { e.preventDefault(); EXT.utils.go(a.getAttribute("data-goview")); });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-jump]"), function (a) {
+      if (a._wired) return; a._wired = true;
+      a.addEventListener("click", function (e) {
+        e.preventDefault();
+        var t = document.getElementById(a.getAttribute("data-jump"));
+        if (t && t.scrollIntoView) t.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+  }
+  function tblWrap(html) { return '<div class="tbl-scroll">' + html + "</div>"; }
+  // heat-style matrix: rows x age buckets, cell shade proportional to the row's share
+  function heatTable(firstCol, columns, rows, hue) {
+    var rgb = hue === "magenta" ? "224,112,158" : "70,217,198";
+    var max = 1;
+    rows.forEach(function (r) { if (!/^All/.test(r.key)) r.cells.forEach(function (c) { if (c > max) max = c; }); });
+    return tblWrap('<table class="grid heat"><thead><tr><th>' + esc(firstCol) + "</th><th>Total</th>" + columns.map(function (c) { return "<th>" + esc(c) + "</th>"; }).join("") +
+      "<th>Median</th><th>p90</th></tr></thead><tbody>" + rows.map(function (r) {
+        var all = /^All/.test(r.key);
+        return '<tr class="' + (all ? "heat-total" : "") + '"><td><b>' + esc(r.key) + '</b></td><td class="mono-n"><b>' + fmt(r.total) + "</b></td>" + r.cells.map(function (c) {
+          var a = all ? 0 : Math.min(0.85, (c / max) * 0.85);
+          return '<td class="mono-n heat-cell" style="background:rgba(' + rgb + "," + a.toFixed(2) + ')' + (a > 0.45 ? ";color:#0b1416" : "") + '">' + (c ? fmt(c) : "·") + "</td>";
+        }).join("") + '<td class="mono-n">' + (r.median != null ? fmt(r.median) + " d" : "—") + '</td><td class="mono-n">' + (r.p90 != null ? fmt(r.p90) + " d" : "—") + "</td></tr>";
+      }).join("") + "</tbody></table>");
+  }
+  // bars for velocity, line for incidents, each on its own scale
+  function dualChart(rows, bk, lk) {
+    var bmax = Math.max.apply(null, rows.map(function (r) { return r[bk] || 0; }).concat([1]));
+    var lmax = Math.max.apply(null, rows.map(function (r) { return r[lk] || 0; }).concat([1]));
+    var n = rows.length;
+    var bars = rows.map(function (r) {
+      return '<div class="cc-month" title="' + esc(r.month) + (r.partial ? " (to 26th)" : "") + ": " + measureLabel(bk).toLowerCase() + " " + (r[bk] || 0) + ", production-signal items " + (r[lk] || 0) + '">' +
+        '<div class="cc-bar b" style="width:62%;height:' + ((r[bk] || 0) / bmax * 100) + "%" + (r.partial ? ";opacity:.4" : "") + '"></div></div>';
+    }).join("");
+    var pts = rows.map(function (r, i) { return ((i + 0.5) / n * 100).toFixed(2) + "," + (100 - (r[lk] || 0) / lmax * 96).toFixed(2); }).join(" ");
+    var line = '<svg class="dc-line" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="' + pts + '" fill="none" stroke="var(--magenta)" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></svg>';
+    var dots = rows.map(function (r, i) {
+      return '<span class="dc-dot" style="left:' + ((i + 0.5) / n * 100) + "%;bottom:" + ((r[lk] || 0) / lmax * 96) + '%"><span class="dc-val">' + (r[lk] || 0) + "</span></span>";
+    }).join("");
+    var axis = rows.map(function (r) { return '<div class="cc-lbl">' + esc(String(r.month).slice(2)) + "</div>"; }).join("");
+    return '<div class="colchart dualchart"><div class="cc-plot">' + bars + line + '<div class="dc-layer">' + dots + '</div></div><div class="cc-axis">' + axis + "</div></div>";
+  }
+  // month x outage-type heat table
+  function typeHeat(monthly, order, totals) {
+    var max = 1;
+    monthly.forEach(function (m) { order.forEach(function (t) { if ((m.byType[t] || 0) > max) max = m.byType[t]; }); });
+    var share = {}; totals.forEach(function (t) { share[t.type] = t; });
+    return tblWrap('<table class="grid heat type-heat"><thead><tr><th>Type</th>' + monthly.map(function (m) { return "<th>" + esc(m.month.slice(2).replace("-", "/")) + (m.partial ? "*" : "") + "</th>"; }).join("") +
+      "<th>Total</th><th>Share</th></tr></thead><tbody>" + order.map(function (t) {
+        return "<tr><td><b>" + esc(t) + "</b></td>" + monthly.map(function (m) {
+          var c = m.byType[t] || 0, a = Math.min(0.85, c / max * 0.85);
+          return '<td class="mono-n heat-cell" style="background:rgba(224,112,158,' + a.toFixed(2) + ")" + (a > 0.45 ? ";color:#0b1416" : "") + '">' + (c || "·") + "</td>";
+        }).join("") + '<td class="mono-n"><b>' + fmt(share[t].count) + '</b></td><td class="mono-n">' + share[t].share + "%</td></tr>";
+      }).join("") + "</tbody></table>") + '<p class="chart-note">*October 2026 runs to the 26th. Part of its jump reflects a change in how consistently production items were flagged.</p>';
+  }
+  // stacked horizontal bars: waiting to start / in development / done, waiting to ship
+  function flowBars(rows) {
+    var max = Math.max.apply(null, rows.map(function (r) { return r.total || 0; }).concat([1]));
+    var segs = [["wait", "Waiting to start", "var(--slate)"], ["dev", "In development", "var(--kelp)"], ["ship", "Done, waiting to ship", "var(--buoy)"]];
+    var h = rows.map(function (r) {
+      var inner = segs.map(function (s) {
+        var v = r[s[0]]; if (!v) return "";
+        return '<div class="fb-seg" style="width:' + (v / max * 100) + "%;background:" + s[2] + '" title="' + esc(s[1]) + ": " + v + ' d"></div>';
+      }).join("");
+      return '<div class="fb-row"><div class="fb-name">' + esc(r.series) + ' <span class="fb-n">n=' + fmt(r.n) + '</span></div><div class="fb-track">' + inner + '</div><div class="fb-total">' + Math.round(r.total) + " d</div></div>";
+    }).join("");
+    return h + '<div class="chart-legend">' + segs.map(function (s) { return '<span><i style="background:' + s[2] + '"></i>' + s[1] + "</span>"; }).join("") + "</div>";
+  }
+  // cut-to-ship timeline for both trains
+  function releaseTimeline(mono, svc) {
+    function d(s) { return new Date(s + "T00:00:00Z").getTime(); }
+    var DAY = 86400000;
+    var all = mono.concat(svc).map(function (r) { var c = r.cut || null; if (!c && r.ship) c = new Date(d(r.ship) - (r.stab || 0) * DAY).toISOString().slice(0, 10); return Object.assign({}, r, { cutX: c }); });
+    var t0 = d("2025-07-01"), t1 = d("2026-11-01"), span = t1 - t0;
+    function x(s) { return Math.max(0, Math.min(100, (d(s) - t0) / span * 100)); }
+    var months = [];
+    for (var y = 2025, m = 7; y < 2026 || (y === 2026 && m <= 10); m++) { if (m > 12) { m = 1; y++; } months.push(y + "-" + (m < 10 ? "0" : "") + m + "-01"); }
+    var grid = months.map(function (mm, i) { return '<div class="rt-tick" style="left:' + x(mm) + '%">' + (i % 3 === 0 ? '<span>' + mm.slice(2, 7) + "</span>" : "") + "</div>"; }).join("");
+    function rows(list, cls, label) {
+      return '<div class="rt-group">' + label + "</div>" + list.map(function (r) {
+        var l = x(r.cutX), w = Math.max(0.7, x(r.ship) - l);
+        return '<div class="rt-row"><div class="rt-name">' + esc(r.release) + '</div><div class="rt-track">' + grid +
+          '<div class="rt-bar ' + cls + (r.prs > 120 ? " big" : "") + '" style="left:' + l + "%;width:" + w + '%" title="' + esc(r.release) + ": cut " + esc(r.cutX) + ", ship " + esc(r.ship) + (r.prs != null ? ", " + r.prs + " develop PRs" : "") + '"></div>' +
+          (r.prs != null ? '<span class="rt-lbl" style="left:calc(' + (l + w) + '% + 5px)">' + r.prs + "</span>" : "") + "</div></div>";
+      }).join("");
+    }
+    var sv = all.slice(mono.length);
+    return '<div class="rtimeline">' + rows(all.slice(0, mono.length), "mono", "Monolith 4.x") + rows(sv, "svc", "Services 1.x (services web app)") +
+      '<div class="rt-row rt-axis"><div class="rt-name"></div><div class="rt-track">' + grid + "</div></div></div>" +
+      '<div class="chart-legend"><span><i style="background:var(--violet)"></i>Monolith release branch</span><span><i style="background:var(--sky)"></i>Services release branch</span><span><i style="background:var(--magenta)"></i>Batch over 120 PRs</span></div>';
+  }
 
   /* ---------------- transition plan ---------------- */
   views.transition = function () {
@@ -767,6 +1105,12 @@
   });
 
   /* ---------------- router ---------------- */
+  /* Extension point: deepdive.js registers extra views + post-render hooks here.
+     EXT.views[name] returns an HTML string; EXT.after[name] runs once it is in the DOM
+     (needed for anything that binds events or drives an animation). */
+  var EXT = (window.DISCOVERY_EXT = window.DISCOVERY_EXT || { views: {}, after: {} });
+  EXT.utils = { el: el, esc: esc, arr: arr, titleCase: titleCase, renderMarkdown: renderMarkdown, go: function (v) { go(v); } };
+
   function go(view) {
     var activeBtn = null;
     Array.prototype.forEach.call(nav.querySelectorAll("button"), function (b) {
@@ -776,8 +1120,10 @@
     });
     var crumb = document.getElementById("crumb");
     if (crumb && activeBtn) { var lbl = activeBtn.querySelector("span"); crumb.textContent = lbl ? lbl.textContent : "Dashboard"; }
-    main.innerHTML = (views[view] || views.overview)();
+    var render = EXT.views[view] || views[view] || views.overview;
+    main.innerHTML = render();
     main.scrollTop = 0; window.scrollTo(0, 0);
+    if (typeof EXT.after[view] === "function") { try { EXT.after[view](main); } catch (err) { console.error("[deepdive] " + view, err); } }
     if (location.hash !== "#" + view) history.replaceState(null, "", "#" + view);
   }
   nav.addEventListener("click", function (e) { var b = e.target.closest("button[data-view]"); if (b) go(b.getAttribute("data-view")); });
@@ -791,7 +1137,11 @@
     var sd = document.getElementById("surveyDate");
     if (sd) sd.textContent = gen;
     var initial = (location.hash || "#overview").slice(1);
-    go(views[initial] ? initial : "overview");
+    go((views[initial] || EXT.views[initial]) ? initial : "overview");
   }
-  boot();
+  /* Scripts are parsed in order, so extension views registered by deepdive.js
+     are not present yet. Wait for DOMContentLoaded so an initial #hash naming
+     an extension view resolves instead of falling back to the dashboard. */
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
 })();

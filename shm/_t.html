@@ -1,0 +1,14 @@
+<body style="margin:0"><iframe id="f" src="/index.html#monoservices" style="width:1660px;height:1240px;border:0"></iframe>
+<script>
+document.getElementById('f').onload=function(){
+  var d=this.contentDocument;
+  setTimeout(function(){
+    var b=d.querySelector('#ddScope button[data-scope="all"]'); b.click();
+    setTimeout(function(){
+      document.title='cards='+d.querySelectorAll('.dd-card').length
+        +' mono='+d.querySelectorAll('.dd-card[data-domain]').length
+        +' sat='+d.querySelectorAll('.dd-card[data-svc]').length;
+    },500);
+  },2200);
+};
+</script></body>
