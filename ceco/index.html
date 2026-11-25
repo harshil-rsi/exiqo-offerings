@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CECO RFQ agents deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout idea: a fixed 16:9 stage, one idea per slide. Black for openers, warm paper for content, violet for what agents do. */
+  --ink:#111111; --ink2:#333333; --mute:#6f6c66; --paper:#F4F3EE; --card:#FFFFFF; --line:#D9D6CC;
+  --violet:#8657FF; --violet2:#926FED; --lav:#EDDFF7; --lime:#BCFE91; --sky:#ABF0FF; --peach:#FFBC7D;
+  --good:#2f9e44; --warn:#e67700; --bad:#e03131;
+  --fd:"Sora","Manrope",system-ui,sans-serif;
+  --fb:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --fm:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --s:1;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:#0b0b0b;color:var(--ink);font-family:var(--fb);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,[data-goto]:focus-visible{outline:3px solid var(--violet);outline-offset:3px}
+
+/* ---------- stage ---------- */
+.deck{position:relative;width:100%;overflow:hidden}
+.slide{width:1600px;height:900px;background:var(--paper);color:var(--ink);font-size:22px;line-height:1.4;overflow:hidden;position:relative;transform-origin:top left;transform:scale(var(--s));margin:0 0 calc(-900px * (1 - var(--s)) + 14px) 0}
+.slide.dark{background:#0b0b0b;color:#fff}
+body.present{overflow:hidden}
+body.present .deck{position:fixed;inset:0}
+body.present .slide{position:absolute;left:50%;top:50%;margin:-450px 0 0 -800px;transform-origin:center;opacity:0;visibility:hidden;transition:opacity .45s ease,visibility 0s .45s}
+body.present .slide.active{opacity:1;visibility:visible;transition:opacity .45s ease}
+
+.top{position:absolute;left:64px;right:64px;top:30px;display:flex;justify-content:space-between;align-items:center;font-family:var(--fm);font-size:14px;letter-spacing:.09em;text-transform:uppercase;color:var(--mute)}
+.wm{font-family:var(--fd);font-weight:700;letter-spacing:.16em;font-size:18px;color:var(--ink)}
+.wm i{font-style:normal;color:var(--violet)}
+.wm em{font-style:normal;font-family:var(--fm);font-weight:400;font-size:13px;letter-spacing:.09em;color:var(--mute);margin-left:14px}
+.dark .top,.dark .wm em{color:#9a968c}.dark .wm{color:#fff}
+.pg{position:absolute;right:64px;bottom:26px;font-family:var(--fm);font-size:14px;color:var(--mute)}
+.body{position:absolute;left:64px;right:64px;top:84px;bottom:60px;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3,h4,p,ul,ol{margin:0}
+h1{font:700 104px/1 var(--fd);letter-spacing:-.035em}
+h2{font:600 44px/1.1 var(--fd);letter-spacing:-.022em;text-wrap:balance}
+h3{font:600 24px/1.2 var(--fd);letter-spacing:-.01em}
+h4{font:600 19px/1.25 var(--fd)}
+.eyebrow{font-family:var(--fm);font-size:14.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--violet)}
+.dark .eyebrow,.blk .eyebrow{color:#b9a2ff}
+.lead{font-size:24px;color:var(--ink2);max-width:1180px}
+.dark .lead{color:#d9d6cc}
+.sm{font-size:18px}.xs{font-size:16px}.mute{color:var(--mute)}
+.grow{flex:1;min-height:0}
+.row{display:flex;gap:20px}.col{display:flex;flex-direction:column;gap:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px 24px;min-width:0}
+.lav{background:var(--lav);border-color:transparent}.lime{background:var(--lime);border-color:transparent}
+.sky{background:var(--sky);border-color:transparent}.peach{background:var(--peach);border-color:transparent}
+.blk{background:#111;color:#fff;border-color:#111}
+.vio{background:linear-gradient(180deg,var(--violet2),var(--violet));color:#fff;border-color:transparent}
+.chip{display:inline-block;font-family:var(--fm);font-size:13px;letter-spacing:.07em;text-transform:uppercase;padding:4px 11px;border-radius:99px;border:1.5px solid currentColor;white-space:nowrap}
+.chip.fill{background:#111;color:#fff;border-color:#111}
+.num{font:700 58px/1 var(--fd);letter-spacing:-.03em;display:block;font-variant-numeric:tabular-nums}
+ul.ul{list-style:none;padding:0;display:grid;gap:10px}
+ul.ul li{padding-left:24px;position:relative}
+ul.ul li::before{content:"";position:absolute;left:2px;top:.62em;width:11px;height:3px;border-radius:2px;background:var(--violet)}
+.blk ul.ul li::before{background:#b9a2ff}
+.ar{flex:none;width:26px;height:2px;background:currentColor;position:relative;align-self:center;opacity:.55}
+.ar::after{content:"";position:absolute;right:-1px;top:-4px;border-left:8px solid currentColor;border-top:5px solid transparent;border-bottom:5px solid transparent}
+
+/* entrance and step builds: only in presenting mode, so everything is visible at rest */
+body.present .slide.active .a{animation:up .6s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*85ms)}
+@keyframes up{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+body.present .f{opacity:0;transform:translateY(16px);transition:opacity .5s ease,transform .5s cubic-bezier(.2,.7,.2,1)}
+body.present .f.on{opacity:1;transform:none}
+[data-only]{display:none}[data-only].on{display:block}
+
+/* ---------- 1 title ---------- */
+.art{position:absolute;inset:0;width:100%;height:100%}
+.tb{position:absolute;left:64px;top:170px;width:1100px;display:grid;gap:26px}
+.tb .lead{font-size:29px;max-width:900px}
+.tb .meta{font-family:var(--fm);font-size:15px;letter-spacing:.08em;text-transform:uppercase;color:#9a968c}
+.trail{fill:none;stroke:#3a3a3a;stroke-width:2}
+.trail2{fill:none;stroke:var(--violet);stroke-width:3;stroke-dasharray:1500;stroke-dashoffset:1500}
+body.present .active .trail2{animation:draw 2.6s .5s ease forwards}
+body:not(.present) .trail2{stroke-dashoffset:0}
+@keyframes draw{to{stroke-dashoffset:0}}
+.tn circle{fill:#0b0b0b;stroke:var(--violet);stroke-width:3}
+.tn text{font-family:var(--fm);font-size:13px;fill:#9a968c;text-anchor:middle;letter-spacing:.06em;text-transform:uppercase}
+body.present .active .tn{animation:pop .5s both;animation-delay:calc(.6s + var(--i)*.24s);transform-box:fill-box;transform-origin:center}
+@keyframes pop{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:none}}
+.runner{fill:#fff}
+.hint{position:absolute;left:64px;bottom:28px;font-family:var(--fm);font-size:13px;color:#77736a;letter-spacing:.06em}
+
+/* ---------- 2 agenda ---------- */
+.agenda{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:18px 22px}
+.ag{display:grid;grid-template-columns:120px 1fr;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px 26px;text-align:left;width:100%}
+.ag b{font:700 88px/1 var(--fd);color:var(--violet);letter-spacing:-.03em}
+.ag h3{font-size:34px}.ag span{display:block;color:var(--mute);font-size:22px;margin-top:8px}
+.ag:hover{border-color:var(--violet)}
+.ag.key{background:#111;color:#fff;border-color:#111}.ag.key span{color:#c9c5ba}.ag.key b{color:#b9a2ff}
+
+/* ---------- 3 why ---------- */
+.why .card{display:grid;gap:10px;align-content:start}
+.why .who{font-family:var(--fm);font-size:14px;letter-spacing:.07em;text-transform:uppercase}
+.why .stat{display:grid;gap:6px;align-content:center}
+.why .chip{justify-self:start}
+.why .g3 .sm{font-size:20px}
+.why .g3 h3{font-size:30px}
+.stat span{font-size:19px;color:var(--ink2)}
+
+/* ---------- 4 landscape ---------- */
+.band{display:grid;grid-template-columns:150px 1fr;gap:16px;align-items:stretch}
+.band>p{font-family:var(--fm);font-size:13.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);align-self:center}
+.band .tiles{display:grid;gap:12px}
+.tile{border-radius:16px;padding:18px 18px;background:#fff;border:1px solid var(--line);font-size:17.5px;line-height:1.35;color:var(--ink2)}
+.tile b{display:block;font:600 21px/1.2 var(--fd);color:var(--ink);margin-bottom:6px}
+.method{display:flex;align-items:center;gap:8px;font-size:18px;flex-wrap:wrap}
+.method span{background:#111;color:#fff;border-radius:99px;padding:6px 12px;white-space:nowrap;font-size:16px}
+.method .ar{width:16px}
+.proof{display:grid;gap:12px;align-content:start}
+.proof .card{padding:18px 20px}.proof b{font:700 38px/1 var(--fd);letter-spacing:-.02em;display:block}
+.proof span{display:block;font-size:17.5px;line-height:1.3;color:var(--ink2);margin-top:6px}
+
+/* ---------- 5 heard ---------- */
+.hrow{display:flex;justify-content:space-between;align-items:flex-end;gap:20px}
+.hrow .aside{font-family:var(--fm);font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:var(--violet);white-space:nowrap}
+.nums{gap:34px;margin:10px 0 14px}
+.nums span{font-size:16.5px;color:var(--mute);display:block;margin-top:4px}
+ol.steps{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:15px;counter-reset:n}
+.brands{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+.brands i{width:27px;height:27px;border-radius:7px;background:var(--lav);border:1.5px solid var(--violet);font:600 15px/24px var(--fm);font-style:normal;text-align:center;color:var(--violet)}
+body.present .active .brands i{animation:pop .35s both;animation-delay:calc(.5s + var(--i)*28ms)}
+ol.steps li{counter-increment:n;padding-left:44px;position:relative;font-size:22px}
+ol.steps li::before{content:counter(n);position:absolute;left:0;top:1px;width:28px;height:28px;border-radius:50%;background:var(--violet);color:#fff;font:600 14px/28px var(--fm);text-align:center}
+.banner{border-radius:20px;padding:18px 24px;display:flex;gap:22px;align-items:center}
+.banner h3{flex:1}
+.cau{display:grid;gap:8px;font-size:16.5px}
+.cau span{background:rgba(255,255,255,.16);border-radius:10px;padding:6px 12px}
+
+/* ---------- 6 lanes ---------- */
+.lane{display:flex;align-items:center;gap:8px}
+.lane .st{border-radius:14px;padding:11px 15px;font:600 18px/1.2 var(--fd);white-space:nowrap}
+.lane.q .st{background:#fff;border:1px solid var(--line);color:var(--mute);font-weight:400}
+.lane.r .st{background:var(--violet);color:#fff;padding:15px 18px;font-size:20px}
+.mult{display:flex;align-items:center;gap:14px}
+.mult .card{flex:1;text-align:center;padding:16px}
+.mult .x{font:400 40px/1 var(--fd);color:var(--mute)}
+.mult b{font:700 28px/1.1 var(--fd);display:block;letter-spacing:-.02em;white-space:nowrap}
+.mult span{font-size:16.5px;color:var(--ink2)}
+
+/* ---------- 7 pipeline ---------- */
+.p9{display:grid;grid-template-columns:repeat(9,1fr);gap:10px}
+.stage{background:#fff;border:1px solid var(--line);border-top:5px solid var(--violet);border-radius:14px;padding:11px 11px 12px;display:grid;gap:5px;align-content:start}
+.stage i{font:500 13px/1 var(--fm);font-style:normal;color:var(--violet)}
+.stage b{font:600 18.5px/1.15 var(--fd);letter-spacing:-.01em}
+.stage>span{font-size:15px;line-height:1.3;color:var(--ink2)}
+.track{height:4px;background:var(--line);border-radius:2px;position:relative;margin:-8px 0 -8px}
+.track::after{content:"";position:absolute;top:-5px;left:0;width:14px;height:14px;border-radius:50%;background:var(--violet);animation:run 7s linear infinite}
+@keyframes run{from{left:0}to{left:calc(100% - 14px)}}
+.gate{font-size:14.5px;text-align:center;border-radius:99px;padding:5px 4px;background:var(--peach);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gate.auto{background:transparent;border:1px dashed var(--line);color:var(--mute)}
+.rowlab{font-family:var(--fm);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-bottom:-12px}
+.bandrow{border-radius:14px;padding:11px 18px;font-size:17.5px}
+.bandrow b{font-family:var(--fd);font-weight:600}
+
+/* ---------- 8 architecture ---------- */
+.arch{display:block;width:100%;height:auto}
+.arch .zone rect{fill:rgba(134,87,255,.05);stroke:var(--violet);stroke-dasharray:6 5;stroke-width:1.2}
+.arch .zone text{font-family:var(--fm);font-size:11.5px;letter-spacing:.1em;fill:var(--violet)}
+.arch .e{fill:none;stroke:#111;stroke-width:1.4;transition:opacity .4s}
+.arch .n{transition:opacity .4s}
+.arch .n rect{fill:#fff;stroke:#111;stroke-width:1.3}
+.arch .n text{text-anchor:middle;font-family:var(--fb);font-size:12.5px;fill:var(--ink2)}
+.arch .n .t{font-family:var(--fd);font-weight:600;font-size:14px;fill:#111}
+.arch .n .ev{font-family:var(--fm);font-size:11.5px}
+.arch .k-agent rect{fill:#E9E0FF;stroke:var(--violet)}
+.arch .k-rec rect{fill:#D9FBC2;stroke:#4f9a2a}
+.arch .k-out rect{fill:#EFFDE4;stroke:#4f9a2a}
+.arch .k-out .t{font-size:13px}
+.arch .k-hitl rect{fill:#FFD9B3;stroke:#d9822b}
+.arch .k-hitl .t{font-family:var(--fb);font-weight:600;font-size:13px}
+.arch .k-sys rect{fill:#D3F5FF;stroke:#2b97b5}
+.arch .k-gate rect{fill:#111;stroke:#111}
+.arch .k-gate text{fill:#d9d6cc}.arch .k-gate .t{fill:#fff}
+.arch .k-note rect{fill:none;stroke:var(--mute);stroke-dasharray:4 4}
+.arch .k-note .t{font-family:var(--fb);font-weight:500;font-size:13px;fill:var(--ink2)}
+.arch .el{font-family:var(--fm);font-size:11px;fill:var(--mute);text-anchor:middle;transition:opacity .4s}
+.arch .tok{fill:var(--violet)}
+.s-arch[data-step="1"] .arch :is(.n,.e,.el):not(.g1),
+.s-arch[data-step="2"] .arch :is(.n,.e,.el):not(.g2),
+.s-arch[data-step="3"] .arch :is(.n,.e,.el):not(.g3),
+.s-arch[data-step="4"] .arch :is(.n,.e,.el):not(.g4),
+.s-arch[data-step="5"] .arch :is(.n,.e,.el):not(.g5){opacity:.13}
+.capline{min-height:54px;font-size:20.5px;color:var(--ink2);border-left:5px solid var(--violet);padding:2px 0 2px 16px;display:flex;align-items:center}
+.capline b{font-family:var(--fd);font-weight:600;color:var(--ink)}
+
+/* ---------- 9 integrations ---------- */
+.way{display:grid;gap:6px;padding:20px 22px}
+.way h3{font-size:26px}
+.way p{font-size:19.5px;color:var(--ink2)}
+table.t{border-collapse:collapse;width:100%;font-size:19px}
+table.t th{font-family:var(--fm);font-size:12.5px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);text-align:left;padding:0 12px 8px}
+table.t td{padding:17px 12px;border-top:1px solid var(--line);vertical-align:top;color:var(--ink2)}
+table.t td:first-child{font:600 20px/1.25 var(--fd);color:var(--ink);white-space:nowrap}
+.pills{display:flex;gap:10px;flex-wrap:wrap}
+.pill{background:#111;color:#fff;border-radius:99px;padding:9px 18px;font-size:18px}
+.big .sm{font-size:20px}.big h4{font-size:22px;margin-bottom:4px}.big .card{padding:20px 24px}
+
+/* ---------- 10 knowledge ---------- */
+.search{border:2px solid #111;border-radius:14px;padding:16px 18px;font-size:21px;display:flex;gap:12px;align-items:center;background:#fff}
+.search i{width:18px;height:18px;border:2.5px solid #111;border-radius:50%;position:relative;flex:none}
+.search i::after{content:"";position:absolute;right:-7px;bottom:-5px;width:9px;height:2.5px;background:#111;transform:rotate(45deg)}
+.hit{display:grid;grid-template-columns:1fr auto;gap:9px 12px;padding:17px 20px;border-radius:14px;background:#fff;border:1px solid var(--line);font-size:20px}
+.hit b{font-family:var(--fd);font-weight:600}
+.tags{grid-column:1/-1;display:flex;gap:7px;flex-wrap:wrap}
+.tag{font-family:var(--fm);font-size:14.5px;padding:4px 10px;border-radius:7px;background:var(--lime)}
+.tag.v{background:var(--lav)}
+.won{color:var(--good);font-weight:600}.lost{color:var(--bad);font-weight:600}
+
+/* ---------- 11 trust ---------- */
+.rev{display:grid;gap:0}
+.rv{display:grid;grid-template-columns:1.05fr 1.25fr auto;gap:14px;align-items:center;padding:19px 4px;border-top:1px solid var(--line);font-size:19.5px}
+.rv b{font-family:var(--fd);font-weight:600}
+.rv span{color:var(--ink2)}
+.sc{font-family:var(--fm);font-size:13px;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px;border-radius:99px;color:#fff;white-space:nowrap}
+.sc.hi{background:var(--good)}.sc.md{background:var(--warn)}.sc.lo{background:var(--bad)}
+.route{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:center;padding:13px 18px;border-radius:16px;background:#fff;border:1px solid var(--line)}
+.route i{width:16px;height:16px;border-radius:50%;grid-row:span 2}
+.route b{font-family:var(--fd);font-weight:600;font-size:20px}.route span{font-size:16.5px;color:var(--ink2)}
+
+/* ---------- 12 autonomy ---------- */
+.ladder{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;align-items:end}
+.rung{border-radius:16px;padding:14px 16px;background:#fff;border:1px solid var(--line);display:grid;gap:5px;align-content:start}
+.rung i{font:500 13px/1 var(--fm);font-style:normal;color:var(--violet);letter-spacing:.06em}
+.rung b{font:600 21px/1.15 var(--fd)}.rung span{font-size:15.5px;line-height:1.32;color:var(--ink2)}
+.rung:nth-child(1){min-height:104px}.rung:nth-child(2){min-height:122px;background:#F6F1FF}.rung:nth-child(3){min-height:140px;background:#EDE3FF}.rung:nth-child(4){min-height:158px;background:#E1D2FF}
+.lv{display:grid;grid-template-columns:240px repeat(4,1fr);gap:0 8px;align-items:center;font-size:17px;row-gap:15px}
+.lv .h{font-family:var(--fm);font-size:12.5px;letter-spacing:.07em;color:var(--mute);text-align:center}
+.lv .lab{font-family:var(--fd);font-weight:600;font-size:19px}
+.lv .trk{grid-column:2 / 6;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;height:28px;position:relative}
+.lv .trk::before{content:"";position:absolute;inset:13px 0 auto 0;height:2px;background:var(--line)}
+.lv .bar{border-radius:99px;background:var(--violet);position:relative;transform-origin:left center}
+.lv .bar.lock{background:#111}
+.lv .bar::after{content:attr(data-t);position:absolute;right:10px;top:5px;font:500 13px/18px var(--fm);color:#fff;white-space:nowrap}
+body.present .f.on .bar{animation:grow .9s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*90ms)}
+@keyframes grow{from{transform:scaleX(.05)}to{transform:none}}
+
+/* ---------- 13 bring/build ---------- */
+.two{display:grid;grid-template-columns:1.15fr 1fr;gap:20px}
+.items{display:grid;grid-template-columns:1fr 1fr;gap:18px 20px;margin-top:18px;font-size:21.5px}
+.items.one{grid-template-columns:1fr}
+.items div{padding-left:26px;position:relative}
+.items div::before{content:"";position:absolute;left:2px;top:.45em;width:13px;height:13px;border-radius:4px;background:var(--violet)}
+.build .items div::before{background:none;border:2.5px solid #111}
+
+/* ---------- 14/15 cases ---------- */
+.case{display:grid;grid-template-columns:1.12fr 1fr;gap:26px}
+.flowv{display:grid;gap:9px;counter-reset:n}
+.flowv div{counter-increment:n;display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:center;font-size:20px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 16px}
+.flowv div::before{content:counter(n);width:26px;height:26px;border-radius:50%;background:#111;color:#fff;font:500 13px/26px var(--fm);text-align:center}
+.mt{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.m{border-radius:18px;padding:20px 20px;background:#fff;border:1px solid var(--line);display:grid;gap:6px;align-content:start}
+.m b{font:700 42px/1.05 var(--fd);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.m>span{font-size:17.5px;line-height:1.3;color:var(--ink2)}
+.m em{font-style:normal;font-family:var(--fm);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--violet)}
+.carry{display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:18.5px}
+.carry .card{padding:16px 20px}
+.carry h4{margin-bottom:6px}
+
+/* ---------- 16 demo ---------- */
+.frame{border:1.5px solid #3a3a3a;border-radius:20px;background:#151515;position:relative;display:grid;place-items:center;overflow:hidden}
+.frame::before{content:"";position:absolute;left:18px;top:16px;width:12px;height:12px;border-radius:50%;background:#3a3a3a;box-shadow:20px 0 0 #3a3a3a,40px 0 0 #3a3a3a}
+.play{width:120px;height:120px;border-radius:50%;background:var(--violet);display:grid;place-items:center;position:relative}
+.play::after{content:"";border-left:38px solid #fff;border-top:24px solid transparent;border-bottom:24px solid transparent;margin-left:10px}
+.play::before{content:"";position:absolute;inset:-14px;border-radius:50%;border:2px solid var(--violet);animation:pulse 2.2s ease-out infinite}
+@keyframes pulse{from{opacity:.9;transform:scale(.9)}to{opacity:0;transform:scale(1.35)}}
+.beats{display:grid;gap:9px}
+.beat{display:grid;grid-template-columns:30px 1fr;gap:4px 12px;font-size:17.5px;padding:10px 14px;border-radius:14px;background:#171717;border:1px solid #2c2c2c}
+.beat i{font:500 13px/26px var(--fm);font-style:normal;width:26px;height:26px;border-radius:50%;background:var(--violet);text-align:center;grid-row:span 2}
+.beat span{color:#b9a2ff;font-size:15.5px}
+
+/* ---------- 17 next ---------- */
+.ask{display:grid;gap:8px;align-content:start}
+.ask b{font:700 46px/1 var(--fd);letter-spacing:-.03em}
+.ask p{font-size:19.5px;color:var(--ink2)}
+.tl{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;align-items:stretch}
+.ph{border-radius:14px;padding:14px 16px;background:#fff;border:1px solid var(--line);font-size:17.5px;line-height:1.3}
+.ph i{font:500 12.5px/1 var(--fm);font-style:normal;color:var(--violet);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:5px}
+.ph b{font-family:var(--fd);font-weight:600;font-size:21px;display:block;margin-bottom:3px}
+.ph.end{background:linear-gradient(180deg,var(--violet2),var(--violet));color:#fff;border-color:transparent}.ph.end i{color:#e6dcff}
+body.present .f.on .ph{animation:up .5s both;animation-delay:calc(var(--i,0)*130ms)}
+
+
+/* ---------- why RSI (dense) ---------- */
+.wb{background:#fff;border:1px solid var(--line);border-radius:18px;padding:13px 16px;display:grid;gap:9px;align-content:start}
+.wl{font-family:var(--fm);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--violet)}
+.caps{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.caps div{background:var(--lav);border-radius:12px;padding:10px 12px;display:grid;gap:3px;align-content:start}
+.caps b{font:600 18px/1.15 var(--fd)}.caps span{font-size:15px;line-height:1.3;color:var(--ink2)}
+.eco{display:grid;grid-template-columns:160px 1fr;gap:7px 12px;align-items:center}
+.eco>span{font:600 17px/1.2 var(--fd)}
+.eco i{font-size:15px !important;padding:3px 10px !important}
+.eco>div{display:flex;flex-wrap:wrap;gap:5px}
+.eco i,.ls .cell i{font-style:normal;font-size:14px;line-height:1.2;padding:3px 9px;border-radius:99px;border:1px solid var(--line);background:var(--paper);white-space:nowrap}
+.gov{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.gov div{border-radius:12px;padding:10px 12px;background:var(--paper);font-size:15px;line-height:1.3;color:var(--ink2)}
+.gov b{display:block;font:600 16.5px/1.15 var(--fd);color:var(--ink);margin-bottom:4px}
+.lw{padding:16px 18px;display:grid;gap:11px;align-content:center}
+.logos{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.logos.three{grid-template-columns:repeat(3,1fr)}
+.lg{min-height:78px;border-radius:12px;background:#000;border:1px solid #2c2c2c;display:grid;place-items:center;align-content:center;gap:7px;padding:10px 8px;text-align:center}
+.lg img{max-width:80%;max-height:36px;display:block}
+.lg b{font:600 23px/1 var(--fd);color:#fff;letter-spacing:-.01em}
+.lg span{font-size:12.5px;line-height:1.25;color:#a8a49a}
+.lg .mk{display:flex;align-items:center;gap:8px}.lg .mk img{height:26px;max-width:none;filter:invert(1)}
+.cust{font-size:14.5px;line-height:1.4;color:#d9d6cc}.cust b{color:#fff;font-weight:600}
+.wmi{height:24px;display:block}
+
+/* ---------- landscape ---------- */
+.ls{display:grid;grid-template-columns:196px repeat(4,1fr);gap:6px}
+.ls .hd{border-radius:12px;padding:9px 14px;font:600 19px/1.2 var(--fd)}
+.ls .rl{font:600 16.5px/1.2 var(--fd);align-self:center;padding-right:8px}
+.ls .cell{background:#fff;border:1px solid var(--line);border-radius:12px;padding:7px 9px;display:flex;flex-wrap:wrap;gap:4px;align-content:center}
+.ls .cell i{font-size:14.5px;padding:3px 9px}
+
+/* ---------- loops ---------- */
+.loops{display:block;width:100%;height:auto}
+.loops .nd rect{fill:var(--violet)}
+.loops .nd text{fill:#fff;font:600 16.5px var(--fd);text-anchor:middle}
+.loops .fw{stroke:var(--violet);stroke-width:2.5;fill:none}
+.loops .lp{fill:none;stroke:#d9480f;stroke-width:2;stroke-dasharray:7 6;animation:march 1.1s linear infinite}
+@keyframes march{to{stroke-dashoffset:-26}}
+.loops .ll{font:500 14.5px var(--fb);fill:var(--ink2);text-anchor:middle}
+
+/* ---------- stage systems, background agents ---------- */
+.stage .sys{margin-top:6px;padding-top:8px;border-top:1px dashed var(--line);display:grid;gap:3px;font:400 13px/1.3 var(--fm);color:var(--ink2)}
+.stage .sys em{font-style:normal;font-size:10.5px;letter-spacing:.08em;color:var(--violet);text-transform:uppercase}
+.bg4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.bg4 .bandrow{padding:14px 16px;font-size:17px;line-height:1.32}
+.bg4 .bandrow b{display:block;font-size:19px;margin-bottom:4px}
+
+/* ---------- token cost ---------- */
+.phz{display:grid;grid-template-columns:96px 1fr;gap:3px 14px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:13px 18px}
+.phz i{font:500 13px/1 var(--fm);font-style:normal;color:var(--violet);letter-spacing:.06em;text-transform:uppercase;grid-row:span 3;align-self:center}
+.phz b{font:600 21px/1.2 var(--fd)}
+.phz span{font-size:17.5px;line-height:1.35;color:var(--ink2)}
+.costbar{display:block;height:10px;border-radius:99px;background:var(--line);margin-top:5px;position:relative;overflow:hidden}
+.costbar::after{content:"";position:absolute;inset:0 auto 0 0;width:var(--w);background:var(--violet);border-radius:99px;transform-origin:left center}
+body.present .active .costbar::after{animation:grow 1s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(.4s + var(--i,0)*.25s)}
+.lstrip{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:16px}
+.lstrip span{background:#111;color:#fff;border-radius:99px;padding:6px 13px;white-space:nowrap}
+.lstrip .ar{width:16px}
+.strat{display:grid;grid-template-columns:150px 1fr;gap:4px 16px;align-items:center;padding:15px 20px}
+.strat .num{font-size:46px;grid-row:span 2}
+.strat h4{font-size:21px;align-self:end}.strat p{font-size:17px;line-height:1.35;align-self:start}
+
+
+/* ---------- round 4 ---------- */
+.reuse{background:var(--lav);border-radius:12px;padding:10px 14px;display:grid;gap:6px}
+.reuse b{font:600 16.5px/1.2 var(--fd)}
+.reuse>div{display:flex;flex-wrap:wrap;gap:5px}
+.reuse i{font-style:normal;font-size:15px;line-height:1.2;padding:4px 11px;border-radius:99px;background:var(--violet);color:#fff;white-space:nowrap}
+.reuse span{font-size:14.5px;line-height:1.3;color:var(--ink2)}
+.stage>b{min-height:43px}.stage>span{min-height:39px}
+.hx{margin-top:3px;background:var(--violet);border-radius:10px;padding:7px 8px 8px;display:grid;gap:5px}
+.hx em{font:600 13px/1.1 var(--fd);font-style:normal;color:#fff}
+.hx div{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.hx u{text-decoration:none;font:400 11.5px/1 var(--fm);color:#fff;background:rgba(255,255,255,.2);border-radius:5px;padding:3px 2px;text-align:center}
+.stage .sys{margin:-5px 0 0 14px;padding:10px 0 2px 12px;border-top:0;border-left:2px solid var(--violet);display:grid;gap:5px;position:relative}
+.stage .sys span{position:relative;font:400 12.5px/1.25 var(--fm);background:#D3F5FF;border:1px solid #2b97b5;border-radius:6px;padding:3px 6px;color:var(--ink)}
+.stage .sys span::before{content:"";position:absolute;left:-14px;top:50%;width:13px;height:2px;background:var(--violet)}
+.stage .sys::after{content:"";position:absolute;left:-5px;top:0;width:8px;height:8px;border-radius:50%;background:var(--violet);animation:drop 2.4s linear infinite;animation-delay:calc(var(--i,0)*-.27s)}
+@keyframes drop{from{top:0;opacity:1}to{top:calc(100% - 8px);opacity:.15}}
+.hitl{background:var(--peach);border-radius:99px;padding:8px 22px;text-align:center;font:600 20px/1.2 var(--fd)}
+.dpipe{display:flex;align-items:stretch;gap:8px}
+.dstep{flex:1;background:#fff;border:1px solid var(--line);border-top:5px solid var(--violet);border-radius:14px;padding:12px 14px;display:grid;gap:4px;align-content:start}
+.dstep i{font:500 13px/1 var(--fm);font-style:normal;color:var(--violet)}
+.dstep b{font:600 20px/1.15 var(--fd)}.dstep span{font-size:16px;line-height:1.3;color:var(--ink2)}
+.dpipe .ar{width:18px}
+.rec{font:400 14.5px/1.55 var(--fm);display:grid;grid-template-columns:auto 1fr;gap:0 14px}
+.rec span{color:var(--mute)}
+.tools3{display:grid;gap:14px}
+.tools3 p{font-family:var(--fm);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-bottom:5px}
+.tools3 div div{display:flex;flex-wrap:wrap;gap:6px}
+.tools3 i{font-style:normal;font-size:18px;line-height:1.2;padding:6px 14px;border-radius:99px;background:#111;color:#fff;white-space:nowrap}
+.ledger{background:#111;color:#fff;border:2px solid var(--violet);border-radius:20px;padding:20px 22px;display:grid;gap:11px;align-content:center;box-shadow:0 0 0 6px rgba(134,87,255,.14)}
+.ledger .rec{font-size:15.5px;background:#1b1b1b;border:1px solid #2c2c2c;border-radius:12px;padding:11px 14px}
+.ledger .rec span{color:#b9a2ff}
+.ledger ul.ul{font-size:18px;gap:8px;color:#e6e3da}
+.ledger ul.ul li::before{background:#b9a2ff}
+.routes3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.routes3 .route{padding:9px 12px}.routes3 .route b{font-size:17px}.routes3 .route span{font-size:14.5px}
+.ladder.sm .rung:nth-child(1){min-height:92px}.ladder.sm .rung:nth-child(2){min-height:104px}.ladder.sm .rung:nth-child(3){min-height:116px}.ladder.sm .rung:nth-child(4){min-height:128px}
+.ladder.sm .rung{padding:11px 14px}.ladder.sm .rung span{font-size:15px}
+.evl{display:block;width:100%;height:auto}
+.evl .ring{fill:none;stroke:var(--violet);stroke-width:2.5;stroke-dasharray:8 7;animation:march 1.1s linear infinite}
+.evl .pl rect{fill:#fff;stroke:var(--violet);stroke-width:2}
+.evl .pl .t{font:600 15.5px var(--fd);fill:#111;text-anchor:middle}
+.evl .pl .u{font:400 12px var(--fb);fill:var(--ink2);text-anchor:middle}
+.evl .pl.go rect{fill:var(--violet)}.evl .pl.go .t{fill:#fff}.evl .pl.go .u{fill:#e6dcff}
+.evl .c1{font:700 34px var(--fd);fill:#111;text-anchor:middle}
+.evl .c2{font:400 14px var(--fb);fill:var(--ink2);text-anchor:middle}
+.evl .dot{fill:#111}
+
+/* ---------- controls ---------- */
+.pbar{position:fixed;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.12);z-index:40}
+.pbar i{display:block;height:100%;width:0;background:var(--violet);transition:width .4s}
+.hud{position:fixed;right:14px;bottom:14px;z-index:50;display:flex;gap:6px;align-items:center;background:rgba(17,17,17,.88);color:#fff;border-radius:99px;padding:6px 8px;font-family:var(--fm);font-size:12.5px;letter-spacing:.04em;transition:opacity .4s}
+.hud button{background:transparent;border:1px solid #444;border-radius:99px;padding:6px 12px;color:#fff}
+.hud button:hover{border-color:var(--violet)}
+.hud #cnt{padding:0 8px;font-variant-numeric:tabular-nums}
+body.present.idle .hud{opacity:0}
+body.scroll .pbar{display:none}
+.np{position:fixed;left:14px;bottom:14px;max-width:min(560px,calc(100vw - 28px));z-index:45;background:#fffbe6;color:#111;border-radius:14px;padding:12px 16px;font-size:14.5px;line-height:1.45;box-shadow:0 8px 30px rgba(0,0,0,.4);display:none}
+body.present.notes-on .np{display:block}
+.np b{font-family:var(--fm);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:4px;color:#7a5d00}
+aside.notes{display:none}
+.nout{display:none;background:#fffbe6;color:#111;padding:12px 16px;font-size:14.5px;line-height:1.45;margin:-8px 0 14px;border-radius:0 0 12px 12px}
+body.scroll.notes-on .nout{display:block}
+.toast{position:fixed;left:50%;top:18px;transform:translateX(-50%);background:#111;color:#fff;border:1px solid #444;border-radius:12px;padding:10px 16px;font-size:14px;z-index:60;opacity:0;pointer-events:none;transition:opacity .3s;max-width:90vw}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}.trail2{stroke-dashoffset:0}}
+</style>
+</head>
+<body>
+<main class="deck" id="deck">
+
+<!-- 1 -->
+<section class="slide dark" id="s-title" data-sec="">
+  <svg class="art" viewBox="0 0 1600 900" aria-hidden="true">
+    <defs><radialGradient id="glow" cx="82%" cy="24%" r="62%"><stop offset="0" stop-color="#8657FF" stop-opacity=".6"/><stop offset=".55" stop-color="#8657FF" stop-opacity=".12"/><stop offset="1" stop-color="#8657FF" stop-opacity="0"/></radialGradient></defs>
+    <rect width="1600" height="900" fill="url(#glow)"/>
+    <path class="trail" d="M100 770 L1500 670"/><path class="trail2" id="trail" d="M100 770 L1500 670"/>
+    <g id="tnodes"></g>
+    <circle class="runner" r="6"><animateMotion dur="6s" begin="3.2s" repeatCount="indefinite" path="M100 770 L1500 670"/></circle>
+  </svg>
+  <div class="tb">
+    <p class="eyebrow a" style="--i:0">Sales process automation · One CODE</p>
+    <h1 class="a" style="--i:1">Agents that<br>answer RFQs</h1>
+    <p class="lead a" style="--i:2">What it takes to build them well, and how we would start with one CECO product.</p>
+    <p class="meta a" style="--i:3">For CECO Environmental · 23 November 2026</p>
+  </div>
+  <p class="hint">→ or click to advance · ← back · F full screen</p>
+  <aside class="notes">Set the frame early: this is our experience and a way of working, shown so you can judge whether it is a good starting point. It is not a packaged product.</aside>
+</section>
+
+<!-- 2 -->
+<section class="slide" id="s-agenda" data-sec="Agenda">
+  <div class="body">
+    <h2 class="a">Agenda</h2>
+    <div class="agenda grow">
+      <button class="ag a" style="--i:1" data-goto="s-why"><b>1</b><div><h3>Why RSI</h3><span>Our experience building go-to-market agents</span></div></button>
+      <button class="ag a" style="--i:2" data-goto="s-heard"><b>2</b><div><h3>Problem statement</h3><span>Our understanding of the problem statement</span></div></button>
+      <button class="ag key a" style="--i:3" data-goto="s-hard"><b>3</b><div><h3>Anatomy of good RFQ agents</h3><span>Best practices / Components of RFQ agents that work</span></div></button>
+      <button class="ag a" style="--i:4" data-goto="s-case1"><b>4</b><div><h3>Case studies</h3><span>A US PEO and a procurement software company</span></div></button>
+      <button class="ag a" style="--i:5" data-goto="s-demo"><b>5</b><div><h3>Demo (click through)</h3><span>One request, from inbox to proposal</span></div></button>
+      <button class="ag a" style="--i:6" data-goto="s-next"><b>6</b><div><h3>Next step</h3><span>A proof of concept on one CECO product</span></div></button>
+    </div>
+  </div>
+  <aside class="notes">Part 3 is the centre of the session. Invite interruptions there: the aim is for the CECO team to recognise their own process in it.</aside>
+</section>
+
+<!-- 3 -->
+<section class="slide" id="s-why" data-sec="Why RSI">
+  <div class="body" style="gap:12px">
+    <div class="hrow a"><h2>Why RSI</h2><p class="aside">We build go-to-market agents for B2B sales teams, and for the companies that sell them</p></div>
+    <div class="row grow" style="gap:16px">
+      <div class="col" style="flex:1.78;gap:10px">
+        <div class="wb a" style="--i:1">
+          <p class="wl">Business experience · GTM agents we have built</p>
+          <div class="caps">
+            <div><b>Prospecting</b><span>Prioritised accounts and call queues</span></div>
+            <div><b>Enrichment</b><span>Verified contacts and company data</span></div>
+            <div><b>Outreach</b><span>Drafted in the rep's voice, sent on approval</span></div>
+            <div><b>CRM hygiene</b><span>Records updated by chat or voice</span></div>
+            <div><b>RFP and RFQ responses</b><span>From intake to proposal</span></div>
+          </div>
+        </div>
+        <div class="wb a" style="--i:2;flex:1;align-content:center">
+          <p class="wl">Technical experience · Systems we orchestrate, and agents we reuse</p>
+          <div class="eco">
+            <span>CRM</span><div><i>Salesforce</i><i>HubSpot</i><i>Dynamics 365 Sales</i><i>SugarCRM</i></div>
+            <span>Sales tools</span><div><i>Gong</i><i>Outreach</i><i>Salesloft</i><i>Clay</i><i>ZoomInfo</i><i>Marketo</i></div>
+            <span>Pricing and CPQ</span><div><i>Salesforce Revenue Cloud</i><i>SAP CPQ</i><i>Oracle CPQ</i><i>Conga CPQ</i><i>Tacton</i><i>Epicor CPQ</i></div>
+            <span>ERP</span><div><i>Epicor</i><i>SAP S/4HANA</i><i>Dynamics 365 F&amp;O</i><i>Oracle NetSuite</i><i>Infor</i></div>
+            <span>Data platforms</span><div><i>Snowflake</i><i>Microsoft Fabric</i><i>Databricks</i><i>ClickHouse</i></div>
+            <span>Work surfaces</span><div><i>Outlook</i><i>Teams</i><i>Slack</i><i>DocuSign</i><i>PandaDoc</i></div>
+          </div>
+          <div class="reuse"><b>We reuse the agents already in your stack</b><div><i>Agentforce</i><i>Gong agents</i><i>SAP Joule</i><i>HubSpot Breeze</i><i>Dynamics 365 Sales agents</i><i>Epicor Prism</i><i>Claygent</i></div><span>Called as tools or as peer agents over MCP and A2A, so nothing that already works is rebuilt.</span></div>
+        </div>
+        <div class="wb a" style="--i:3">
+          <p class="wl">Architecture and governance · How we make it scale</p>
+          <div class="gov">
+            <div><b>Multi-agent architecture</b>One orchestration layer over one connector gateway</div>
+            <div><b>Harness tuned from traces</b>Every run recorded, reviewed and fed back</div>
+            <div><b>Evaluations as gates</b>No release without a passing score</div>
+            <div><b>Autonomy raised gradually</b>Step by step, on measured results</div>
+            <div><b>Impact a CRO can track</b>Metrics tied to pipeline and cycle time</div>
+          </div>
+        </div>
+      </div>
+      <div class="col" style="flex:1;gap:10px">
+        <div class="card blk lw a" style="--i:2;flex:1">
+          <p class="eyebrow">Agents built for B2B sales teams</p>
+          <div class="logos">
+            <div class="lg"><img src="logos/measurabl.png" alt="Measurabl"></div>
+            <div class="lg"><b>Coupa</b></div>
+            <div class="lg"><img src="logos/gna.png" alt="G&amp;A Partners" style="max-height:44px"></div>
+            <div class="lg"><img src="logos/rsi.png" alt="RSI"><span>our own B2B sales agents</span></div>
+          </div>
+        </div>
+        <div class="card blk lw a" style="--i:3;flex:1.1">
+          <p class="eyebrow">Engineering partner to GTM software companies</p>
+          <div class="logos three">
+            <div class="lg"><img src="logos/maxiq.png" alt="MaxIQ"><span>AI-native revenue platform</span></div>
+            <div class="lg"><b style="font-size:20px">Zylotech</b><span>Customer data platform</span></div>
+            <div class="lg"><div class="mk"><img src="logos/dayai.png" alt=""><b style="font-size:20px">Day AI</b></div><span>AI-native CRM</span></div>
+          </div>
+          <p class="cust">Their products serve revenue teams at enterprises such as <b>Snowflake</b>, <b>ServiceNow</b> and <b>Commvault</b>.</p>
+        </div>
+        <p class="xs mute" style="text-align:center">1,400+ AI-proficient engineers · 120+ AI projects delivered</p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Three things to land: we have built every kind of GTM agent including RFP and RFQ responders; we have wired agents into the CRM, pricing and ERP systems they will recognise; and we build for sales teams directly and for the software companies that sell GTM agents.</aside>
+</section>
+
+<!-- 4 -->
+<section class="slide" id="s-land" data-sec="Why RSI">
+  <div class="body" style="gap:14px">
+    <h2 class="a">RSI agent engineering experience landscape</h2>
+    <div class="ls a grow" style="--i:1;align-content:center">
+          <span></span><div class="hd peach">AWS</div><div class="hd sky">Microsoft</div><div class="hd lime">Google Cloud</div><div class="hd lav">Hyperscaler-agnostic</div>
+          <span class="rl">Agent runtime</span><div class="cell"><i>Bedrock AgentCore Runtime</i><i>AgentCore Harness</i></div><div class="cell"><i>Foundry Agent Service</i><i>Copilot Studio</i></div><div class="cell"><i>Agent Platform Runtime</i><i>Agent Studio</i></div><div class="cell"><i>Self-hosted LangGraph</i><i>Temporal</i><i>Kubernetes</i></div>
+          <span class="rl">Orchestration and frameworks</span><div class="cell"><i>Strands Agents</i><i>Step Functions</i><i>Lambda durable functions</i></div><div class="cell"><i>Microsoft Agent Framework</i><i>Semantic Kernel</i><i>AutoGen</i></div><div class="cell"><i>Agent Development Kit</i><i>A2A protocol</i></div><div class="cell"><i>LangGraph</i><i>deep agents</i><i>CrewAI</i><i>Claude Agent SDK</i><i>OpenAI Agents SDK</i></div>
+          <span class="rl">Memory and knowledge</span><div class="cell"><i>AgentCore Memory</i><i>Bedrock Knowledge Bases</i><i>S3 Files</i></div><div class="cell"><i>Foundry memory</i><i>Foundry IQ</i><i>Azure AI Search</i></div><div class="cell"><i>Memory Bank</i><i>Sessions</i><i>RAG Engine</i></div><div class="cell"><i>Mem0</i><i>Zep</i><i>Letta</i><i>pgvector</i></div>
+          <span class="rl">Identity and access</span><div class="cell"><i>AgentCore Identity</i><i>IAM</i><i>Cognito</i></div><div class="cell"><i>Entra Agent ID</i><i>Entra ID</i></div><div class="cell"><i>Agent Identity</i><i>Cloud IAM</i></div><div class="cell"><i>Okta</i><i>Auth0</i><i>OAuth on-behalf-of</i></div>
+          <span class="rl">Tools gateway and connectors</span><div class="cell"><i>AgentCore Gateway</i><i>AgentCore Browser</i><i>Code Interpreter</i></div><div class="cell"><i>Foundry tools and MCP</i><i>Azure API Management</i></div><div class="cell"><i>Agent Gateway</i><i>Apigee</i><i>Agent Registry</i></div><div class="cell"><i>MCP servers</i><i>LiteLLM</i><i>Kong AI Gateway</i><i>Browserbase</i></div>
+          <span class="rl">Security, guardrails, policy</span><div class="cell"><i>AgentCore Policy (Cedar)</i><i>Bedrock Guardrails</i></div><div class="cell"><i>Foundry guardrails</i><i>Azure AI Content Safety</i></div><div class="cell"><i>Model Armor</i><i>IAM conditions</i></div><div class="cell"><i>NeMo Guardrails</i><i>Lakera</i><i>Open Policy Agent</i><i>RSI Guardian agent</i></div>
+          <span class="rl">Observability and evaluation</span><div class="cell"><i>AgentCore Observability</i><i>AgentCore Evaluations</i><i>CloudWatch</i></div><div class="cell"><i>Foundry tracing and evaluations</i><i>Azure Monitor</i></div><div class="cell"><i>Agent Platform evaluation</i><i>Cloud Trace</i></div><div class="cell"><i>Langfuse</i><i>LangSmith</i><i>Braintrust</i><i>Arize Phoenix</i><i>DeepEval</i><i>ClickHouse</i></div>
+          <span class="rl">Models and routing</span><div class="cell"><i>Amazon Bedrock</i><i>Claude</i><i>Nova</i></div><div class="cell"><i>Azure OpenAI in Foundry</i><i>Foundry model catalog</i></div><div class="cell"><i>Gemini</i><i>Model Garden</i></div><div class="cell"><i>Anthropic API</i><i>OpenAI API</i><i>OpenRouter</i><i>Open-weight models</i></div>
+    </div>
+  </div>
+  <aside class="notes">Read the columns, not the cells. The point for CECO: we build on whichever cloud they standardise on, with Microsoft the natural fit beside Fabric and Dynamics 365, and the parts that matter most (identity, policy, evaluation) exist on all of them.</aside>
+</section>
+
+<!-- 5 -->
+<section class="slide" id="s-heard" data-sec="Problem statement">
+  <div class="body">
+    <div class="hrow a"><h2>What we heard</h2><p class="aside">Tell us where this is wrong</p></div>
+    <div class="g2 grow">
+      <div class="card a" style="--i:1">
+        <p class="eyebrow">Today</p>
+        <div class="row nums"><div><b class="num">30+</b><span>brands, run as separate entities</span></div><div><b class="num">3–5 weeks</b><span>from RFQ to proposal</span></div></div>
+        <ul class="ul" style="font-size:22px;gap:13px">
+          <li>RFQs arrive by email to application engineers in each unit.</li>
+          <li>One answer often combines products from several brands.</li>
+          <li>Engineers search old proposals for sizing, materials, parameters and vendors. Those proposals sit in many folders.</li>
+          <li>Each brand has its own systems, often legacy Epicor. Data and process are not yet standardized.</li>
+        </ul>
+        <div class="brands" id="brands" aria-hidden="true"></div>
+        <p class="xs mute" style="margin-top:8px">Each square is a brand with its own inbox, systems and price logic.</p>
+      </div>
+      <div class="card blk f" data-f="1">
+        <p class="eyebrow">One CODE, as we understand it</p>
+        <ol class="steps">
+          <li>One portal where customers submit RFQs. Until then, RFQs are picked up from engineers' Outlook inboxes.</li>
+          <li>AI reads the RFQ, pulls the data, sizes, and drafts the proposal.</li>
+          <li>Application engineers review it with an accuracy score and give the final approval.</li>
+          <li>Everything is observable, and results feed back into Microsoft Fabric.</li>
+          <li>Later, the portal connects to Dynamics 365 and CRM to create leads and opportunities.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="banner vio f" data-f="2">
+      <h3 style="font-size:25px;line-height:1.25">The milestone: a working proof of concept on one product area.</h3>
+      <div class="cau"><span>Trust comes from seeing it work on your own RFQs</span><span>Adoption and change management are part of the job</span></div>
+    </div>
+  </div>
+  <aside class="notes">Pause after each column and ask for corrections. Two things to confirm: the date of the leadership meeting, and which systems hold sizing and pricing data for the product they would pick.</aside>
+</section>
+
+<!-- 6 -->
+<section class="slide" id="s-hard" data-sec="Anatomy of good RFQ agents">
+  <div class="body" style="gap:14px">
+    <h2 class="a">An engineered RFQ is more complex and non-linear than a questionnaire RFP</h2>
+    <div class="card a" style="--i:1;padding:11px 22px">
+      <div class="lane q"><h3 style="margin-right:16px;white-space:nowrap;font-size:21px">A questionnaire RFP</h3><span class="st">Questions</span><i class="ar"></i><span class="st">Answer library</span><i class="ar"></i><span class="st">Draft</span><i class="ar"></i><span class="st">Review</span><p class="sm mute" style="margin-left:18px">A straight line. Mostly a writing problem.</p></div>
+    </div>
+    <div class="card f" data-f="1" style="display:grid;gap:4px;padding:13px 22px 12px;border:2px solid var(--violet)">
+      <div class="hrow"><h3><span style="color:var(--violet)">An engineered RFQ</span> is engineering and commerce in one document</h3><p class="sm" style="color:var(--ink2)">Violet arrows move forward. Every dashed line is a trip back.</p></div>
+      <svg class="loops" viewBox="0 0 1420 268" role="img" aria-label="An engineered RFQ moves forward through six steps and loops back five ways before it becomes a proposal"><defs><marker id="lf" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="#8657FF"/></marker><marker id="lb" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,1 L9,5 L0,9 z" fill="#d9480f"/></marker></defs><path class="lp" d="M570,104 C570,30 130,30 130,104" marker-end="url(#lb)"/><path class="lp" d="M810,104 C810,56 610,56 610,104" marker-end="url(#lb)"/><path class="lp" d="M1050,104 C1050,44 850,44 850,104" marker-end="url(#lb)"/><path class="lp" d="M830,156 C830,222 350,222 350,156" marker-end="url(#lb)"/><path class="lp" d="M1310,156 C1310,290 110,290 110,156" marker-end="url(#lb)"/><text class="ll" x="350" y="38">Data missing: ask the customer</text><text class="ll" x="710" y="57">Vendor quote changes the pick</text><text class="ll" x="950" y="47">Margin too thin: re-cost</text><text class="ll" x="590" y="190">Too costly: swap a product or brand</text><text class="ll" x="1075" y="206">Customer revises the spec: another round</text><path class="fw" d="M213,130 L245,130" marker-end="url(#lf)"/><path class="fw" d="M453,130 L485,130" marker-end="url(#lf)"/><path class="fw" d="M693,130 L725,130" marker-end="url(#lf)"/><path class="fw" d="M933,130 L965,130" marker-end="url(#lf)"/><path class="fw" d="M1173,130 L1205,130" marker-end="url(#lf)"/><g class="nd"><rect x="7" y="104" width="206" height="52" rx="12"/><text x="110" y="136">Specification</text></g><g class="nd"><rect x="247" y="104" width="206" height="52" rx="12"/><text x="350" y="136">Multi-brand solution</text></g><g class="nd"><rect x="487" y="104" width="206" height="52" rx="12"/><text x="590" y="136">Sizing</text></g><g class="nd"><rect x="727" y="104" width="206" height="52" rx="12"/><text x="830" y="136">Cost</text></g><g class="nd"><rect x="967" y="104" width="206" height="52" rx="12"/><text x="1070" y="136">Price and risk</text></g><g class="nd"><rect x="1207" y="104" width="206" height="52" rx="12"/><text x="1310" y="136">Proposal</text></g></svg>
+    </div>
+    <div class="mult f" data-f="2">
+      <div class="card"><b>30+ brands</b><span>each with its own products</span></div><span class="x">×</span>
+      <div class="card"><b>Own ERP</b><span>Epicor instances, Dynamics 365</span></div><span class="x">×</span>
+      <div class="card"><b>Own sizing method</b><span>sheets, tools, engineer judgment</span></div><span class="x">×</span>
+      <div class="card"><b>Own price logic</b><span>price lists, quote tools, margin rules</span></div>
+    </div>
+    <div class="card blk f grow" data-f="3" style="display:grid;align-content:center;padding:14px 24px"><h3 style="font-size:23px;line-height:1.28">A quote goes round these loops several times, across people, tools and brands. So one agent will not do it: it takes a small team of specialist agents that keep the state of every loop, with a person approving each stage.</h3></div>
+  </div>
+  <aside class="notes">Walk one loop out loud, for example a vendor quote arriving late and changing the fan selection, which changes cost, which changes price. Manufacturing quoting is harder than what a procurement SaaS or a PEO needs; saying so first is what makes the rest credible.</aside>
+</section>
+
+<!-- 7 -->
+<section class="slide" id="s-pipe" data-sec="Anatomy of good RFQ agents">
+  <div class="body" style="gap:14px">
+    <div class="hrow a"><h2>One RFQ, nine stages, a person at each gate</h2><p class="aside" style="white-space:normal;max-width:560px;text-align:right;line-height:1.5">Each stage runs on its own mini agent harness, wired to the systems beneath it</p></div>
+    <div class="p9">
+      <div class="stage a" style="--i:1"><i>01</i><b>RFQ lands</b><span>Inbox today, portal later</span><div class="hx"><em>Intake agent</em><div><u>skills</u><u>tools</u><u>memory</u><u>checks</u></div></div><div class="sys" style="--i:0"><span>Outlook inboxes</span><span>One CODE portal</span><span>WordPress site</span></div></div>
+      <div class="stage a" style="--i:2"><i>02</i><b>Bid or no bid</b><span>Fit, capacity, past margin</span><div class="hx"><em>Qualify agent</em><div><u>skills</u><u>tools</u><u>memory</u><u>checks</u></div></div><div class="sys" style="--i:1"><span>CRM</span><span>Dynamics 365</span><span>Fabric history</span></div></div>
+      <div class="stage a" style="--i:3"><i>03</i><b>Read the spec</b><span>Every requirement, every conflict</span><div class="hx"><em>Spec agent</em><div><u>skills</u><u>tools</u><u>memory</u><u>checks</u></div></div><div class="sys" style="--i:2"><span>Shared folders</span><span>Past proposals</span><span>Fabric</span></div></div>
+      <div class="stage a" style="--i:4"><i>04</i><b>Clarify</b><span>Questions back to the customer</span><div class="hx"><em>Clarify agent</em><div><u>skills</u><u>tools</u><u>memory</u><u>checks</u></div></div><div class="sys" style="--i:3"><span>Outlook</span><span>Teams</span><span>Portal</span></div></div>
+      <div class="stage a" style="--i:5"><i>05</i><b>Compose</b><span>Which brands, which products</span><div class="hx"><em>Solution agent</em><div><u>skills</u><u>tools</u><u>memory</u><u>checks</u></div></div><div class="sys" style="--i:4"><span>Brand catalogues</span><span>Past proposals</span><span>Fabric</span></div></div>
+      <div class="stage a" style="--i:6"><i>06</i><b>Size and select</b><span>Each brand's own sheet or tool</span><div class="hx"><em>Sizing agent</em><div><u>skills</u><u>tools</u><u>memory</u><u>checks</u></div></div><div class="sys" style="--i:5"><span>Excel sizing</span><span>Epicor data</span><span>Vendor tools</span></div></div>
+      <div class="stage a" style="--i:7"><i>07</i><b>Cost</b><span>Item costs, vendor quotes</span><div class="hx"><em>Costing agent</em><div><u>skills</u><u>tools</u><u>memory</u><u>checks</u></div></div><div class="sys" style="--i:6"><span>Epicor per brand</span><span>Dynamics 365</span><span>Vendor emails</span></div></div>
+      <div class="stage a" style="--i:8"><i>08</i><b>Price and terms</b><span>Margin, risk, exceptions</span><div class="hx"><em>Pricing agent</em><div><u>skills</u><u>tools</u><u>memory</u><u>checks</u></div></div><div class="sys" style="--i:7"><span>Price lists</span><span>Epicor pricing</span><span>Cognos margins</span></div></div>
+      <div class="stage a" style="--i:9"><i>09</i><b>Assemble and send</b><span>Your template, your wording</span><div class="hx"><em>Proposal agent</em><div><u>skills</u><u>tools</u><u>memory</u><u>checks</u></div></div><div class="sys" style="--i:8"><span>Word templates</span><span>Portal</span><span>CRM</span></div></div>
+    </div>
+    <div class="hitl f" data-f="1">Human in the loop</div>
+    <div class="f" data-f="2" style="display:grid;gap:8px">
+      <div class="hrow"><h3>Behind the stages, background agents run for the whole lifecycle</h3><p class="sm mute">Always on, shared by every stage. Four that have earned their place in our builds:</p></div>
+      <div class="bg4">
+        <div class="bandrow lime"><b>Document tagging agent</b>Files and indexes every document as it arrives, at any stage.</div>
+        <div class="bandrow lav"><b>Follow-up agent</b>Chases customers, vendors and colleagues until each question is answered.</div>
+        <div class="bandrow sky"><b>Status watcher</b>Watches inboxes, the portal and ERP for changes and wakes the right stage.</div>
+        <div class="bandrow peach"><b>Record keeper</b>Keeps the CRM opportunity and the quote record current.</div>
+      </div>
+    </div>
+    <div class="card blk f grow" data-f="3" style="display:grid;align-content:center;padding:10px 24px;max-height:96px"><h3 style="font-size:21px;line-height:1.3"><span style="color:#b9a2ff">A hypothesis to test with you.</span> The follow-up loop is where we start seeing time savings and acceleration to response.</h3></div>
+  </div>
+  <aside class="notes">Each stage has its own small harness (skills, tools, memory and checks) connected to the systems listed under it. Correct the systems with them: the list is from our notes, and Epicor differs by brand.</aside>
+</section>
+
+<!-- 8 -->
+<section class="slide s-arch" id="s-arch" data-sec="Anatomy of good RFQ agents" data-steps="6">
+  <div class="body" style="gap:10px">
+    <h2 class="a">What the system is made of</h2>
+    <div class="a" style="--i:1">
+<svg class="arch" id="arch" viewBox="0 0 1500 612" role="img" aria-label="Components of a system of agents that answers RFQs">
+<defs><marker id="ah" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="#111"/></marker></defs>
+<g class="zone"><rect x="238" y="118" width="1024" height="366" rx="14"/><text x="1244" y="137" text-anchor="end">AGENTS</text></g>
+<path class="e g1" id="e_ch" d="M750,52 L750,66" marker-end="url(#ah)"/>
+<path class="e g1 g2" id="e_lb" d="M250,86 L224,86" marker-end="url(#ah)"/>
+<path class="e g2" id="e_bt" d="M224,132 L1000,132 L1000,146" marker-end="url(#ah)"/>
+<path class="e g2" id="e_bf" d="M224,175 L258,175" marker-end="url(#ah)"/>
+<path class="e g2 g3" id="e_bp" d="M224,262 L258,262" marker-end="url(#ah)"/>
+<path class="e g2" id="e_hb" d="M121,286 L121,272" marker-end="url(#ah)"/>
+<path class="e g2" id="e_wf" d="M18,400 L7,400 L7,200 L18,200" marker-end="url(#ah)" marker-start="url(#ah)"/>
+<path class="e g2" id="e_fr" d="M290,204 L290,216 L231,216 L231,317 L224,317" marker-end="url(#ah)"/>
+<path class="e g2 g3" id="e_a2a" d="M466,228 L466,204" marker-end="url(#ah)"/>
+<path class="e g3" id="e_c0" d="M388,266 L400.67,266" marker-end="url(#ah)"/>
+<path class="e g3" id="e_c1" d="M530.67,266 L543.34,266" marker-end="url(#ah)"/>
+<path class="e g3" id="e_c2" d="M673.34,266 L686.01,266" marker-end="url(#ah)"/>
+<path class="e g3" id="e_c3" d="M816.01,266 L828.68,266" marker-end="url(#ah)"/>
+<path class="e g3" id="e_c4" d="M958.68,266 L971.35,266" marker-end="url(#ah)"/>
+<path class="e g3" id="e_c5" d="M1101.35,266 L1114.02,266" marker-end="url(#ah)"/>
+<path class="e g3" id="e_o0" d="M323,304 L323,362" marker-end="url(#ah)"/>
+<path class="e g3" id="e_o1" d="M465.67,304 L465.67,362" marker-end="url(#ah)"/>
+<path class="e g3" id="e_o2" d="M608.34,304 L608.34,362" marker-end="url(#ah)"/>
+<path class="e g3" id="e_o3" d="M751.01,304 L751.01,362" marker-end="url(#ah)"/>
+<path class="e g3" id="e_o4" d="M893.68,304 L893.68,362" marker-end="url(#ah)"/>
+<path class="e g3" id="e_o5" d="M1036.35,304 L1036.35,362" marker-end="url(#ah)"/>
+<path class="e g3" id="e_o6" d="M1179.02,304 L1179.02,362" marker-end="url(#ah)"/>
+<path class="e g2 g5" id="e_tl" d="M1244,175 L1276,175" marker-end="url(#ah)"/>
+<path class="e g3 g5" id="e_sl" d="M820,228 L820,216 L1268,216 L1268,200 L1276,200" marker-end="url(#ah)"/>
+<path class="e g3 g5" id="e_ol" d="M1244,384 L1269,384 L1269,330 L1276,330" marker-end="url(#ah)"/>
+<path class="e g5" id="e_lf" d="M1379,350 L1379,364" marker-end="url(#ah)"/>
+<path class="e g4" id="e_ag" d="M722,484 L722,500" marker-end="url(#ah)"/>
+<path class="e g4" id="e_ig" d="M488,523 L502,523" marker-end="url(#ah)"/>
+<path class="e g4" id="e_pg" d="M956,523 L942,523" marker-end="url(#ah)"/>
+<path class="e g4" id="e_gs" d="M722,546 L722,562" marker-end="url(#ah)"/>
+<g class="n g1 k-infra" id="n-ch0"><rect x="250" y="8" width="324" height="44" rx="9"/><text x="412" y="33.75">
+<tspan class="t" x="412" dy="0">Application engineers&#x27; Outlook inboxes</tspan>
+</text></g>
+<g class="n g1 k-infra" id="n-ch1"><rect x="588" y="8" width="324" height="44" rx="9"/><text x="750" y="33.75">
+<tspan class="t" x="750" dy="0">RFQ portal (planned)</tspan>
+</text></g>
+<g class="n g1 k-infra" id="n-ch2"><rect x="926" y="8" width="324" height="44" rx="9"/><text x="1088" y="33.75">
+<tspan class="t" x="1088" dy="0">Review workbench: Teams and web</tspan>
+</text></g>
+<g class="n g1 k-infra" id="n-landing"><rect x="250" y="66" width="1000" height="40" rx="9"/><text x="750" y="89.75">
+<tspan class="t" x="750" dy="0">Landing zone: every RFQ and attachment stored once, duplicates dropped</tspan>
+</text></g>
+<g class="n g2 k-infra" id="n-bus"><rect x="18" y="66" width="206" height="206" rx="9"/><text x="121" y="88">
+<tspan class="t" x="121" dy="0">Event bus</tspan>
+<tspan class="ev" x="121" dy="17">&#160;</tspan>
+<tspan class="ev" x="121" dy="17">rfq.received</tspan>
+<tspan class="ev" x="121" dy="17">document.tagged</tspan>
+<tspan class="ev" x="121" dy="17">stage.done</tspan>
+<tspan class="ev" x="121" dy="17">approval.granted</tspan>
+<tspan class="ev" x="121" dy="17">reply.received</tspan>
+<tspan class="ev" x="121" dy="17">heartbeat.tick</tspan>
+</text></g>
+<g class="n g2 k-infra" id="n-beat"><rect x="18" y="286" width="206" height="62" rx="9"/><text x="121" y="313">
+<tspan class="t" x="121" dy="0">Heartbeat</tspan>
+<tspan class="s" x="121" dy="15.5">wakes agents, sends reminders</tspan>
+</text></g>
+<g class="n g2 k-infra" id="n-flow"><rect x="18" y="362" width="206" height="76" rx="9"/><text x="121" y="388.25">
+<tspan class="t" x="121" dy="0">Case workflow</tspan>
+<tspan class="s" x="121" dy="15.5">one per RFQ; waits days</tspan>
+<tspan class="s" x="121" dy="15.5">for people at no cost</tspan>
+</text></g>
+<g class="n g2 k-agent" id="n-fu"><rect x="258" y="146" width="480" height="58" rx="9"/><text x="498" y="171">
+<tspan class="t" x="498" dy="0">Follow-up agent (shared)</tspan>
+<tspan class="s" x="498" dy="15.5">chases customers, vendors and colleagues until answered</tspan>
+</text></g>
+<g class="n g2 k-agent" id="n-tag"><rect x="754" y="146" width="490" height="58" rx="9"/><text x="999" y="171">
+<tspan class="t" x="999" dy="0">Document tagging agent (always on)</tspan>
+<tspan class="s" x="999" dy="15.5">reads, tags, indexes and versions every document</tspan>
+</text></g>
+<g class="n g3 k-agent" id="n-p0"><rect x="258" y="228" width="130" height="76" rx="9"/><text x="323" y="262">
+<tspan class="t" x="323" dy="0">Qualify</tspan>
+<tspan class="s" x="323" dy="15.5">bid or no bid</tspan>
+</text></g>
+<g class="n g3 k-out" id="n-o0"><rect x="258" y="362" width="130" height="44" rx="9"/><text x="323" y="387.75">
+<tspan class="t" x="323" dy="0">Fit decision</tspan>
+</text></g>
+<g class="n g3 k-agent" id="n-p1"><rect x="400.67" y="228" width="130" height="76" rx="9"/><text x="465.67" y="262">
+<tspan class="t" x="465.67" dy="0">Read the spec</tspan>
+<tspan class="s" x="465.67" dy="15.5">requirements, gaps</tspan>
+</text></g>
+<g class="n g3 k-out" id="n-o1"><rect x="400.67" y="362" width="130" height="44" rx="9"/><text x="465.67" y="387.75">
+<tspan class="t" x="465.67" dy="0">Requirement list</tspan>
+</text></g>
+<g class="n g3 k-agent" id="n-p2"><rect x="543.34" y="228" width="130" height="76" rx="9"/><text x="608.34" y="262">
+<tspan class="t" x="608.34" dy="0">Compose</tspan>
+<tspan class="s" x="608.34" dy="15.5">brands, products</tspan>
+</text></g>
+<g class="n g3 k-out" id="n-o2"><rect x="543.34" y="362" width="130" height="44" rx="9"/><text x="608.34" y="387.75">
+<tspan class="t" x="608.34" dy="0">Solution outline</tspan>
+</text></g>
+<g class="n g3 k-agent" id="n-p3"><rect x="686.01" y="228" width="130" height="76" rx="9"/><text x="751.01" y="262">
+<tspan class="t" x="751.01" dy="0">Size and select</tspan>
+<tspan class="s" x="751.01" dy="15.5">runs brand tools</tspan>
+</text></g>
+<g class="n g3 k-out" id="n-o3"><rect x="686.01" y="362" width="130" height="44" rx="9"/><text x="751.01" y="387.75">
+<tspan class="t" x="751.01" dy="0">Sizing sheet</tspan>
+</text></g>
+<g class="n g3 k-agent" id="n-p4"><rect x="828.68" y="228" width="130" height="76" rx="9"/><text x="893.68" y="262">
+<tspan class="t" x="893.68" dy="0">Cost</tspan>
+<tspan class="s" x="893.68" dy="15.5">ERP, vendor quotes</tspan>
+</text></g>
+<g class="n g3 k-out" id="n-o4"><rect x="828.68" y="362" width="130" height="44" rx="9"/><text x="893.68" y="387.75">
+<tspan class="t" x="893.68" dy="0">Cost build-up</tspan>
+</text></g>
+<g class="n g3 k-agent" id="n-p5"><rect x="971.35" y="228" width="130" height="76" rx="9"/><text x="1036.35" y="262">
+<tspan class="t" x="1036.35" dy="0">Price and terms</tspan>
+<tspan class="s" x="1036.35" dy="15.5">margin, risk</tspan>
+</text></g>
+<g class="n g3 k-out" id="n-o5"><rect x="971.35" y="362" width="130" height="44" rx="9"/><text x="1036.35" y="387.75">
+<tspan class="t" x="1036.35" dy="0">Price and risks</tspan>
+</text></g>
+<g class="n g3 k-agent" id="n-p6"><rect x="1114.02" y="228" width="130" height="76" rx="9"/><text x="1179.02" y="262">
+<tspan class="t" x="1179.02" dy="0">Assemble</tspan>
+<tspan class="s" x="1179.02" dy="15.5">proposal pack</tspan>
+</text></g>
+<g class="n g3 k-out" id="n-o6"><rect x="1114.02" y="362" width="130" height="44" rx="9"/><text x="1179.02" y="387.75">
+<tspan class="t" x="1179.02" dy="0">Draft proposal</tspan>
+</text></g>
+<g class="n g3 k-hitl" id="n-hitl"><rect x="258" y="318" width="986" height="30" rx="9"/><text x="751" y="336.75">
+<tspan class="t" x="751" dy="0">A person approves each stage: application engineer · sales lead · commercial approver</tspan>
+</text></g>
+<g class="n g3 k-note" id="n-note"><rect x="258" y="424" width="986" height="44" rx="9"/><text x="751" y="449.75">
+<tspan class="t" x="751" dy="0">Agents use the same sheets and tools as your engineers. The model never does the arithmetic.</tspan>
+</text></g>
+<g class="n g5 k-rec" id="n-lib"><rect x="1276" y="66" width="206" height="150" rx="9"/><text x="1379" y="106">
+<tspan class="t" x="1379" dy="0">Knowledge library</tspan>
+<tspan class="s" x="1379" dy="15.5">past proposals,</tspan>
+<tspan class="s" x="1379" dy="15.5">catalogues, data sheets</tspan>
+<tspan class="s" x="1379" dy="15.5">&#160;</tspan>
+<tspan class="s" x="1379" dy="15.5">tagged, indexed,</tspan>
+<tspan class="s" x="1379" dy="15.5">versioned</tspan>
+</text></g>
+<g class="n g5 k-rec" id="n-ledger"><rect x="1276" y="230" width="206" height="120" rx="9"/><text x="1379" y="278.25">
+<tspan class="t" x="1379" dy="0">Decision ledger</tspan>
+<tspan class="s" x="1379" dy="15.5">who, what, why,</tspan>
+<tspan class="s" x="1379" dy="15.5">evidence, approver</tspan>
+</text></g>
+<g class="n g5 k-sys" id="n-fabric"><rect x="1276" y="364" width="206" height="74" rx="9"/><text x="1379" y="389.25">
+<tspan class="t" x="1379" dy="0">Microsoft Fabric</tspan>
+<tspan class="s" x="1379" dy="15.5">scores and traces</tspan>
+<tspan class="s" x="1379" dy="15.5">fed back</tspan>
+</text></g>
+<g class="n g5 k-rec" id="n-evals"><rect x="18" y="452" width="206" height="58" rx="9"/><text x="121" y="477">
+<tspan class="t" x="121" dy="0">Evaluations and traces</tspan>
+<tspan class="s" x="121" dy="15.5">scored on your past RFQs</tspan>
+</text></g>
+<g class="n g4 k-infra" id="n-ident"><rect x="238" y="500" width="250" height="46" rx="9"/><text x="363" y="519">
+<tspan class="t" x="363" dy="0">Identity</tspan>
+<tspan class="s" x="363" dy="15.5">signs in as the engineer</tspan>
+</text></g>
+<g class="n g4 k-gate" id="n-gate"><rect x="502" y="500" width="440" height="46" rx="9"/><text x="722" y="519">
+<tspan class="t" x="722" dy="0">Tools gateway</tspan>
+<tspan class="s" x="722" dy="15.5">one door to every system, with each person&#x27;s permissions</tspan>
+</text></g>
+<g class="n g4 k-infra" id="n-policy"><rect x="956" y="500" width="306" height="46" rx="9"/><text x="1109" y="519">
+<tspan class="t" x="1109" dy="0">Policy</tspan>
+<tspan class="s" x="1109" dy="15.5">who may quote what, approval limits</tspan>
+</text></g>
+<g class="n g4 k-sys" id="n-s0"><rect x="10" y="562" width="202" height="44" rx="9"/><text x="111" y="587.75">
+<tspan class="t" x="111" dy="0">Epicor (per brand)</tspan>
+</text></g>
+<g class="n g4 k-sys" id="n-s1"><rect x="222.67" y="562" width="202" height="44" rx="9"/><text x="323.67" y="587.75">
+<tspan class="t" x="323.67" dy="0">Dynamics 365</tspan>
+</text></g>
+<g class="n g4 k-sys" id="n-s2"><rect x="435.34" y="562" width="202" height="44" rx="9"/><text x="536.34" y="587.75">
+<tspan class="t" x="536.34" dy="0">CRM</tspan>
+</text></g>
+<g class="n g4 k-sys" id="n-s3"><rect x="648.01" y="562" width="202" height="44" rx="9"/><text x="749.01" y="587.75">
+<tspan class="t" x="749.01" dy="0">Sizing sheets and tools</tspan>
+</text></g>
+<g class="n g4 k-sys" id="n-s4"><rect x="860.68" y="562" width="202" height="44" rx="9"/><text x="961.68" y="587.75">
+<tspan class="t" x="961.68" dy="0">Price lists, quote tools</tspan>
+</text></g>
+<g class="n g4 k-sys" id="n-s5"><rect x="1073.35" y="562" width="202" height="44" rx="9"/><text x="1174.35" y="587.75">
+<tspan class="t" x="1174.35" dy="0">Vendor and customer email</tspan>
+</text></g>
+<g class="n g4 k-sys" id="n-s6"><rect x="1286.02" y="562" width="202" height="44" rx="9"/><text x="1387.02" y="587.75">
+<tspan class="t" x="1387.02" dy="0">SharePoint, shared drives</tspan>
+</text></g>
+<text class="el g2 g3" x="532" y="221">asks for follow-up</text>
+<text class="el g3 g5" x="1040" y="212">search</text>
+<g id="tokens"></g></svg>
+    </div>
+    <div class="capline">
+      <p data-only="0" class="on">Five parts. We will take them one at a time.</p>
+      <p data-only="1"><b>1 · Intake.</b> RFQs arrive from engineers' inboxes now and from the portal later. Every file is stored once.</p>
+      <p data-only="2"><b>2 · Always-on agents.</b> One files every document. One chases every open question. A heartbeat wakes them, and one workflow per RFQ holds the state.</p>
+      <p data-only="3"><b>3 · Stage agents.</b> One specialist per stage. A person approves before the next stage starts.</p>
+      <p data-only="4"><b>4 · One gateway.</b> Agents reach Epicor, Dynamics 365, CRM and sizing tools through one door, signed in as the engineer, inside written rules.</p>
+      <p data-only="5"><b>5 · Records.</b> Past proposals become a searchable library. Every decision is logged with its evidence and fed back to Fabric.</p>
+      <p data-only="6"><b>Together.</b> One RFQ moves left to right, people approve at each gate, and every number can be traced to its source.</p>
+    </div>
+  </div>
+  <aside class="notes">Six clicks: overview, then intake, always-on agents, stage agents, gateway, records, then everything together. The design runs on open frameworks, so it can sit on Azure next to Fabric or on AWS.</aside>
+</section>
+
+<!-- 9 -->
+<section class="slide" id="s-int" data-sec="Anatomy of good RFQ agents">
+  <div class="body">
+    <h2 class="a">Agent integration to your systems of record</h2>
+    <div class="row grow">
+      <div class="col" style="flex:1;justify-content:center">
+        <p class="eyebrow a" style="--i:1">Three ways an agent uses a tool</p>
+        <div class="card sky way a" style="--i:1"><h3>Connector</h3><p>Where a system has an API: Dynamics 365, CRM, Fabric, Outlook, Teams.</p></div>
+        <div class="card lime way a" style="--i:2"><h3>Run the file as it is</h3><p>Excel sizing sheets and estimate workbooks run untouched in a sandbox. Inputs in, results out.</p></div>
+        <div class="card peach way a" style="--i:3"><h3>Use the screen</h3><p>Older ERP screens and vendor sizing software with no API, through a supervised session.</p></div>
+      </div>
+      <div class="col" style="flex:1.75;justify-content:center">
+        <div class="card f" data-f="1" style="padding:18px 14px 8px">
+          <table class="t"><thead><tr><th>Stage</th><th>What the agent touches</th><th>What happens</th></tr></thead><tbody>
+            <tr><td>Size and select</td><td>Each brand's sizing sheet or software, vendor selection tools</td><td>Fills inputs from the spec, runs the tool, reads the result</td></tr>
+            <tr><td>Cost</td><td>ERP items and bills of material, price lists, vendor quotes by email</td><td>Builds the cost line by line, each line with its source</td></tr>
+            <tr><td>Price and terms</td><td>Price lists, quote tools or CPQ where a brand has one, approval limits</td><td>Applies your rules. A person sets margin and signs.</td></tr>
+            <tr><td>Record</td><td>CRM, Dynamics 365</td><td>Opportunity and quote updated after approval</td></tr>
+          </tbody></table>
+        </div>
+        <div class="pills f" data-f="2"><span class="pill">The model never does the arithmetic</span><span class="pill">Each brand keeps its own method</span><span class="pill">Read-only first. Every write is approved.</span></div>
+        <p class="f" data-f="2" style="color:var(--ink2);font-size:19px"><b>On Epicor.</b> Older versions need backend configuration before they open up. Our team has taken a CRM-to-Epicor connector to production in 7 weeks.</p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Ask what the chosen product uses for sizing and for pricing. If a brand has a quote tool or CPQ, the agent drives it; if it is a workbook, the agent runs the workbook.</aside>
+</section>
+
+<!-- 10 -->
+<section class="slide" id="s-know" data-sec="Anatomy of good RFQ agents">
+  <div class="body" style="gap:14px">
+    <h2 class="a">Document intelligence: every document tagged, versioned and ready to query</h2>
+    <div class="dpipe">
+      <div class="dstep a" style="--i:1"><i>01</i><b>Documents arrive</b><span>Past proposals, catalogues and data sheets, plus every new file on the current RFQ</span></div><i class="ar"></i>
+      <div class="dstep a" style="--i:2"><i>02</i><b>Parse</b><span>Layouts, tables, drawings and scans become clean, structured text</span></div><i class="ar"></i>
+      <div class="dstep a" style="--i:3"><i>03</i><b>Tag</b><span>Brand, product, customer, duty, materials, vendors, outcome</span></div><i class="ar"></i>
+      <div class="dstep a" style="--i:4"><i>04</i><b>Version</b><span>Every revision kept with its source. Nothing is overwritten.</span></div><i class="ar"></i>
+      <div class="dstep a" style="--i:5"><i>05</i><b>Agents query</b><span>Exact wording, metadata filters and similar past jobs</span></div>
+    </div>
+    <div class="card blk f" data-f="1" style="padding:13px 24px"><h3 style="font-size:22px;line-height:1.3"><span style="color:#b9a2ff">An always-on background agent</span> runs this for the documents you already have and for every new one, so the other agents query one knowledge store in the most efficient way.</h3></div>
+    <div class="row grow f" data-f="2">
+      <div class="card" style="flex:1;display:grid;align-content:center;gap:8px">
+        <div class="hrow"><p class="eyebrow">What gets attached to a document</p><span class="chip" style="color:var(--mute)">Illustrative</span></div>
+        <div class="rec"><span>file</span><b>customer-spec-rev-C.pdf</b><span>version</span><b>3, replaces rev B</b><span>type</span><b>customer specification</b><span>rfq</span><b>RFQ-0412, current</b><span>tags</span><b>brand A · product family · duty · materials</b><span>source</span><b>email from customer, 12 Nov</b><span>parsed</span><b>42 pages, 9 tables, 3 drawings</b></div>
+      </div>
+      <div class="col" style="flex:1;justify-content:center;gap:9px">
+        <div class="search" style="padding:11px 16px;font-size:18px"><i></i><span>Jobs like this one: same duty, similar flow</span></div>
+        <div class="hit" style="padding:11px 16px;font-size:18px"><b>2025 · Brand B with Brand A</b><span class="won">Won</span><div class="tags"><span class="tag">similar flow</span><span class="tag">same materials</span><span class="tag v">sizing sheet</span></div></div>
+        <div class="hit" style="padding:11px 16px;font-size:18px"><b>2023 · Brand A</b><span class="lost">Lost on price</span><div class="tags"><span class="tag">same duty</span><span class="tag v">exceptions list</span></div></div>
+      </div>
+      <div class="card lav f" data-f="3" style="flex:1.05;display:grid;align-content:center;gap:10px">
+        <p class="eyebrow">Tools we use for this</p>
+        <div class="tools3">
+          <div><p>Agentic parsers</p><div><i>LlamaParse</i><i>Unsiloed AI</i><i>Reducto</i></div></div>
+          <div><p>Open source, self-hosted</p><div><i>Docling</i><i>Unstructured</i></div></div>
+          <div><p>Cloud document services</p><div><i>Azure AI Document Intelligence</i><i>Amazon Textract</i><i>Google Document AI</i></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">This is what application engineers do by hand today: look up old proposals for sizing, materials, parameters and vendors. Here it runs all the time, for old documents and new ones, and Fabric keeps the structured data beside it.</aside>
+</section>
+
+<!-- 11 -->
+<section class="slide" id="s-trust" data-sec="Anatomy of good RFQ agents">
+  <div class="body big" style="gap:16px">
+    <h2 class="a">All extractions are cited and carry confidence scores</h2>
+    <div class="row grow" style="align-items:stretch">
+      <div class="col" style="flex:1.2;justify-content:center;gap:10px">
+        <div class="card a" style="--i:1;display:flex;flex-direction:column;gap:6px;padding:20px 24px">
+          <div class="hrow"><p class="eyebrow">Draft proposal · engineer's review</p><span class="chip" style="color:var(--mute)">Illustrative</span></div>
+          <div class="rev">
+            <div class="rv" style="padding:13px 4px"><b>Design flow · 20,000 scfm</b><span>RFQ data sheet, page 3</span><i class="sc hi">High</i></div>
+            <div class="rv" style="padding:13px 4px"><b>Scrubber diameter · 9 ft</b><span>Brand sizing sheet, run 14</span><i class="sc hi">High</i></div>
+            <div class="rv" style="padding:13px 4px"><b>Fan motor · 150 hp</b><span>Vendor selection, quote pending</span><i class="sc md">Medium</i></div>
+            <div class="rv" style="padding:13px 4px"><b>Warranty · 18 months</b><span>Clause 14.2 conflicts with standard terms</span><i class="sc lo">Needs review</i></div>
+          </div>
+          <div class="row f" data-f="1" style="align-items:center;gap:14px;border-top:2px solid #111;padding-top:10px"><b class="num" style="font-size:50px">86</b><p class="sm" style="color:var(--ink2)"><b style="color:var(--ink)">Accuracy score.</b> Earned by replaying your past RFQs against what your engineers actually quoted.</p></div>
+        </div>
+        <div class="routes3 f" data-f="1">
+          <div class="route"><i style="background:var(--good)"></i><b>Green</b><span>Quick review</span></div>
+          <div class="route"><i style="background:var(--warn)"></i><b>Amber</b><span>Check flagged lines</span></div>
+          <div class="route"><i style="background:var(--bad)"></i><b>Red</b><span>Engineer leads</span></div>
+        </div>
+      </div>
+      <div class="ledger f" data-f="2" style="flex:1">
+        <div class="hrow"><p class="eyebrow">Decision ledger · a core component</p><span class="chip" style="color:#9a968c">Illustrative entry</span></div>
+        <h3 style="font-size:25px;line-height:1.22">Every decision, by an agent or a person, is written once and never changed</h3>
+        <div class="rec"><span>decision</span><b>Offer option B instead of option A</b><span>by</span><b>Solution agent, version 14</b><span>because</span><b>Spec clause 4.2 needs a 4-hour response</b><span>evidence</span><b>customer-spec-rev-C.pdf, page 12</b><span>approved</span><b>J. Doe, lead engineer</b><span>trace</span><b>full agent run, replayable</b><span>chain</span><b>hash of the previous entry</b></div>
+        <ul class="ul">
+          <li>Later stages read it: costing sees why the selection changed.</li>
+          <li>Any number in a proposal traces back to a source and a signature.</li>
+          <li>Scores, overrides and cycle times feed Microsoft Fabric.</li>
+        </ul>
+        <div class="pills"><span class="pill" style="background:var(--violet)">Append-only</span><span class="pill" style="background:var(--violet)">Hash-chained</span><span class="pill" style="background:var(--violet)">Fed to Fabric</span></div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">This answers their three asks together: an accuracy score, observability, and feedback into Fabric. The decision ledger is what makes the system explainable to an engineer, a manager and an auditor. The equipment figures are illustrative.</aside>
+</section>
+
+<!-- 12 -->
+<section class="slide" id="s-auto" data-sec="Anatomy of good RFQ agents">
+  <div class="body" style="gap:14px">
+    <h2 class="a">Autonomy is earned through evaluation, one step at a time</h2>
+    <div class="ladder sm">
+      <div class="rung a" style="--i:1"><i>LEVEL 0</i><b>Shadow</b><span>The agent works beside the engineer. Every output is reviewed. This builds the test set.</span></div>
+      <div class="rung a" style="--i:2"><i>LEVEL 1</i><b>Suggest</b><span>The agent drafts. The engineer edits and decides.</span></div>
+      <div class="rung a" style="--i:3"><i>LEVEL 2</i><b>Confirm first</b><span>The agent proposes an action. It happens after one click.</span></div>
+      <div class="rung a" style="--i:4"><i>LEVEL 3</i><b>Act, then notify</b><span>Only for steps that can be undone. The agent acts and reports.</span></div>
+    </div>
+    <div class="row grow">
+      <div class="card f" data-f="1" style="flex:1.12;border:2px solid var(--violet);display:grid;align-content:center;gap:4px;padding:14px 22px">
+        <div class="hrow"><h3>An evaluations-first loop decides every promotion</h3><span class="chip" style="color:var(--violet)">How we work</span></div>
+        <svg class="evl" viewBox="0 0 640 322" role="img" aria-label="A loop: offline evaluations, online evaluations, trace analytics in ClickHouse, harness improvements, then promotion of autonomy, and round again"><path class="ring" id="evring" d="M320,62 C470,62 536,110 536,172 C536,240 440,284 320,284 C200,284 104,240 104,172 C104,110 170,62 320,62 Z"/><circle class="dot" r="7"><animateMotion dur="9s" repeatCount="indefinite"><mpath href="#evring"/></animateMotion></circle><text class="c1" x="320" y="168">Evals first</text><text class="c2" x="320" y="192">every release, every run</text><g class="pl"><rect x="222" y="33" width="196" height="50" rx="12"/><text class="t" x="320" y="55">Offline evals</text><text class="u" x="320" y="72">test set, before every release</text></g><g class="pl"><rect x="438" y="125" width="196" height="50" rx="12"/><text class="t" x="536" y="147">Online evals</text><text class="u" x="536" y="164">live runs scored as they happen</text></g><g class="pl"><rect x="354" y="261" width="196" height="50" rx="12"/><text class="t" x="452" y="283">Trace analytics</text><text class="u" x="452" y="300">every run analyzed in ClickHouse</text></g><g class="pl"><rect x="90" y="261" width="196" height="50" rx="12"/><text class="t" x="188" y="283">Improve the harness</text><text class="u" x="188" y="300">prompts, tools, checks</text></g><g class="pl go"><rect x="6" y="125" width="196" height="50" rx="12"/><text class="t" x="104" y="147">Promote autonomy</text><text class="u" x="104" y="164">one capability at a time</text></g></svg>
+        <p class="sm" style="color:var(--ink2);font-size:17px">Offline and online evaluations run constantly. What the traces show goes back into the harness. A capability moves up a level only when the scores say so, and moves back down if they slip.</p>
+      </div>
+      <div class="col f" data-f="2" style="flex:1;justify-content:center;gap:10px">
+        <div class="card" style="padding:16px 18px">
+          <div class="lv" style="grid-template-columns:178px repeat(4,1fr);row-gap:10px">
+            <span></span><span class="h">SHADOW</span><span class="h">SUGGEST</span><span class="h">CONFIRM</span><span class="h">ACT</span>
+            <span class="lab" style="font-size:16.5px">Intake and tagging</span><div class="trk"><i class="bar" style="grid-column:2 / 5;--i:0" data-t="from suggest"></i></div>
+            <span class="lab" style="font-size:16.5px">Reading the spec</span><div class="trk"><i class="bar" style="grid-column:1 / 4;--i:1" data-t="from shadow"></i></div>
+            <span class="lab" style="font-size:16.5px">Follow-up emails</span><div class="trk"><i class="bar" style="grid-column:2 / 4;--i:2" data-t="confirm to send"></i></div>
+            <span class="lab" style="font-size:16.5px">Sizing</span><div class="trk"><i class="bar" style="grid-column:1 / 4;--i:3" data-t="engineer confirms"></i></div>
+            <span class="lab" style="font-size:16.5px">Costing</span><div class="trk"><i class="bar" style="grid-column:1 / 4;--i:4" data-t="estimator confirms"></i></div>
+            <span class="lab" style="font-size:16.5px">Price and terms</span><div class="trk"><i class="bar lock" style="grid-column:1 / 3;--i:5" data-t="always a person"></i></div>
+            <span class="lab" style="font-size:16.5px">Sending out</span><div class="trk"><i class="bar lock" style="grid-column:3 / 4;--i:6" data-t=""></i></div>
+          </div>
+          <p class="xs mute" style="margin-top:10px">Violet: where each capability starts and how far it can go. Black: always a person.</p>
+        </div>
+        <div class="card blk" style="padding:14px 20px"><p class="eyebrow">Always a person</p><p style="margin-top:5px;font-size:19px">Bid or no bid. Price, margin and terms. Anything sent to the customer.</p></div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">The loop is the point: offline evaluations before every release, online evaluations on live runs, trace analytics in ClickHouse, harness improvements, and only then a promotion. Nothing moves up without measured results on their own RFQs.</aside>
+</section>
+
+<!-- 12b -->
+<section class="slide" id="s-cost" data-sec="Anatomy of good RFQ agents">
+  <div class="body" style="gap:14px">
+    <h2 class="a">Token cost: start accurate, then drive it down</h2>
+    <div class="row grow">
+      <div class="col" style="flex:1.22;gap:10px;justify-content:center">
+        <p class="eyebrow a" style="--i:1">How cost per RFQ falls over time</p>
+        <div class="phz a" style="--i:1"><i>Phase 1</i><b>Lead with the most capable models</b><span>Correct output comes first, so engineers trust it and adoption is high. Cost per RFQ is at its highest here.</span><em class="costbar" style="--w:100%;--i:0"></em></div>
+        <div class="phz a" style="--i:2"><i>Phase 2</i><b>Learn from every run</b><span>Agent traces flow into ClickHouse for analysis. Failures become new evaluations, and the evaluations harden with each cycle.</span><em class="costbar" style="--w:60%;--i:1"></em></div>
+        <div class="phz a" style="--i:3"><i>Phase 3</i><b>Tune the harness</b><span>Caching, model routing and smaller models take over the steps that have proved stable.</span><em class="costbar" style="--w:26%;--i:2"></em></div>
+        <p class="xs mute a" style="--i:3">Bars show the direction of cost per RFQ, not a forecast.</p>
+        <div class="lstrip f" data-f="1"><span>Traces</span><i class="ar"></i><span>ClickHouse analytics</span><i class="ar"></i><span>Evaluations</span><i class="ar"></i><span>Harness changes</span><i class="ar"></i><span>Lower cost</span><em style="font-style:normal;color:var(--mute);font-size:15px;flex-basis:100%">The loop repeats on every release.</em></div>
+      </div>
+      <div class="col" style="flex:1;gap:10px;justify-content:center">
+        <p class="eyebrow f" data-f="2">What has worked for us</p>
+        <div class="card lav strat f" data-f="2"><b class="num">&gt;<span class="cu" data-to="80">80</span>%</b><h4>Prompt caching</h4><p>Cache hit rate on agents we have built. Those tokens cost 10 to 15% of the model's list price.</p></div>
+        <div class="card sky strat f" data-f="2"><b class="num">&lt;<span class="cu" data-to="10">10</span>%</b><h4>Shadow models, then smaller models</h4><p>A large model runs in shadow to train and grade a smaller one. A step moves over only after evaluations and A/B tests show the same quality, and then costs under a tenth of what it did.</p></div>
+        <div class="card lime strat f" data-f="3"><b class="num">&lt;$<span class="cu" data-to="200">200</span></b><h4>The right model for each step</h4><p>Simple steps go to small models from day one. On our PEO build that kept a month of dry runs under $200 of model spend.</p></div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">The promise here is a method, not a number: accuracy first, then cost comes down as traces and evaluations show which steps are safe to make cheaper.</aside>
+</section>
+
+<!-- 13 -->
+<section class="slide" id="s-bring" data-sec="Anatomy of good RFQ agents">
+  <div class="body">
+    <h2 class="a">What we bring, and what we build with you</h2>
+    <div class="two grow">
+      <div class="card lav a" style="--i:1;display:grid;align-content:center">
+        <p class="eyebrow">We bring · reusable from earlier builds</p>
+        <div class="items">
+          <div>Email and document intake</div><div>Document tagging and discrepancy checks</div>
+          <div>Follow-up agent with reminders</div><div>Review workbench with approvals</div>
+          <div>Tools gateway with per-person permissions</div><div>Decision ledger and traces</div>
+          <div>Evaluation harness and autonomy ladder</div><div>A delivery method: shadow, draft, controlled rollout</div>
+        </div>
+      </div>
+      <div class="card build f" data-f="1" style="border:2px solid #111;display:grid;align-content:center">
+        <p class="eyebrow" style="color:#111">We build with you · specific to CECO</p>
+        <div class="items one">
+          <div>Product and brand catalogue</div><div>Sizing logic for each product</div><div>Cost build-up rules</div>
+          <div>Pricing policy and approval limits</div><div>Proposal templates and wording</div><div>Connectors to your Epicor instances and Dynamics 365</div>
+        </div>
+      </div>
+    </div>
+    <div class="card blk f" data-f="2" style="padding:20px 26px"><h3 style="font-size:28px">It saves months of plumbing. It is not a product you switch on.</h3></div>
+  </div>
+  <aside class="notes">Say plainly what is reusable: the know-how and the plumbing. The manufacturing logic is theirs and is built with their engineers.</aside>
+</section>
+
+<!-- 14 -->
+<section class="slide" id="s-case1" data-sec="Case studies">
+  <div class="body">
+    <div class="hrow a"><div><p class="eyebrow">Build 1 · In pilot with sales reps since November 2026</p><h2 style="margin-top:8px">RFP to signed contract for <span data-name="G&amp;A Partners">a large US PEO</span></h2></div></div>
+    <div class="case grow">
+      <div class="col" style="justify-content:center;gap:12px">
+        <div class="flowv a" style="--i:1">
+          <div>The rep forwards the RFP email. A case opens with every attachment read.</div>
+          <div>Documents are reconciled person by person. Discrepancies are listed.</div>
+          <div>A follow-up to the broker is drafted and sent. Replies are read back in.</div>
+          <div>Clean data is submitted to the underwriting platform with one click.</div>
+          <div>Rates and pricing come back. A side-by-side comparison is built.</div>
+          <div>The contract is generated and sent for signature.</div>
+        </div>
+        <div class="carry f" data-f="2">
+          <div class="card lime"><h4>Carries over to CECO</h4>Email intake, discrepancy checks, follow-up, hand-offs to systems of record, a person approving each stage.</div>
+          <div class="card"><h4>Does not carry over</h4>One product and one pricing system. CECO has 30+ brands, each with its own.</div>
+        </div>
+      </div>
+      <div class="mt f" data-f="1" style="align-content:center">
+        <div class="m"><em>Target</em><b style="font-size:35px;white-space:nowrap">7–9 → 4–5 days</b><span>turnaround from RFP to rates</span></div>
+        <div class="m"><em>Measured</em><b>~<span class="cu" data-to="30">30</span> s</b><span>from forwarded email to an open case</span></div>
+        <div class="m"><em>Measured</em><b>20–40 min</b><span>to read and reconcile a full document pack</span></div>
+        <div class="m"><em>Measured</em><b>&lt; $<span class="cu" data-to="200">200</span></b><span>model spend for a month of dry runs</span></div>
+        <div class="m"><em>Delivery</em><b>3–4 weeks</b><span>to the first working version</span></div>
+        <div class="m"><em>Integration</em><b>3 systems</b><span>CRM, underwriting platform, pricing and contracts</span></div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Shown without client data. The turnaround figure is the client's target, the rest are measured in the pilot. Press N to switch between the anonymous description and the client name.</aside>
+</section>
+
+<!-- 15 -->
+<section class="slide" id="s-case2" data-sec="Case studies">
+  <div class="body">
+    <div class="hrow a"><div><p class="eyebrow">Build 2 · In build, version 1 committed for mid-January</p><h2 style="margin-top:8px">RFP and RFI answers for <span data-name="Coupa">a global procurement software company</span></h2></div></div>
+    <div class="case grow">
+      <div class="col" style="justify-content:center;gap:12px">
+        <div class="flowv a" style="--i:1">
+          <div>A solution advisor drops the customer's questionnaire into the deal channel.</div>
+          <div>The agent drafts each answer from the approved library, with its source.</div>
+          <div>Questions with no approved answer go to a named expert, in the tools they already use.</div>
+          <div>Legal and security approve the items that touch their areas.</div>
+          <div>Answers are written back into the customer's own file.</div>
+        </div>
+        <div class="carry f" data-f="2">
+          <div class="card lime"><h4>Carries over to CECO</h4>Answer only from approved sources. Route gaps to named owners. Write back in the customer's format.</div>
+          <div class="card"><h4>Different at CECO</h4>Their answers come from a library. Yours come from sizing, costing and pricing tools.</div>
+        </div>
+      </div>
+      <div class="mt f" data-f="1" style="align-content:center">
+        <div class="m"><em>Design rule</em><b><span class="cu" data-to="100">100</span>%</b><span>of answers cited, or marked "Not found"</span></div>
+        <div class="m"><em>Design rule</em><b>0 new screens</b><span>it lives in the chat and CRM tools the team already uses</span></div>
+        <div class="m"><em>Design rule</em><b>Every write</b><span>is approved by a person before it lands</span></div>
+        <div class="m"><em>Design rule</em><b>No shared login</b><span>the agent acts with the requesting person's own access</span></div>
+        <div class="m" style="grid-column:1 / -1"><em>Delivery</em><b>~10 weeks</b><span>from kickoff to version 1, with release gates scored on a test set</span></div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Be clear this one is in build: the figures are the rules it is being built to and the committed date, not results yet.</aside>
+</section>
+
+<!-- 16 -->
+<section class="slide dark" id="s-demo" data-sec="Demo">
+  <div class="body">
+    <h2 class="a">Click-through: one request, from inbox to proposal</h2>
+    <div class="row grow">
+      <div class="frame a" style="--i:1;flex:1.5"><div style="display:grid;gap:22px;justify-items:center"><div class="play"></div><p style="font-family:var(--fm);font-size:15px;letter-spacing:.1em;text-transform:uppercase;color:#9a968c" id="demoHint">Switch to the click-through prototype</p><a id="demoLink" href="#" target="_blank" rel="noopener" style="display:none;color:#fff;font-size:20px">Open the click-through</a></div></div>
+      <div class="col" style="flex:1;justify-content:center">
+        <p class="eyebrow a" style="--i:2">What you will see, and the CECO equivalent</p>
+        <div class="beats">
+          <div class="beat a" style="--i:2"><i>1</i><b>An RFP email is forwarded</b><span>An RFQ in an application engineer's inbox</span></div>
+          <div class="beat a" style="--i:3"><i>2</i><b>Documents read, discrepancies listed</b><span>Spec conflicts and missing data</span></div>
+          <div class="beat a" style="--i:4"><i>3</i><b>Follow-up drafted and sent</b><span>Clarifications to the customer, quotes from vendors</span></div>
+          <div class="beat a" style="--i:5"><i>4</i><b>Submission to underwriting</b><span>Sizing and selection</span></div>
+          <div class="beat a" style="--i:6"><i>5</i><b>Pricing and comparison</b><span>Cost, price and terms</span></div>
+          <div class="beat a" style="--i:7"><i>6</i><b>Proposal generated</b><span>The proposal pack</span></div>
+        </div>
+        <p class="xs a" style="--i:8;color:#9a968c">Shown as a click-through. A live run takes about 20 minutes.</p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">Placeholder. Switch windows to the sanitised click-through here. Narrate each beat with its CECO equivalent from the right-hand list.</aside>
+</section>
+
+<!-- 17 -->
+<section class="slide" id="s-next" data-sec="Next step">
+  <div class="body big" style="gap:16px">
+    <h2 class="a">Proposed next step: prove it on one product</h2>
+    <div class="g3">
+      <div class="card lav ask a" style="--i:1"><b>1</b><h3>Pick one product area</h3><p>One brand, one product family, with a sizing method your engineers trust.</p></div>
+      <div class="card sky ask a" style="--i:2"><b>2</b><h3>Share 10 to 15 past RFQs</h3><p>With the proposals that answered them, the sizing sheet, the price list and the template.</p></div>
+      <div class="card lime ask a" style="--i:3"><b>3</b><h3>Name two application engineers</h3><p>A few hours of their time, to walk us through one RFQ and score the agent's work.</p></div>
+    </div>
+    <div class="tl f" data-f="1">
+      <div class="ph" style="--i:0"><i>Step 1</i><b>Design workshop</b>One RFQ, end to end, with your engineers</div>
+      <div class="ph" style="--i:1"><i>Step 2</i><b>Build</b>Intake, spec reading, sizing, cost and a proposal draft for that product</div>
+      <div class="ph" style="--i:2"><i>Step 3</i><b>Shadow runs</b>Past RFQs replayed, every output scored</div>
+      <div class="ph" style="--i:3"><i>Step 4</i><b>Rehearse</b>Fix what the scores show</div>
+      <div class="ph end" style="--i:4"><i>Outcome</i><b>Leadership demo</b>A working proof of concept on your own RFQs</div>
+    </div>
+    <div class="row grow f" data-f="2">
+      <div class="card" style="flex:1.25;display:grid;align-content:center;gap:8px"><p class="eyebrow">What you would see at the end</p><p class="sm" style="color:var(--ink2)">A real RFQ taken from an inbox to a requirement list, a sized selection, a cost build-up and a draft proposal in your template. Each number with its source and a score, and a record of where the agent and your engineers disagreed.</p></div>
+      <div class="card" style="flex:1;display:grid;align-content:center;gap:8px"><p class="eyebrow">What we would measure</p><ul class="ul sm"><li>Time to a first draft</li><li>Requirements found and missed</li><li>Sizing match with the engineer's result</li><li>Proposal lines accepted without edits</li></ul></div>
+      <div class="card blk" style="flex:.9;display:grid;align-content:center;gap:10px"><p class="eyebrow">Shape</p><p class="sm">Fixed scope. One small joint team. Read-only access to start.</p><h3 style="font-size:25px;line-height:1.2">Which product should we start with?</h3></div>
+    </div>
+  </div>
+  <aside class="notes">End on the question. If they name a product, book the workshop before the call ends.</aside>
+</section>
+
+</main>
+
+<div class="pbar"><i id="prog"></i></div>
+<div class="hud" id="hud">
+  <button id="bPrev" type="button" aria-label="Previous slide">‹</button><span id="cnt">1 / 17</span><button id="bNext" type="button" aria-label="Next slide">›</button>
+  <button id="bNotes" type="button">Notes</button><button id="bMode" type="button">All slides</button><button id="bFull" type="button">Full screen</button>
+</div>
+<div class="np" id="np"></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+  var DEMO_URL = '';                       // paste the click-through link here to show a button on the demo slide
+  var body = document.body, root = document.documentElement;
+  var slides = [].slice.call(document.querySelectorAll('.slide'));
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var cur = 0, forced = null, mode = '', idleT = null, raf = null, live = [];
+  function $(id){ return document.getElementById(id); }
+
+  // slide chrome
+  slides.forEach(function(s, i){
+    var t = document.createElement('header'); t.className = 'top';
+    t.innerHTML = (s.classList.contains('dark') ? '<span class="wm" style="display:flex;align-items:center"><img class="wmi" src="logos/exiqo.png" alt="EXIQO"><em>the AI studio from RSI</em></span>' : '<span class="wm">EXIQO<i>™</i><em>the AI studio from RSI</em></span>') + '<span>' + (s.dataset.sec || '') + '</span>';
+    s.insertBefore(t, s.firstChild);
+    var p = document.createElement('span'); p.className = 'pg'; p.textContent = (i + 1 < 10 ? '0' : '') + (i + 1) + ' / ' + slides.length; s.appendChild(p);
+    var n = s.querySelector('aside.notes');
+    var o = document.createElement('div'); o.className = 'nout'; o.textContent = n ? n.textContent : ''; s.parentNode.insertBefore(o, s.nextSibling);
+  });
+
+  // title art: the nine stages as a trail
+  (function(){
+    var g = $('tnodes'), names = ['RFQ', 'qualify', 'spec', 'clarify', 'compose', 'size', 'cost', 'price', 'proposal'], NS = 'http://www.w3.org/2000/svg';
+    names.forEach(function(nm, k){
+      var x = 100 + k * 175, y = 770 - k * 12.5, grp = document.createElementNS(NS, 'g'); grp.setAttribute('class', 'tn'); grp.style.setProperty('--i', k);
+      var c = document.createElementNS(NS, 'circle'); c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', 11);
+      var t = document.createElementNS(NS, 'text'); t.setAttribute('x', x); t.setAttribute('y', y + 38); t.textContent = nm;
+      grp.appendChild(c); grp.appendChild(t); g.appendChild(grp);
+    });
+  })();
+
+  (function(){ var b = $('brands'); if(!b) return; for(var k = 0; k < 31; k++){ var i = document.createElement('i'); i.style.setProperty('--i', k); if(k === 30) i.textContent = '+'; b.appendChild(i); } })();
+
+  if(DEMO_URL){ var dl = $('demoLink'); dl.href = DEMO_URL; dl.style.display = 'inline'; $('demoHint').style.display = 'none'; }
+
+  function maxStep(s){
+    var m = +(s.dataset.steps || 0);
+    s.querySelectorAll('[data-f]').forEach(function(e){ m = Math.max(m, +e.dataset.f); });
+    return m;
+  }
+  function applyStep(s, k){
+    s.dataset.step = k;
+    s.querySelectorAll('[data-f]').forEach(function(e){ e.classList.toggle('on', +e.dataset.f <= k); });
+    s.querySelectorAll('[data-only]').forEach(function(e){ e.classList.toggle('on', +e.dataset.only === k); });
+    if(s.id === 's-arch') tokens(s, k);
+    s.querySelectorAll('.cu').forEach(function(e){ var f = e.closest('[data-f]'); if(mode === 'present' && f && +f.dataset.f === k) count(e); });
+  }
+  function count(e){
+    var to = +e.dataset.to, suf = e.dataset.suf || '', sep = e.dataset.sep, t0 = null;
+    function fmt(v){ v = Math.round(v); return (sep ? v.toLocaleString('en-US') : v) + suf; }
+    if(reduce){ e.textContent = fmt(to); return; }
+    function tick(ts){ if(!t0) t0 = ts; var p = Math.min(1, (ts - t0) / 900); e.textContent = fmt(to * (1 - Math.pow(1 - p, 3))); if(p < 1) requestAnimationFrame(tick); }
+    requestAnimationFrame(tick);
+  }
+
+  // moving dots on the architecture slide
+  function tokens(s, k){
+    var svg = s.querySelector('.arch'), layer = svg && svg.querySelector('#tokens'); if(!layer) return;
+    while(layer.firstChild) layer.removeChild(layer.firstChild); live = [];
+    if(mode !== 'present' || reduce || k < 1) return;
+    var sel = k >= 6 ? '.e' : '.e.g' + k;
+    svg.querySelectorAll(sel).forEach(function(p){
+      var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); c.setAttribute('r', 4.5); c.setAttribute('class', 'tok'); layer.appendChild(c);
+      live.push({p:p, c:c, len:p.getTotalLength()});
+    });
+    if(live.length && !raf) raf = requestAnimationFrame(move);
+  }
+  function move(ts){
+    live.forEach(function(o){ var d = Math.max(1100, o.len * 10), t = (ts % d) / d, pt = o.p.getPointAtLength(t * o.len); o.c.setAttribute('cx', pt.x); o.c.setAttribute('cy', pt.y); });
+    raf = (live.length && mode === 'present' && slides[cur].id === 's-arch') ? requestAnimationFrame(move) : null;
+  }
+
+  function show(i, atEnd){
+    i = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach(function(s, k){ s.classList.toggle('active', k === i); });
+    cur = i; var s = slides[i];
+    applyStep(s, atEnd ? maxStep(s) : 0);
+    if(mode === 'present') s.querySelectorAll('.cu').forEach(function(e){ if(!e.closest('[data-f]')) count(e); });
+    $('cnt').textContent = (i + 1) + ' / ' + slides.length;
+    $('prog').style.width = ((i + 1) / slides.length * 100) + '%';
+    var n = s.querySelector('aside.notes'); $('np').innerHTML = '<b>Notes</b>' + (n ? n.innerHTML : '');
+    try { history.replaceState(null, '', '#' + (i + 1)); } catch(e){}
+  }
+  function next(){ var s = slides[cur], k = +(s.dataset.step || 0); if(k < maxStep(s)) applyStep(s, k + 1); else if(cur < slides.length - 1) show(cur + 1); }
+  function prev(){ var s = slides[cur], k = +(s.dataset.step || 0); if(k > 0) applyStep(s, k - 1); else if(cur > 0) show(cur - 1, true); }
+
+  function setMode(m){
+    if(m === mode) return; mode = m;
+    body.classList.toggle('present', m === 'present'); body.classList.toggle('scroll', m === 'scroll');
+    $('bMode').textContent = m === 'present' ? 'All slides' : 'Present';
+    if(m === 'scroll'){ slides.forEach(function(s){ s.classList.add('active'); applyStep(s, maxStep(s)); }); }
+    else show(cur);
+  }
+  function fit(){
+    var w = window.innerWidth, h = window.innerHeight, phone = w < 820 && h > w;
+    setMode(forced || (phone ? 'scroll' : 'present'));
+    var sc = mode === 'present' ? Math.min(w / 1600, h / 900) : Math.min(1, root.clientWidth / 1600);
+    root.style.setProperty('--s', sc);
+  }
+  function toast(t){ var e = $('toast'); e.textContent = t; e.classList.add('on'); setTimeout(function(){ e.classList.remove('on'); }, 3200); }
+  function full(){
+    var el = root, req = el.requestFullscreen || el.webkitRequestFullscreen;
+    if(document.fullscreenElement || document.webkitFullscreenElement){ (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }
+    try { var r = req && req.call(el); if(r && r.catch) r.catch(function(){ toast('Full screen is blocked in this frame. Open the page in its own tab, then press F.'); }); if(!req) toast('Full screen is not available here.'); }
+    catch(e){ toast('Full screen is blocked in this frame. Open the page in its own tab, then press F.'); }
+  }
+  function names(){
+    var on = body.classList.toggle('named');
+    document.querySelectorAll('[data-name]').forEach(function(e){ if(!e.dataset.anon) e.dataset.anon = e.textContent; e.textContent = on ? e.dataset.name : e.dataset.anon; });
+    toast(on ? 'Client names shown' : 'Client names hidden');
+  }
+  function notes(){ body.classList.toggle('notes-on'); }
+  function wake(){ body.classList.remove('idle'); clearTimeout(idleT); idleT = setTimeout(function(){ body.classList.add('idle'); }, 2600); }
+
+  window.addEventListener('keydown', function(e){
+    if(e.metaKey || e.ctrlKey || e.altKey) return;
+    var k = e.key;
+    if(k === 'f' || k === 'F'){ full(); return; }
+    if(k === 'n' || k === 'N'){ names(); return; }
+    if(k === 'p' || k === 'P'){ notes(); return; }
+    if(mode !== 'present') return;
+    if(k === 'ArrowRight' || k === 'PageDown' || k === ' ' || k === 'Enter' || k === 'ArrowDown'){ e.preventDefault(); next(); }
+    else if(k === 'ArrowLeft' || k === 'PageUp' || k === 'Backspace' || k === 'ArrowUp'){ e.preventDefault(); prev(); }
+    else if(k === 'Home') show(0); else if(k === 'End') show(slides.length - 1, true);
+  });
+  $('deck').addEventListener('click', function(e){
+    var g = e.target.closest('[data-goto]');
+    if(g){ var t = slides.indexOf($(g.dataset.goto)); if(t >= 0){ if(mode === 'present') show(t); else slides[t].scrollIntoView({behavior: reduce ? 'auto' : 'smooth'}); } return; }
+    if(mode !== 'present' || e.target.closest('a,button')) return;
+    next();
+  });
+  var tx = null;
+  $('deck').addEventListener('touchstart', function(e){ tx = e.touches[0].clientX; }, {passive:true});
+  $('deck').addEventListener('touchend', function(e){ if(tx === null || mode !== 'present') return; var dx = e.changedTouches[0].clientX - tx; tx = null; if(Math.abs(dx) > 50){ e.preventDefault(); dx < 0 ? next() : prev(); } });
+  $('bNext').addEventListener('click', function(){ mode === 'present' ? next() : window.scrollBy(0, window.innerHeight * .8); });
+  $('bPrev').addEventListener('click', function(){ mode === 'present' ? prev() : window.scrollBy(0, -window.innerHeight * .8); });
+  $('bNotes').addEventListener('click', notes);
+  $('bFull').addEventListener('click', full);
+  $('bMode').addEventListener('click', function(){ forced = mode === 'present' ? 'scroll' : 'present'; fit(); if(mode === 'scroll') slides[cur].scrollIntoView(); });
+  window.addEventListener('mousemove', wake); window.addEventListener('resize', fit);
+
+  var h = parseInt((location.hash || '').replace('#', ''), 10); if(h >= 1 && h <= slides.length) cur = h - 1;
+  fit(); if(mode === 'present') show(cur); wake();
+})();
+</script>
+</body>
+</html>
